@@ -37,9 +37,9 @@ int main (int argc, char* argv [])
   manipServer.setProblemSolver (problemSolver);
 
   corbaServer.startCorbaServer ();
-  wbsServer.startCorbaServer ("hpp", "plannerContext",
-				"hpp", "wholebodyStep");
-  manipServer.startCorbaServer ("hpp", "plannerContext",
-				"hpp", "manipulation");
+  wbsServer.startCorbaServer ("hpp", "corbaserver",
+				"wholebodyStep", "robot");
+  manipServer.startCorbaServer ("hpp", "corbaserver",
+				"manipulation", "robot");
   corbaServer.processRequest(true);
 }

@@ -15,22 +15,22 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef HPP_MANIPULATION_CORBA_MANIPULATION_IMPL_HH
-# define HPP_MANIPULATION_CORBA_MANIPULATION_IMPL_HH
+#ifndef HPP_MANIPULATION_CORBA_ROBOT_IMPL_HH
+# define HPP_MANIPULATION_CORBA_ROBOT_IMPL_HH
 
 # include <hpp/corbaserver/manipulation/fwd.hh>
 # include <hpp/manipulation/problem-solver.hh>
-# include "manipulation.hh"
+# include "robot.hh"
 
 namespace hpp {
   namespace manipulation {
     namespace impl {
       using CORBA::Short;
 
-      class Manipulation : public virtual POA_hpp::Manipulation
+      class Robot : public virtual POA_hpp::corbaserver::manipulation::Robot
       {
       public:
-	Manipulation ();
+	Robot ();
 	void setProblemSolver (const ProblemSolverPtr_t& problemSolver)
 	{
 	  problemSolver_ = problemSolver;
@@ -71,4 +71,4 @@ namespace hpp {
   } // namespace manipulation
 } // namespace hpp
 
-#endif // HPP_MANIPULATION_MANIPULATION_IMPL_HH
+#endif // HPP_MANIPULATION_CORBA_ROBOT_IMPL_HH

@@ -19,13 +19,13 @@
 
 #include <hpp/util/exception.hh>
 #include <hpp/corbaserver/manipulation/server.hh>
-#include "manipulation.impl.hh"
+#include "robot.impl.hh"
 
 namespace hpp {
   namespace manipulation {
     Server::Server (int argc, char *argv[], bool multiThread,
 		    const std::string& poaName) : 
-      impl_ (new corba::Server <impl::Manipulation>
+      impl_ (new corba::Server <impl::Robot>
 	     (argc, argv, multiThread, poaName)) {}
     Server::~Server () 
     {delete impl_;

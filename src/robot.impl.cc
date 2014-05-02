@@ -18,16 +18,16 @@
 #include <hpp/util/debug.hh>
 #include <hpp/model/urdf/util.hh>
 #include <hpp/manipulation/object.hh>
-#include "manipulation.impl.hh"
+#include "robot.impl.hh"
 
 namespace hpp {
   namespace manipulation {
     namespace impl {
-      Manipulation::Manipulation () : problemSolver_ (0x0)
+      Robot::Robot () : problemSolver_ (0x0)
       {
       }
 
-      void Manipulation::loadRobotModel (const char* robotName,
+      void Robot::loadRobotModel (const char* robotName,
 					 const char* rootJointType,
 					 const char* packageName,
 					 const char* modelName,
@@ -51,7 +51,7 @@ namespace hpp {
 	}
       }
 
-      void Manipulation::loadHumanoidModel (const char* robotName,
+      void Robot::loadHumanoidModel (const char* robotName,
 					    const char* rootJointType,
 					    const char* packageName,
 					    const char* modelName,
@@ -75,7 +75,7 @@ namespace hpp {
 	}
       }
 
-      void Manipulation::loadObjectModel (const char* objectName,
+      void Robot::loadObjectModel (const char* objectName,
 					  const char* rootJointType,
 					  const char* packageName,
 					  const char* modelName,
@@ -99,7 +99,7 @@ namespace hpp {
 	}
       }
 
-      void Manipulation::buildCompositeRobot (const char* robotName,
+      void Robot::buildCompositeRobot (const char* robotName,
 					      const Names_t& robotNames)
 	throw (Error)
       {

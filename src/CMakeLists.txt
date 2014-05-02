@@ -17,7 +17,7 @@
 
 SET(LIBRARY_NAME ${PROJECT_NAME})
 SET(IDL_SOURCES
-  manipulation
+  robot
 )
 
 OMNIIDL_INCLUDE_DIRECTORIES(
@@ -32,12 +32,12 @@ FOREACH(IDL ${IDL_SOURCES})
 ENDFOREACH()
 
 ADD_LIBRARY(${LIBRARY_NAME} SHARED
-  manipulation.hh
-  manipulationSK.cc
-  manipulation.impl.cc
-  manipulation.impl.hh
+  robot.hh
+  robotSK.cc
+  robot.impl.cc
+  robot.impl.hh
   server.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/manipulation_idl.py
+  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/robot_idl.py
 )
 
 PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation)
@@ -53,19 +53,18 @@ FOREACH (IDL ${IDL_SOURCES})
     OUTPUT
     ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}_idl.py
     COMMAND ${OMNIIDL}
-    ARGS -bpython -Wbpackage="hpp.corbaserver.manipulation"
-    -I${CMAKE_SOURCE_DIR}/idl
+    ARGS -bpython -Wbpackage="" -I${CMAKE_SOURCE_DIR}/idl
     ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation/${IDL}.idl
     MAIN_DEPENDENCY
     ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation/${IDL}.idl
     )
   SET_SOURCE_FILES_PROPERTIES(
-    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}_idl.py
+    ${CMAKE_CURRENT_BINARY_DIR}/${IDL}_idl.py
     GENERATED=ON
     )
   INSTALL(
     FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}_idl.py
+    ${CMAKE_CURRENT_BINARY_DIR}/${IDL}_idl.py
     DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
     )
 ENDFOREACH()
@@ -73,16 +72,6 @@ INSTALL(
   FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/__init__.py
   DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
-  )
-INSTALL(
-  FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/hpp/__init__.py
-  DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation/hpp
-  )
-INSTALL(
-  FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/hpp__POA/__init__.py
-  DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation/hpp__POA
   )
 INSTALL(
   FILES

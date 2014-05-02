@@ -15,8 +15,8 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef HPP_MANIPULATION_CORBA_SERVER_IDL
-# define HPP_MANIPULATION_CORBA_SERVER_IDL
+#ifndef HPP_MANIPULATION_CORBA_ROBOT_IDL
+# define HPP_MANIPULATION_CORBA_ROBOT_IDL
 
 module hpp
 {
@@ -28,12 +28,14 @@ module hpp
     string msg;
   };
 
-  interface Manipulation
+  module corbaserver {
+  module manipulation {
+  interface Robot
   {
     ///  Load robot model and store in local map
     ///
-    /// \param robotName Name of the robot in ProblemSolver object
-    ///        (see hpp::Manipulation::ProblemSolver::addRobot)
+    /// \param robotName key of the robot in ProblemSolver object map
+    ///        (see hpp::manipulation::ProblemSolver::addRobot)
     /// \param rootJointType type of root joint among "anchor", "freeflyer",
     /// "planar",
     /// \param packageName Name of the ROS package containing the model,
@@ -51,8 +53,8 @@ module hpp
 
     ///  Load humanoid robot model and store in local map
     ///
-    /// \param robotName Name of the robot in ProblemSolver object
-    ///        (see hpp::Manipulation::ProblemSolver::addRobot)
+    /// \param robotName key of the robot in ProblemSolver object map
+    ///        (see hpp::manipulation::ProblemSolver::addRobot)
     /// \param rootJointType type of root joint among "anchor", "freeflyer",
     /// "planar",
     /// \param packageName Name of the ROS package containing the model,
@@ -70,8 +72,8 @@ module hpp
 
     ///  Load object model and store in local map
     ///
-    /// \param objectName Name of the robot in ProblemSolver object
-    ///        (see hpp::Manipulation::ProblemSolver::addRobot)
+    /// \param robotName key of the object in ProblemSolver object map
+    ///        (see hpp::manipulation::ProblemSolver::addRobot)
     /// \param rootJointType type of root joint among "anchor", "freeflyer",
     /// "planar",
     /// \param packageName Name of the ROS package containing the model,
@@ -93,7 +95,9 @@ module hpp
     /// \param robotNames list of names of the robots and objects.
     void buildCompositeRobot (in string robotName, in Names_t robotNames)
       raises (Error);
-  }; // interface Manipulation
+  }; // interface Robot
+  }; // module manipulation
+  }; // module corbaserver
 }; // module hpp
 
-#endif // HPP_MANIPULATION_CORBA_SERVER_IDL
+#endif // HPP_MANIPULATION_CORBA_ROBOT_IDL
