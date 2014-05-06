@@ -115,6 +115,8 @@ INSTALL(
 INSTALL(
   FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/client.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/srdf_parser.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/problem_solver.py
   DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
   )
 

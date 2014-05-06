@@ -65,7 +65,7 @@ namespace hpp {
 	  throw (hpp::Error);
 
 
-	virtual void addHandle (const char* objectName, const char* jointName,
+	virtual void addHandle (const char* objectName, const char* linkName,
 				const char* handleName,
 				const ::hpp::Transform localPosition)
 	  throw (hpp::Error);

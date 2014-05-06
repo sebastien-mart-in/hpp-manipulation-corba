@@ -95,10 +95,10 @@ module hpp
     /// Add Handle to an object
     ///
     /// \param objectName name of the object holding the handle,
-    /// \param jointName name of the joint holding the handle,
+    /// \param linkName name of the link (hpp::model::Body) holding the handle,
     /// \param handleName name of the handle,
     /// \param localPosition position of the handle in the joint frame.
-    void addHandle (in string objectName, in string jointName,
+    void addHandle (in string objectName, in string linkName,
 		    in string handleName, in Transform localPosition)
       raises (Error);
   }; // interface Robot

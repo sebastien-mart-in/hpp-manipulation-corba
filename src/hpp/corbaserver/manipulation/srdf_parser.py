@@ -30,10 +30,11 @@ class Parser (object):
     """
     Parser of srdf file that looks for object handles.
     """
-    def __init__ (self, client, filename):
+    def __init__ (self, client, objectName, filename):
         """
         Constructor takes a client to hpp-manipulation corba server.
         """
+        self.objectName = objectName
         self.filename
         self.client = client
         self.tree = parse (filename)
@@ -62,4 +63,7 @@ class Parser (object):
             link = links [0]
             linkName = link.attributes ['name'].nodeValue
 
-            client.addHandle (self.objectName, )
+            client.addHandle (self.objectName, linkName, localPosition)
+
+    def parse (self):
+        self.parseHandles ()

@@ -114,14 +114,14 @@ namespace hpp {
 	  throw Error (exc.what ());
 	}
       }
-      void Robot::addHandle (const char* objectName, const char* jointName,
+      void Robot::addHandle (const char* objectName, const char* linkName,
 			     const char* handleName,
 			     const ::hpp::Transform localPosition)
 	throw (hpp::Error)
       {
 	try {
 	  ObjectPtr_t object = problemSolver_->object (objectName);
-	  JointPtr_t joint = object->getJointByName (jointName);
+	  JointPtr_t joint = object->getJointByBodyName (linkName);
 	  Object::Handle handle;
 	  handle.name = handleName;
 	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
@@ -130,6 +130,7 @@ namespace hpp {
 			 localPosition [2]);
 	  handle.localPosition = Transform3f (q, v);
 	  object->addHandle (handle);
+	  hppDout (info, *object);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
