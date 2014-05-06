@@ -15,6 +15,7 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include <fcl/math/transform.h>
 #include <hpp/util/debug.hh>
 #include <hpp/model/urdf/util.hh>
 #include <hpp/manipulation/object.hh>
@@ -113,6 +114,27 @@ namespace hpp {
 	  throw Error (exc.what ());
 	}
       }
+      void Robot::addHandle (const char* objectName, const char* jointName,
+			     const char* handleName,
+			     const ::hpp::Transform localPosition)
+	throw (hpp::Error)
+      {
+	try {
+	  ObjectPtr_t object = problemSolver_->object (objectName);
+	  JointPtr_t joint = object->getJointByName (jointName);
+	  Object::Handle handle;
+	  handle.name = handleName;
+	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
+			       localPosition [5], localPosition [6]);
+	  fcl::Vec3f v (localPosition [0], localPosition [1],
+			 localPosition [2]);
+	  handle.localPosition = Transform3f (q, v);
+	  object->addHandle (handle);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

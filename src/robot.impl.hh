@@ -64,7 +64,12 @@ namespace hpp {
 					  const hpp::Names_t& robotNames)
 	  throw (hpp::Error);
 
-      private:
+
+	virtual void addHandle (const char* objectName, const char* jointName,
+				const char* handleName,
+				const ::hpp::Transform localPosition)
+	  throw (hpp::Error);
+private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Problem
     } // namespace impl

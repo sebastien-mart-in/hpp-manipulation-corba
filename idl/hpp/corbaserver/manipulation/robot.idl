@@ -18,15 +18,11 @@
 #ifndef HPP_MANIPULATION_CORBA_ROBOT_IDL
 # define HPP_MANIPULATION_CORBA_ROBOT_IDL
 
+# include <hpp/corbaserver/common.idl>
+
 module hpp
 {
   typedef sequence <string> Names_t;
-
-  /// Corba exception travelling through the Corba channel
-  exception Error
-  {
-    string msg;
-  };
 
   module corbaserver {
   module manipulation {
@@ -94,6 +90,16 @@ module hpp
     /// \param robotName Name of the composite robot,
     /// \param robotNames list of names of the robots and objects.
     void buildCompositeRobot (in string robotName, in Names_t robotNames)
+      raises (Error);
+
+    /// Add Handle to an object
+    ///
+    /// \param objectName name of the object holding the handle,
+    /// \param jointName name of the joint holding the handle,
+    /// \param handleName name of the handle,
+    /// \param localPosition position of the handle in the joint frame.
+    void addHandle (in string objectName, in string jointName,
+		    in string handleName, in Transform localPosition)
       raises (Error);
   }; // interface Robot
   }; // module manipulation

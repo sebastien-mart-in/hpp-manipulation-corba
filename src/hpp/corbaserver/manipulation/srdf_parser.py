@@ -62,4 +62,4 @@ class Parser (object):
             link = links [0]
             linkName = link.attributes ['name'].nodeValue
 
-
+            client.addHandle (self.objectName, )
