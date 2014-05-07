@@ -29,7 +29,7 @@
 /// class:
 ///   \li hpp::manipulation::Server.
 /// The corba services provided by the library are described in interface
-///   \li hpp::Manipulation.
+///   \li hpp::corbaserver::manipulation::Robot.
 ///
 /// The client part is provided through python module
 /// \c hpp.corbaserver.manipulation
