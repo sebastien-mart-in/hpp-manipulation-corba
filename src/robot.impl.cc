@@ -95,6 +95,7 @@ namespace hpp {
 				       std::string (srdfSuffix));
 	  // Add device to the planner
 	  problemSolver_->addObject (objectName, object);
+	  hppDout (info, *object);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}

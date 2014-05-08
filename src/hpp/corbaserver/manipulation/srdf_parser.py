@@ -35,7 +35,7 @@ class Parser (object):
         Constructor takes a client to hpp-manipulation corba server.
         """
         self.objectName = objectName
-        self.filename
+        self.filename = filename
         self.client = client
         self.tree = parse (filename)
 
@@ -47,7 +47,7 @@ class Parser (object):
         robotElement = nodeList [0]
         handles = robotElement.getElementsByTagName ('handle')
         for h in handles:
-            name = h.attributes ['name'].nodeValue
+            handleName = str (h.attributes ['name'].nodeValue)
             localPositions = h.getElementsByTagName ('local_position')
             if not localPositions.length is 1:
                 raise RuntimeError ('expected 1 tag "local_position", ' +
@@ -61,9 +61,10 @@ class Parser (object):
                 raise RuntimeError ('expected 1 tag "link", ' +
                                     'but found %i.'%links.length)
             link = links [0]
-            linkName = link.attributes ['name'].nodeValue
+            linkName = str (link.attributes ['name'].nodeValue)
 
-            client.addHandle (self.objectName, linkName, localPosition)
+            self.client.robot.addHandle (self.objectName, linkName, handleName,
+                                         localPosition)
 
     def parse (self):
         self.parseHandles ()

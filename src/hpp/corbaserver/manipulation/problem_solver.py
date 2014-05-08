@@ -110,7 +110,7 @@ class ProblemSolver (object):
         if not path:
             raise IOError ("package " + packageName + " not found")
         filename = path + '/' + 'srdf/' + modelName + srdfSuffix + '.srdf'
-        parser = SrdfParser (client, objectName, filename)
+        parser = SrdfParser (self.client, objectName, filename)
         parser.parse ()
 
     def buildCompositeRobot (self, robotName, robotNames):
