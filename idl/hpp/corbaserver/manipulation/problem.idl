@@ -1,0 +1,47 @@
+// Copyright (c) 2014 CNRS
+// Author: Florent Lamiraux
+//
+// This file is part of hpp-manipulation-corba.
+// hpp-manipulation-corba is free software: you can redistribute it
+// and/or modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation, either version
+// 3 of the License, or (at your option) any later version.
+//
+// hpp-manipulation-corba is distributed in the hope that it will be
+// useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Lesser Public License for more details.  You should have
+// received a copy of the GNU Lesser General Public License along with
+// hpp-manipulation-corba.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+#ifndef HPP_MANIPULATION_CORBA_ROBOT_IDL
+# define HPP_MANIPULATION_CORBA_ROBOT_IDL
+
+# include <hpp/corbaserver/common.idl>
+
+module hpp
+{
+  module corbaserver {
+    module manipulation {
+      interface Problem
+      {
+	/// Create grasp constraint between robot effector and object handle
+	///
+	/// \param graspName name of the constraint for storing in a map,
+	/// \param jointName name of the joint in the form "robot/joint" where
+	/// robot is the name of the Device owning the joint and joint is the
+	/// name of the joint in the Device,
+	/// \param handleName name of the handle in the form "object/handle"
+	/// where object is the name of the object owning the handle and handle
+	/// is the name of the handle in this object.
+	void createGrasp (in string graspName, in string jointName,
+			  in string handleName,
+			  in Transform handlePositioninJoint)
+	  raises (Error);
+      }; // interface Robot
+    }; // module manipulation
+  }; // module corbaserver
+}; // module hpp
+
+#endif // HPP_MANIPULATION_CORBA_ROBOT_IDL

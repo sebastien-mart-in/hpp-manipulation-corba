@@ -19,32 +19,43 @@
 
 #include <hpp/util/exception.hh>
 #include <hpp/corbaserver/manipulation/server.hh>
+#include "problem.impl.hh"
 #include "robot.impl.hh"
 
 namespace hpp {
   namespace manipulation {
     Server::Server (int argc, char *argv[], bool multiThread,
 		    const std::string& poaName) : 
-      impl_ (new corba::Server <impl::Robot>
-	     (argc, argv, multiThread, poaName)) {}
+      problemImpl_ (new corba::Server <impl::Problem>
+		    (argc, argv, multiThread, poaName)),
+      robotImpl_ (new corba::Server <impl::Robot>
+		  (argc, argv, multiThread, poaName)) {}
     Server::~Server () 
-    {delete impl_;
+    {
+      delete problemImpl_;
+      delete robotImpl_;
     }
     
     void Server::setProblemSolver (ProblemSolverPtr_t problemSolver)
     {
-      impl_->implementation ().setProblemSolver (problemSolver);
+      problemImpl_->implementation ().setProblemSolver (problemSolver);
+      robotImpl_->implementation ().setProblemSolver (problemSolver);
     }
 
     /// Start corba server
     void Server::startCorbaServer(const std::string& contextId,
 				  const std::string& contextKind,
-				  const std::string& objectId,
-				  const std::string& objectKind)
+				  const std::string& objectId)
     {
-      if (impl_->startCorbaServer(contextId, contextKind, objectId, objectKind)
-	  != 0) {
-	HPP_THROW_EXCEPTION (hpp::Exception, "Failed to start corba server.");
+      if (robotImpl_->startCorbaServer(contextId, contextKind,
+				       objectId, "robot") != 0) {
+	HPP_THROW_EXCEPTION (hpp::Exception,
+			     "Failed to start corba robot server.");
+      }
+      if (problemImpl_->startCorbaServer(contextId, contextKind,
+					 objectId, "problem") != 0) {
+	HPP_THROW_EXCEPTION (hpp::Exception,
+			     "Failed to start corba problem server.");
       }
     }
   } // namespace manipulation

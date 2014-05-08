@@ -17,6 +17,7 @@
 
 SET(LIBRARY_NAME ${PROJECT_NAME})
 SET(IDL_SOURCES
+  problem
   robot
 )
 
@@ -44,13 +45,18 @@ ENDFOREACH()
 ADD_LIBRARY(${LIBRARY_NAME} SHARED
   common.hh
   commonSK.cc
+  problem.hh
+  problemSK.cc
+  problem.impl.cc
+  problem.impl.hh
   robot.hh
   robotSK.cc
   robot.impl.cc
   robot.impl.hh
   server.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/robot_idl.py
   ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/common_idl.py
+  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/problem_idl.py
+  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/robot_idl.py
 )
 
 PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation)
@@ -117,6 +123,7 @@ INSTALL(
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/client.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/srdf_parser.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/problem_solver.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/robot.py
   DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
   )
 

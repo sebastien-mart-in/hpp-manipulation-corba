@@ -124,6 +124,7 @@ namespace hpp {
 	  ObjectPtr_t object = problemSolver_->object (objectName);
 	  JointPtr_t joint = object->getJointByBodyName (linkName);
 	  Object::Handle handle;
+	  handle.joint = joint;
 	  handle.name = handleName;
 	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
 			       localPosition [5], localPosition [6]);

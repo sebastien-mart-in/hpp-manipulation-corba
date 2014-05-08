@@ -40,6 +40,6 @@ int main (int argc, char* argv [])
   wbsServer.startCorbaServer ("hpp", "corbaserver",
 				"wholebodyStep", "robot");
   manipServer.startCorbaServer ("hpp", "corbaserver",
-				"manipulation", "robot");
+				"manipulation");
   corbaServer.processRequest(true);
 }

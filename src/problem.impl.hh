@@ -15,65 +15,39 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef HPP_MANIPULATION_CORBA_ROBOT_IMPL_HH
-# define HPP_MANIPULATION_CORBA_ROBOT_IMPL_HH
+#ifndef HPP_MANIPULATION_CORBA_PROBLEM_IMPL_HH
+# define HPP_MANIPULATION_CORBA_PROBLEM_IMPL_HH
 
 # include <hpp/corbaserver/manipulation/fwd.hh>
+# include <hpp/manipulation/constraint-builder.hh>
 # include <hpp/manipulation/problem-solver.hh>
-# include "robot.hh"
+# include "problem.hh"
 
 namespace hpp {
   namespace manipulation {
     namespace impl {
       using CORBA::Short;
 
-      class Robot : public virtual POA_hpp::corbaserver::manipulation::Robot
+      class Problem : public virtual POA_hpp::corbaserver::manipulation::Problem
       {
       public:
-	Robot ();
+	Problem ();
 	void setProblemSolver (const ProblemSolverPtr_t& problemSolver)
 	{
 	  problemSolver_ = problemSolver;
 	}
 
-	virtual void loadRobotModel (const char* robotName,
-				     const char* rootJointType,
-				     const char* packageName,
-				     const char* modelName,
-				     const char* urdfSuffix,
-				     const char* srdfSuffix)
-	  throw (hpp::Error);
-
-	virtual void loadHumanoidModel (const char* robotName,
-					const char* rootJointType,
-					const char* packageName,
-					const char* modelName,
-					const char* urdfSuffix,
-					const char* srdfSuffix)
-	  throw (hpp::Error);
-
-	virtual void loadObjectModel (const char* objectName,
-				      const char* rootJointType,
-				      const char* packageName,
-				      const char* modelName,
-				      const char* urdfSuffix,
-				      const char* srdfSuffix)
-	  throw (hpp::Error);
-
-	virtual void buildCompositeRobot (const char* robotName,
-					  const hpp::Names_t& robotNames)
-	  throw (hpp::Error);
-
-
-	virtual void addHandle (const char* objectName, const char* linkName,
-				const char* handleName,
-				const ::hpp::Transform localPosition)
+	virtual void createGrasp (const char* graspName,
+				  const char* jointName,
+				  const char* handleName,
+				  const CORBA::Double* handlePositioninJoint)
 	  throw (hpp::Error);
 private:
 	ProblemSolverPtr_t problemSolver_;
-      }; // class Robot
+	ConstraintBuilder constraintBuilder_;
+      }; // class Problem
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp
 
-#endif // HPP_MANIPULATION_CORBA_ROBOT_IMPL_HH
+#endif // HPP_MANIPULATION_CORBA_PROBLEM_IMPL_HH

@@ -20,7 +20,7 @@
 from omniORB import CORBA
 import CosNaming
 
-from hpp.corbaserver.manipulation import Robot
+from hpp.corbaserver.manipulation import Robot, Problem
 
 class CorbaError(Exception):
     """
@@ -46,6 +46,26 @@ class Client:
     if self.rootContext is None:
         raise CorbaError ('failed to narrow the root context')
 
+    # client of Problem interface
+    name = [CosNaming.NameComponent ("hpp", "corbaserver"),
+            CosNaming.NameComponent ("manipulation", "problem")]
+    
+    try:
+        obj = self.rootContext.resolve (name)
+    except CosNaming.NamingContext.NotFound, ex:
+        raise CorbaError ('failed to find manipulation service.')
+    try:
+        client = obj._narrow (Problem)
+    except KeyError:
+        raise CorbaError ('invalid service name manipulation')
+
+    if client is None:
+      # This happens when stubs from client and server are not synchronized.
+        raise CorbaError (
+            'failed to narrow client for service manipulation')
+    self.problem = client
+
+    # client of Robot interface
     name = [CosNaming.NameComponent ("hpp", "corbaserver"),
             CosNaming.NameComponent ("manipulation", "robot")]
     
@@ -63,3 +83,4 @@ class Client:
         raise CorbaError (
             'failed to narrow client for service manipulation')
     self.robot = client
+

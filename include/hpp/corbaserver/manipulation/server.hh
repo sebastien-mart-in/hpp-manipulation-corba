@@ -27,6 +27,7 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      class Problem;
       class Robot;
     }
     class HPP_MANIPULATION_CORBA_DLLAPI Server
@@ -43,10 +44,10 @@ namespace hpp {
       /// Call hpp::corba::Server <impl::Problem>::startCorbaServer
       void startCorbaServer(const std::string& contextId,
 			    const std::string& contextKind,
-			    const std::string& objectId,
-			    const std::string& objectKind);
+			    const std::string& objectId);
     private:
-      corba::Server <impl::Robot>* impl_;
+      corba::Server <impl::Problem>* problemImpl_;
+      corba::Server <impl::Robot>* robotImpl_;
     }; // class Server
   } // namespace manipulation
 } // namespace hpp
