@@ -49,39 +49,9 @@ namespace hpp {
 	  fcl::Vec3f v (handlePositioninJoint [0], handlePositioninJoint [1],
 			handlePositioninJoint [2]);
 	  GraspPtr_t grasp = Grasp::create (joint, handle, Transform3f (q, v));
-	  NumericalConstraintPtr_t constraint = constraintBuilder_
+	  DifferentiableFunctionPtr_t constraint = constraintBuilder_
 	    (robot, grasp);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
-	} catch (const std::exception& exc) {
-	  throw Error (exc.what ());
-	}
-      }
-
-      void Problem::addNumericalConstraints
-      (const char* constraintName, const Names_t& constraintNames)
-	throw (Error)
-      {
-	try {
-	  const ConstraintSetPtr_t& constraints
-	    (problemSolver_->constraints ());
-	  const DevicePtr_t& robot (problemSolver_->robot ());
-	  if (!robot) {
-	    throw Error ("You should set the robot before defining"
-			 " constraints.");
-	  }
-	  ConfigProjectorPtr_t  configProjector =
-	    constraints->configProjector ();
-	  if (!configProjector) {
-	    configProjector = ConfigProjector::create
-	      (robot, constraintName, problemSolver_->errorThreshold (),
-	       problemSolver_->maxIterations ());
-	    constraints->addConstraint (configProjector);
-	  }
-	  for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
-	    std::string name (constraintNames [i]);
-	    configProjector->addConstraint (problemSolver_->numericalConstraint
-					    (name));
-	  }
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
