@@ -42,7 +42,10 @@ namespace hpp {
 				  const char* handleName,
 				  const CORBA::Double* handlePositioninJoint)
 	  throw (hpp::Error);
-private:
+	virtual void addNumericalConstraints
+	(const char* constraintName, const hpp::Names_t& constraintNames)
+	  throw (Error);
+      private:
 	ProblemSolverPtr_t problemSolver_;
 	ConstraintBuilder constraintBuilder_;
       }; // class Problem

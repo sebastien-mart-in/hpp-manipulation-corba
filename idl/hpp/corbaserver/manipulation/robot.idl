@@ -22,8 +22,6 @@
 
 module hpp
 {
-  typedef sequence <string> Names_t;
-
   module corbaserver {
   module manipulation {
   interface Robot

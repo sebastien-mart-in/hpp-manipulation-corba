@@ -39,6 +39,13 @@ module hpp
 			  in string handleName,
 			  in Transform handlePositioninJoint)
 	  raises (Error);
+
+	/// Add numerical constraints by names
+	/// \param constraintName Name of the set of numerical constraint,
+	/// \param constraintNames names of the constraints to apply,
+	void addNumericalConstraints (in string constraintName,
+				      in Names_t constraintNames)
+	  raises (Error);
       }; // interface Robot
     }; // module manipulation
   }; // module corbaserver

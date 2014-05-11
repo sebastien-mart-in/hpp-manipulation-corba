@@ -15,6 +15,8 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include <hpp/core/constraint-set.hh>
+#include <hpp/core/config-projector.hh>
 #include <hpp/manipulation/robot.hh>
 #include <hpp/manipulation/object.hh>
 #include "problem.impl.hh"
@@ -50,6 +52,36 @@ namespace hpp {
 	  NumericalConstraintPtr_t constraint = constraintBuilder_
 	    (robot, grasp);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      void Problem::addNumericalConstraints
+      (const char* constraintName, const Names_t& constraintNames)
+	throw (Error)
+      {
+	try {
+	  const ConstraintSetPtr_t& constraints
+	    (problemSolver_->constraints ());
+	  const DevicePtr_t& robot (problemSolver_->robot ());
+	  if (!robot) {
+	    throw Error ("You should set the robot before defining"
+			 " constraints.");
+	  }
+	  ConfigProjectorPtr_t  configProjector =
+	    constraints->configProjector ();
+	  if (!configProjector) {
+	    configProjector = ConfigProjector::create
+	      (robot, constraintName, problemSolver_->errorThreshold (),
+	       problemSolver_->maxIterations ());
+	    constraints->addConstraint (configProjector);
+	  }
+	  for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
+	    std::string name (constraintNames [i]);
+	    configProjector->addConstraint (problemSolver_->numericalConstraint
+					    (name));
+	  }
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}

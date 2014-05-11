@@ -27,6 +27,10 @@ namespace hpp {
     namespace impl {
       typedef manipulation::ProblemSolver ProblemSolver;
       class Server;
+      typedef core::ConstraintSet ConstraintSet;
+      typedef core::ConstraintSetPtr_t ConstraintSetPtr_t;
+      typedef core::ConfigProjector ConfigProjector;
+      typedef core::ConfigProjectorPtr_t ConfigProjectorPtr_t;
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp
