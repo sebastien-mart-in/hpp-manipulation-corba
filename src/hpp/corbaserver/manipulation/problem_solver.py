@@ -45,3 +45,15 @@ class ProblemSolver (object):
         """
         self.client.manipulation.problem.createGrasp \
             (graspName, jointName, handleName, handlePositioninJoint)
+
+    def createStaticStabilityConstraints (self, constraintName, q0):
+        self.client.wholebodyStep.problem.addStaticStabilityConstraints \
+            (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle)
+        self.balanceConstraints = [constraintName + "/relative-com",
+                                   constraintName + "/relative-orientation",
+                                   constraintName + "/relative-position",
+                                   constraintName + "/orientation-left-foot",
+                                   constraintName + "/position-left-foot"]
+
+    def balanceConstraints (self):
+        return self.balanceConstraints
