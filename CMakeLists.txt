@@ -43,6 +43,7 @@ IF (HPP_DEBUG)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHPP_DEBUG")
 ENDIF()
 
+ADD_DOC_DEPENDENCY("hpp-core >= 3")
 ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
 ADD_REQUIRED_DEPENDENCY("hpp-wholebody-step-corba >= 3 ")
 ADD_REQUIRED_DEPENDENCY("hpp-manipulation")

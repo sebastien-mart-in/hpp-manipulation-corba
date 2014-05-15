@@ -52,7 +52,7 @@
 ///     to launch \c hpp-manipulation-server executable,
 ///     open a python terminal and type:
 ///     \code
-///     from hpp.corbaserver.manipulation.client import Client as ManipulationClient
+///     from hpp.corbaserver.manipulation import Client as ManipulationClient
 ///     mcl = ManipulationClient ()
 ///     \endcode
 /// Then variable mcl contains a member \c problem that can send
@@ -64,7 +64,16 @@
 ///                                    "_capsule", "_capsule")
 ///     \endcode
 ///
-/// \section how_to_embed How to embed a server in an application
+/// Some python classes are provided that embed corba clients and
+/// that forward corba resquest to the server side:
+///   \li manipulation.robot.Robot to load and handle a manipulation robot,x
+///   \li manipulation.robot.HumanoidRobot to load and handle a manipulation
+///       robot, containing a humanoid robot at first place,
+///   \li manipulation.problem_solver.ProblemSolver to set and solve a
+///       manipulation planning problem.
+///
+/// \section hpp_manipulation_corba_how_to_embed \
+/// How to embed a server in an application
 ///
 /// Embedding the corba server into an application can be done by linking the
 /// application with \c libhpp-manipulation-corba.so in a similar way as

@@ -22,6 +22,8 @@ from hpp.corbaserver import Client as BasicClient
 
 from srdf_parser import Parser as SrdfParser
 
+## Corba clients to the various servers
+#
 class CorbaClient:
     """
     Container for corba clients to various interfaces.
@@ -31,87 +33,73 @@ class CorbaClient:
         self.manipulation = ManipulationClient ()
         self.wholebodyStep = WholebodyStepClient ()
 
+## Load and handle a composite robot for manipulation planning
 class Robot (object):
-    """
-    Helper class to enhance corba interface
-    """
     def __init__ (self, robotName, rootJointType):
         self.robotName = robotName
         self.client = CorbaClient ()
         self.loadModel (robotName, rootJointType)
 
+    ## Virtual function to load the robot model
     def loadModel (self, robotName, rootJointType):
-        """
-        Virtual function to load robot model
-
-          Overloaded in HumanoidRobot class
-        """
         self.client.manipulation.robot.loadRobotModel \
             (robotName, rootJointType, self.packageName, self.urdfName,
              self.urdfSuffix, self.srdfSuffix)
 
+    ## Load robot model and store in local map
+    #
+    #  \param robotName key of the robot in manipulation::ProblemSolver object
+    #         map (see manipulation::ProblemSolver::addRobot)
+    #  \param rootJointType type of root joint among "anchor", "freeflyer",
+    #         "planar",
+    #  \param packageName Name of the ROS package containing the model,
+    #  \param modelName Name of the package containing the model
+    #  \param urdfSuffix suffix for urdf file,
+    #
+    #  The ros url are built as follows:
+    #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
+    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
     def loadRobotModel (self, robotName, rootJointType, packageName, modelName,
                         urdfSuffix, srdfSuffix):
-
-        """
-        Load robot model and store in local map
-
-        input robotName key of the robot in ProblemSolver object map
-              (see hpp::manipulation::ProblemSolver::addRobot)
-        input rootJointType type of root joint among "anchor", "freeflyer",
-              "planar",
-        input packageName Name of the ROS package containing the model,
-        input modelName Name of the package containing the model
-        input urdfSuffix suffix for urdf file,
-
-        The ros url are built as follows:
-        "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-        "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-
-        """
         self.client.manipulation.robot.loadRobotModel (robotName, rootJointType,
                                                        packageName, modelName,
                                                        urdfSuffix, srdfSuffix)
 
+    ## Load humanoid robot model and store in local map
+    #
+    #  \param robotName key of the robot in ProblemSolver object map
+    #         (see manipulation::ProblemSolver::addRobot)
+    #  \param rootJointType type of root joint among "anchor", "freeflyer",
+    #         "planar",
+    #  \param packageName Name of the ROS package containing the model,
+    #  \param modelName Name of the package containing the model
+    #  \param urdfSuffix suffix for urdf file,
+    #
+    #  The ros url are built as follows:
+    #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
+    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
     def loadHumanoidModel (self, robotName, rootJointType, packageName,
                            modelName, urdfSuffix, srdfSuffix):
-        """
-        Load humanoid robot model and store in local map
-
-        input robotName key of the robot in ProblemSolver object map
-              (see hpp::manipulation::ProblemSolver::addRobot)
-        input rootJointType type of root joint among "anchor", "freeflyer",
-              "planar",
-        input packageName Name of the ROS package containing the model,
-        input modelName Name of the package containing the model
-        input urdfSuffix suffix for urdf file,
-
-        The ros url are built as follows:
-        "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-        "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-        """
         self.client.manipulation.robot.loadHumanoidModel \
             (robotName, rootJointType, packageName, modelName,
              urdfSuffix, srdfSuffix)
 
+    ## Load object model and store in local map
+    #
+    #  \param robotName key of the object in ProblemSolver object map
+    #         (see manipulation::ProblemSolver::addRobot)
+    #  \param rootJointType type of root joint among "anchor", "freeflyer",
+    #         "planar",
+    #  \param packageName Name of the ROS package containing the model,
+    #  \param modelName Name of the package containing the model
+    #  \param urdfSuffix suffix for urdf file,
+    #
+    #  The ros url are built as follows:
+    #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
+    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
     def loadObjectModel (self, objectName, rootJointType,
                          packageName, modelName,
                          urdfSuffix, srdfSuffix):
-        """
-        Load object model and store in local map
-
-        input robotName key of the object in ProblemSolver object map
-              (see hpp::manipulation::ProblemSolver::addRobot)
-        input rootJointType type of root joint among "anchor", "freeflyer",
-              "planar",
-        input packageName Name of the ROS package containing the model,
-        input modelName Name of the package containing the model
-        input urdfSuffix suffix for urdf file,
-
-        The ros url are built as follows:
-        "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-        "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-        """
         self.client.manipulation.robot.loadObjectModel \
             (objectName, rootJointType, packageName, modelName, urdfSuffix,
              srdfSuffix)
@@ -130,13 +118,11 @@ class Robot (object):
         parser = SrdfParser (self.client.manipulation, objectName, filename)
         parser.parse ()
 
+    ## Build a composite robot from a set of robots and objects
+    #
+    #  \param robotName Name of the composite robot,
+    #  \param robotNames list of names of the robots and objects.
     def buildCompositeRobot (self, robotName, robotNames):
-        """
-        Build a composite robot from a set of robots and objects
-
-        input robotName Name of the composite robot,
-        input robotNames list of names of the robots and objects.
-        """
         self.client.manipulation.robot.buildCompositeRobot (robotName,
                                                             robotNames)
         self.jointNames = self.client.basic.robot.getJointNames ()
@@ -150,12 +136,10 @@ class Robot (object):
             self.rankInVelocity [j] = rankInVelocity
             rankInVelocity += self.client.basic.robot.getJointNumberDof (j)
 
+    ## Set bounds on the translation part of the freeflyer joint.
+    #
+    #  Valid only if the robot has a freeflyer joint.
     def setTranslationBounds (self, xmin, xmax, ymin, ymax, zmin, zmax):
-        """
-        Set bounds on the translation part of the freeflyer joint.
-
-          Valid only if the robot has a freeflyer joint.
-        """
         self.client.basic.robot.setJointBounds (self.robotName + "base_joint_x",
                                                 [xmin, xmax])
         self.client.basic.robot.setJointBounds (self.robotName + "base_joint_y",

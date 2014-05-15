@@ -19,6 +19,14 @@
 
 from srdf_parser import Parser as SrdfParser
 
+## Definition of a manipulation planning problem
+#
+#  This class wraps the Corba client to the server implemented by
+#  libhpp-manipulation-corba.so
+#
+#  Some method implemented by the server can be considered as private. The
+#  goal of this class is to hide them and to expose those that can be
+#  considered as public.
 class ProblemSolver (object):
     """
     This class wraps the Corba client to the server implemented by
@@ -32,28 +40,40 @@ class ProblemSolver (object):
         self.client = robot.client
         self.robot = robot
 
+    ##  Create a grasp constraint for the composite robot
+    #
+    #   constraint is stored in C++ hpp::core::ProblemSolver local map
+    #   of numerical constraints.
+    #   \sa hpp::core::ProblemSolver::addNumericalConstraint
+    #
+    #   \param graspName key in the map of numerical constraints,
+    #   \param jointName name of the joint that grasps "robot/joint",
+    #   \param handleName name of the handle grasped "object/handle",
+    #   \param handlePositioninJoint position of the handle in the joint frame.
     def createGrasp (self, graspName, jointName, handleName,
                      handlePositioninJoint) :
-        """
-        Create a grasp constraint for the composite robot and store
-        it in map of numerical constraints.
-
-        input graspName key in the map of numerical constraints,
-        input jointName name of the joint that grasps "robot/joint",
-        input handleName name of the handle grasped "object/handle",
-        input handlePositioninJoint position of the handle in the joint frame.
-        """
         self.client.manipulation.problem.createGrasp \
             (graspName, jointName, handleName, handlePositioninJoint)
 
+    ##  Create static stability constraints
+    #
+    #   Call corba request
+    #   hpp::corbaserver::wholebody_step::Problem::addStaticStabilityConstraints
+    #
+    #   The ankles are defined by members leftAnkle and rightAnkle of variable
+    #   robot passed at construction of this object.
+    #   \param constraintName name of the resulting constraint,
+    #   \param q0 configuration that satisfies the constraints
     def createStaticStabilityConstraints (self, constraintName, q0):
         self.client.wholebodyStep.problem.addStaticStabilityConstraints \
             (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle)
-        self.balanceConstraints = [constraintName + "/relative-com",
-                                   constraintName + "/relative-orientation",
-                                   constraintName + "/relative-position",
-                                   constraintName + "/orientation-left-foot",
-                                   constraintName + "/position-left-foot"]
+        self.balanceConstraints_ = [constraintName + "/relative-com",
+                                    constraintName + "/relative-orientation",
+                                    constraintName + "/relative-position",
+                                    constraintName + "/orientation-left-foot",
+                                    constraintName + "/position-left-foot"]
 
+    ## Return balance constraints created by method
+    #  ProblemSolver.createStaticStabilityConstraints
     def balanceConstraints (self):
-        return self.balanceConstraints
+        return self.balanceConstraints_
