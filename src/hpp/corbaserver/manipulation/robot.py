@@ -34,6 +34,9 @@ class CorbaClient:
         self.wholebodyStep = WholebodyStepClient ()
 
 ## Load and handle a composite robot for manipulation planning
+#
+#  A composite robot is a kinematic chain composed of several sub-kinematic
+#  chains rooted at an anchor joint.
 class Robot (object):
     def __init__ (self, robotName, rootJointType):
         self.robotName = robotName
@@ -126,6 +129,10 @@ class Robot (object):
         self.client.manipulation.robot.buildCompositeRobot (robotName,
                                                             robotNames)
         self.jointNames = self.client.basic.robot.getJointNames ()
+        self.__setattr__ (self.robotName + 'JointNames',
+                          map (lambda n : n [len(self.robotName)+1:],
+                               filter (lambda n: n[:len (self.robotName)]
+                                       == self.robotName, self.jointNames)))
         self.rankInConfiguration = dict ()
         self.rankInVelocity = dict ()
         rankInConfiguration = rankInVelocity = 0
@@ -135,6 +142,60 @@ class Robot (object):
                 self.client.basic.robot.getJointConfigSize (j)
             self.rankInVelocity [j] = rankInVelocity
             rankInVelocity += self.client.basic.robot.getJointNumberDof (j)
+
+    ## \name Degrees of freedom
+    #  \{
+
+    ## Get size of configuration
+    # \return size of configuration
+    def getConfigSize (self):
+        return self.client.basic.robot.getConfigSize ()
+
+    # Get size of velocity
+    # \return size of velocity
+    def getNumberDof (self):
+        return self.client.basic.robot.getNumberDof ()
+    ## \}
+
+    ## \name Access to current configuration
+    #\{
+
+    ## Set current configuration of composite robot
+    #
+    #  \param q configuration of the composite robot
+    def setCurrentConfig (self, q):
+        self.client.basic.robot.setCurrentConfig (q)
+
+    ## Get current configuration of composite robot
+    #
+    #  \return configuration of the composite robot
+    def getCurrentConfig (self):
+        return self.client.basic.robot.getCurrentConfig ()
+    ## \}
+
+    ## \name Collision checking and distance computation
+    # \{
+
+    ## Test collision with obstacles and auto-collision.
+    #
+    # Check whether current configuration of robot is valid by calling
+    # CkwsDevice::collisionTest ().
+    # \return whether configuration is valid
+    def collisionTest ():
+        return self.client.basic.robot.collisionTest ()
+
+    ## Compute distances between bodies and obstacles
+    #
+    # \return list of distances,
+    # \return names of the objects belonging to a body
+    # \return names of the objects tested with inner objects,
+    # \return  closest points on the body,
+    # \return  closest points on the obstacles
+    # \note outer objects for a body can also be inner objects of another
+    # body.
+    def distancesToCollision ():
+        return self.client.basic.robot.distancesToCollision ()
+    ## \}
 
     ## Set bounds on the translation part of the freeflyer joint.
     #
