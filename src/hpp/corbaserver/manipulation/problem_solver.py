@@ -28,14 +28,6 @@ from srdf_parser import Parser as SrdfParser
 #  goal of this class is to hide them and to expose those that can be
 #  considered as public.
 class ProblemSolver (object):
-    """
-    This class wraps the Corba client to the server implemented by
-    libhpp-manipulation-corba.so
-
-    Some method implemented by the server can be considered as private. The
-    goal of this class is to hide them and to expose those that can be
-    considered as public.
-    """
     def __init__ (self, robot):
         self.client = robot.client
         self.robot = robot
