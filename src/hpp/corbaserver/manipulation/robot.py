@@ -181,7 +181,7 @@ class Robot (object):
     # Check whether current configuration of robot is valid by calling
     # CkwsDevice::collisionTest ().
     # \return whether configuration is valid
-    def collisionTest ():
+    def collisionTest (self):
         return self.client.basic.robot.collisionTest ()
 
     ## Compute distances between bodies and obstacles
@@ -193,7 +193,7 @@ class Robot (object):
     # \return  closest points on the obstacles
     # \note outer objects for a body can also be inner objects of another
     # body.
-    def distancesToCollision ():
+    def distancesToCollision (self):
         return self.client.basic.robot.distancesToCollision ()
     ## \}
 
