@@ -69,3 +69,27 @@ class ProblemSolver (object):
     #  ProblemSolver.createStaticStabilityConstraints
     def balanceConstraints (self):
         return self.balanceConstraints_
+
+    ## Reset Constraints
+    #
+    #  Reset all constraints, including numerical constraints and locked
+    #  degrees of freedom.
+    def resetConstraints (self):
+        self.client.basic.problem.resetConstraints ()
+
+    ## Set numerical constraints in ConfigProjector
+    #
+    #  \param name name of the resulting numerical constraint obtained
+    #         by stacking elementary numerical constraints,
+    #  \param names list of names of the numerical constraints as
+    #         inserted by method hpp::core::ProblemSolver::addNumericalConstraint.
+    def setNumericalConstraints (self, name, names):
+        self.client.basic.problem.setNumericalConstraints (name, names)
+
+    ## Apply constraints
+    #
+    #  \param q initial configuration
+    #  \return configuration projected in success,
+    #  \throw Error if projection failed.
+    def applyConstraints (self, q):
+        self.client.basic.problem.applyConstraints (q)
