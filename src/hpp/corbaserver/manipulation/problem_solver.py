@@ -32,6 +32,39 @@ class ProblemSolver (object):
         self.client = robot.client
         self.robot = robot
 
+    ## \name Initial and goal configurations
+    # \{
+
+    ## Set initial configuration of specified problem.
+    #	\param dofArray Array of degrees of freedom
+    #	\throw Error.
+    def setInitialConfig (self, dofArray):
+        return self.client.basic.problem.setInitialConfig (dofArray)
+
+    ## Get initial configuration of specified problem.
+    #	\return Array of degrees of freedom
+    def getInitialConfig (self):
+        return self.client.basic.problem.getInitialConfig ()
+
+    ## \brief Add goal configuration to specified problem.
+    #	\param dofArray Array of degrees of freedom
+    #	\throw Error.
+    def addGoalConfig (self, dofArray):
+        return self.client.basic.problem.addGoalConfig (dofArray)
+
+    ## Get goal configurations of specified problem.
+    #	\return Array of degrees of freedom
+    def getGoalConfigs (self):
+        return self.client.basic.problem.getGoalConfigs ()
+
+    ## Reset goal configurations
+    def resetGoalConfigs (self):
+        return self.client.basic.problem.resetGoalConfigs ()
+    ## \}
+
+    ## \name Constraints
+    #  \{
+
     ##  Create a grasp constraint for the composite robot
     #
     #   constraint is stored in C++ hpp::core::ProblemSolver local map
@@ -44,7 +77,7 @@ class ProblemSolver (object):
     #   \param handlePositioninJoint position of the handle in the joint frame.
     def createGrasp (self, graspName, jointName, handleName,
                      handlePositioninJoint) :
-        self.client.manipulation.problem.createGrasp \
+        return self.client.manipulation.problem.createGrasp \
             (graspName, jointName, handleName, handlePositioninJoint)
 
     ##  Create static stability constraints
@@ -75,7 +108,7 @@ class ProblemSolver (object):
     #  Reset all constraints, including numerical constraints and locked
     #  degrees of freedom.
     def resetConstraints (self):
-        self.client.basic.problem.resetConstraints ()
+        return self.client.basic.problem.resetConstraints ()
 
     ## Set numerical constraints in ConfigProjector
     #
@@ -84,7 +117,7 @@ class ProblemSolver (object):
     #  \param names list of names of the numerical constraints as
     #         inserted by method hpp::core::ProblemSolver::addNumericalConstraint.
     def setNumericalConstraints (self, name, names):
-        self.client.basic.problem.setNumericalConstraints (name, names)
+        return self.client.basic.problem.setNumericalConstraints (name, names)
 
     ## Apply constraints
     #
@@ -92,4 +125,60 @@ class ProblemSolver (object):
     #  \return configuration projected in success,
     #  \throw Error if projection failed.
     def applyConstraints (self, q):
-        self.client.basic.problem.applyConstraints (q)
+        return self.client.basic.problem.applyConstraints (q)
+
+    ## Lock degree of freedom with given value
+    # \param jointName name of the joint
+    # \param value value of the locked degree of freedom,
+    # \param rankInConfiguration rank of the locked dof in the joint
+    #        configuration vector
+    # \param rankInVelocity rank of the locked dof in the joint
+    #        velocity vector
+    def lockDof (self, jointName, value, rankInConfiguration, rankInVelocity):
+        return self.client.basic.problem.lockDof \
+            (jointName, value, rankInConfiguration, rankInVelocity)
+
+    ## Lock joint with one degree of freedom with given value 
+    # \param jointName name of the joint
+    # \param value value of the locked degree of freedom,
+    def lockOneDofJoint (self, jointName, value):
+        return self.client.basic.problem.lockDof (jointName, value, 0, 0)
+    ## \}
+
+    ## \name Solve problem and get paths
+    # \{
+
+    ## Solve the problem of corresponding ChppPlanner object
+    def solve (self):
+        return self.client.basic.problem.solve ()
+
+    ## Make direct connection between two configurations
+    #  \param startConfig, endConfig: the configurations to link.
+    #  \throw Error if steering method fails to create a direct path of if
+    #  direct path is not valid
+    def directPath (self, startConfig, endConfig):
+        return self.client.basic.problem.directPath (startConfig, endConfig)
+
+    ## Get Number of paths
+    def numberPaths (self):
+        return self.client.basic.problem.numberPaths ()
+
+    ## Optimize a given path
+    # \param inPathId Id of the path in this problem.
+    # \throw Error.
+    def optimizePath(self, inPathId):
+        return self.client.basic.problem.optimizePath (inPathId)
+
+    ## Get length of path
+    # \param inPathId rank of the path in the problem
+    # \return length of path if path exists.
+    def pathLength(self, inPathId):
+        return self.client.basic.problem.pathLength(inPathId)
+
+    ## Get the robot's config at param on the a path
+    # \param inPathId rank of the path in the problem
+    # \param atDistance : the user parameter choice
+    # \return dofseq : the config at param
+    def configAtDistance(self, inPathId, atDistance):
+        return self.client.basic.problem.configAtDistance(inPathId, atDistance)
+    ## \}

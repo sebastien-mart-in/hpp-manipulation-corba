@@ -157,6 +157,41 @@ class Robot (object):
         return self.client.basic.robot.getNumberDof ()
     ## \}
 
+    ## \name Joints
+    #\{
+
+    # Get joint names in the same order as in the configuration.
+    def getJointNames (self):
+        return self.client.basic.robot.getJointNames ()
+
+    # Get joint position.
+    def getJointPosition (self, jointName):
+        return self.client.basic.robot.getJointPosition (jointName)
+
+    # Get joint number degrees of freedom.
+    def getJointNumberDof (self, jointName):
+        return self.client.basic.robot.getJointNumberDof (jointName)
+
+    # Get joint number config size.
+    def getJointConfigSize (self, jointName):
+        return self.client.basic.robot.getJointConfigSize (jointName)
+
+    # set bounds for the joint
+    def setJointBounds (self, jointName, inJointBound):
+        return self.client.basic.robot.setJointBounds (jointName, inJointBound)
+
+    ## Set bounds on the translation part of the freeflyer joint.
+    #
+    #  Valid only if the robot has a freeflyer joint.
+    def setTranslationBounds (self, xmin, xmax, ymin, ymax, zmin, zmax):
+        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_x",
+                                                [xmin, xmax])
+        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_y",
+                                                [ymin, ymax])
+        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_z",
+                                                [zmin, zmax])
+    ## \}
+
     ## \name Access to current configuration
     #\{
 
@@ -197,16 +232,21 @@ class Robot (object):
         return self.client.basic.robot.distancesToCollision ()
     ## \}
 
-    ## Set bounds on the translation part of the freeflyer joint.
-    #
-    #  Valid only if the robot has a freeflyer joint.
-    def setTranslationBounds (self, xmin, xmax, ymin, ymax, zmin, zmax):
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_x",
-                                                [xmin, xmax])
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_y",
-                                                [ymin, ymax])
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_z",
-                                                [zmin, zmax])
+    ## \}
+    ## \name Mass and inertia
+    # \{
+
+    ## Get mass of robot
+    def getMass ():
+        return self.client.robot.getMass ()
+
+    ## Get position of center of mass
+    def getCenterOfMass ():
+        return self.client.robot.getCenterOfMass ()
+    ## Get Jacobian of the center of mass
+    def getJacobianCenterOfMass ():
+        return self.client.robot.getJacobianCenterOfMass ()
+    ##\}
 
 class HumanoidRobot (Robot):
 
