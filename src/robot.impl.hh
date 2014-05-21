@@ -69,6 +69,11 @@ namespace hpp {
 				const char* handleName,
 				const ::hpp::Transform localPosition)
 	  throw (hpp::Error);
+	virtual void addAxialHandle (const char* objectName,
+				     const char* linkName,
+				     const char* handleName,
+				     const ::hpp::Transform localPosition)
+	  throw (hpp::Error);
 private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Robot

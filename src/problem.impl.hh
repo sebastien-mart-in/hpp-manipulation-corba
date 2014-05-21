@@ -19,7 +19,6 @@
 # define HPP_MANIPULATION_CORBA_PROBLEM_IMPL_HH
 
 # include <hpp/corbaserver/manipulation/fwd.hh>
-# include <hpp/manipulation/constraint-builder.hh>
 # include <hpp/manipulation/problem-solver.hh>
 # include "problem.hh"
 
@@ -44,7 +43,6 @@ namespace hpp {
 	  throw (hpp::Error);
       private:
 	ProblemSolverPtr_t problemSolver_;
-	ConstraintBuilder constraintBuilder_;
       }; // class Problem
     } // namespace impl
   } // namespace manipulation

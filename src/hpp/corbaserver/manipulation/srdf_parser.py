@@ -45,6 +45,7 @@ class Parser (object):
             raise RuntimeError ("file " +
                                 self.filename + ' has no node "robot"')
         robotElement = nodeList [0]
+        # Parse handles
         handles = robotElement.getElementsByTagName ('handle')
         for h in handles:
             handleName = str (h.attributes ['name'].nodeValue)
@@ -65,6 +66,27 @@ class Parser (object):
 
             self.client.robot.addHandle (self.objectName, linkName, handleName,
                                          localPosition)
+        # Parse axial handles
+        handles = robotElement.getElementsByTagName ('axial_handle')
+        for h in handles:
+            handleName = str (h.attributes ['name'].nodeValue)
+            localPositions = h.getElementsByTagName ('local_position')
+            if not localPositions.length is 1:
+                raise RuntimeError ('expected 1 tag "local_position", ' +
+                                    'but found %i.'%localPositions.length)
+            localPosition = localPositions [0]
+            position = localPosition.childNodes [0].nodeValue
+            localPosition = map (float, (filter (isFloat,
+                                                 position.split (' '))))
+            links = h.getElementsByTagName ('link')
+            if not links.length is 1:
+                raise RuntimeError ('expected 1 tag "link", ' +
+                                    'but found %i.'%links.length)
+            link = links [0]
+            linkName = str (link.attributes ['name'].nodeValue)
+
+            self.client.robot.addAxialHandle (self.objectName, linkName,
+                                              handleName, localPosition)
 
     def parse (self):
         self.parseHandles ()

@@ -19,6 +19,8 @@
 #include <hpp/util/debug.hh>
 #include <hpp/model/urdf/util.hh>
 #include <hpp/manipulation/object.hh>
+#include <hpp/manipulation/handle.hh>
+#include <hpp/manipulation/axial-handle.hh>
 #include "robot.impl.hh"
 
 namespace hpp {
@@ -123,14 +125,12 @@ namespace hpp {
 	try {
 	  ObjectPtr_t object = problemSolver_->object (objectName);
 	  JointPtr_t joint = object->getJointByBodyName (linkName);
-	  Object::Handle handle;
-	  handle.joint = joint;
-	  handle.name = handleName;
 	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
 			       localPosition [5], localPosition [6]);
 	  fcl::Vec3f v (localPosition [0], localPosition [1],
 			 localPosition [2]);
-	  handle.localPosition = Transform3f (q, v);
+	  HandlePtr_t handle = Handle::create (handleName, Transform3f (q, v),
+					       joint);
 	  object->addHandle (handle);
 	  hppDout (info, *object);
 	} catch (const std::exception& exc) {
@@ -138,6 +138,26 @@ namespace hpp {
 	}
       }
 
+      void Robot::addAxialHandle (const char* objectName, const char* linkName,
+				  const char* handleName,
+				  const ::hpp::Transform localPosition)
+	throw (hpp::Error)
+      {
+	try {
+	  ObjectPtr_t object = problemSolver_->object (objectName);
+	  JointPtr_t joint = object->getJointByBodyName (linkName);
+	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
+			       localPosition [5], localPosition [6]);
+	  fcl::Vec3f v (localPosition [0], localPosition [1],
+			 localPosition [2]);
+	  HandlePtr_t handle = AxialHandle::create
+	    (handleName, Transform3f (q, v), joint);
+	  object->addHandle (handle);
+	  hppDout (info, *object);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp
