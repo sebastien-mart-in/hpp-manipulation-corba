@@ -39,6 +39,7 @@ class CorbaClient:
 #  chains rooted at an anchor joint.
 class Robot (object):
     def __init__ (self, robotName, rootJointType):
+        self.rootJointType = rootJointType
         self.robotName = robotName
         self.client = CorbaClient ()
         self.loadModel (robotName, rootJointType)
