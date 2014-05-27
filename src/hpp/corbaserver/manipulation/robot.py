@@ -208,6 +208,11 @@ class Robot (object):
     #  \return configuration of the composite robot
     def getCurrentConfig (self):
         return self.client.basic.robot.getCurrentConfig ()
+
+    ## Shoot random configuration
+    #  \return dofArray Array of degrees of freedom.
+    def shootRandomConfig(self):
+        return self.client.basic.robot.shootRandomConfig ()
     ## \}
 
     ## \name Collision checking and distance computation

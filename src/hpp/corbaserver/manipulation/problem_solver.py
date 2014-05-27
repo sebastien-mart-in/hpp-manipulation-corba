@@ -105,6 +105,37 @@ class ProblemSolver (object):
 
     ## Reset Constraints
     #
+
+    ## Create orientation constraint between two joints
+    #
+    #  \param constraintName name of the constraint created,
+    #  \param joint1Name name of first joint
+    #  \param joint2Name name of second joint
+    #  \param p quaternion representing the desired orientation
+    #         of joint2 in the frame of joint1.
+    #  If joint1 of joint2 is "", the corresponding joint is replaced by
+    #  the global frame.
+    #  constraints are stored in ProblemSolver object
+    def createOrientationConstraint (self, constraintName, joint1Name,
+                                     joint2Name, p):
+        return self.client.basic.problem.createOrientationConstraint \
+            (constraintName, joint1Name, joint2Name, p)
+
+    ## Create position constraint between two joints
+    #
+    #  \param constraintName name of the constraint created,
+    #  \param joint1Name name of first joint
+    #  \param joint2Name name of second joint
+    #  \param point1 point in local frame of joint1,
+    #  \param point2 point in local frame of joint2.
+    #  If joint1 of joint2 is "", the corresponding joint is replaced by
+    #  the global frame.
+    #  constraints are stored in ProblemSolver object
+    def createPositionConstraint (self, constraintName, joint1Name,
+                                  joint2Name, point1, point2):
+        return self.client.basic.problem.createPositionConstraint \
+            (constraintName, joint1Name, joint2Name, point1, point2)
+
     #  Reset all constraints, including numerical constraints and locked
     #  degrees of freedom.
     def resetConstraints (self):
