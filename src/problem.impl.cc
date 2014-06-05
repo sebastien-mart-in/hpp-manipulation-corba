@@ -17,7 +17,7 @@
 
 #include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
-#include <hpp/manipulation/grasp.hh>
+#include <hpp/manipulation/gripper.hh>
 #include <hpp/manipulation/robot.hh>
 #include <hpp/manipulation/object.hh>
 #include "problem.impl.hh"
@@ -49,9 +49,9 @@ namespace hpp {
 			       handlePositioninJoint [6]);
 	  fcl::Vec3f v (handlePositioninJoint [0], handlePositioninJoint [1],
 			handlePositioninJoint [2]);
-	  GraspPtr_t grasp = Grasp::create (joint, handle, Transform3f (q, v));
+	  GripperPtr_t gripper = Gripper::create (joint, Transform3f (q, v));
 	  DifferentiableFunctionPtr_t constraint =
-	    handle->createGrasp (robot, grasp);
+	    handle->createGrasp ( gripper);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
