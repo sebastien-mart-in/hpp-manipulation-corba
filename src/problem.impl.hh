@@ -36,13 +36,7 @@ namespace hpp {
 	  problemSolver_ = problemSolver;
 	}
 
-	virtual void createGrasp (const char* graspName,
-				  const char* jointName,
-				  const char* handleName,
-				  const CORBA::Double* handlePositioninJoint)
-	  throw (hpp::Error);
-
-        virtual void createGraspWithGripper (const char* graspName,
+        virtual void createGrasp (const char* graspName,
 				  const char* gripperName,
 				  const char* handleName)
 	  throw (hpp::Error);

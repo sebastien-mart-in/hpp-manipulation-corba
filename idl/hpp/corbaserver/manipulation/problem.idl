@@ -26,28 +26,16 @@ module hpp
     module manipulation {
       interface Problem
       {
-	/// Create grasp constraint between robot effector and object handle
-	///
-	/// \param graspName name of the constraint for storing in a map,
-	/// \param jointName name of the joint in the form "robot/joint" where
-	/// robot is the name of the Device owning the joint and joint is the
-	/// name of the joint in the Device,
-	/// \param handleName name of the handle in the form "object/handle"
-	/// where object is the name of the object owning the handle and handle
-	/// is the name of the handle in this object.
-	void createGrasp (in string graspName, in string jointName,
-			  in string handleName,
-			  in Transform handlePositioninJoint)
-	  raises (Error);
 
         /// Create grasp constraint between robot gripper and object handle
 	///
-	/// \param graspName name of the constraint for storing in a map,
+	/// \param graspName name of the constraint for storing in ProblemSolver
+	///        map,
 	/// \param gripperName name of the gripper used when it has been created
 	/// \param handleName name of the handle in the form "object/handle"
 	/// where object is the name of the object owning the handle and handle
 	/// is the name of the handle in this object.
-	void createGraspWithGripper (in string graspName, in string gripperName,
+	void createGrasp (in string graspName, in string gripperName,
 			  in string handleName)
 	  raises (Error);
 

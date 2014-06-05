@@ -30,35 +30,6 @@ namespace hpp {
       }
 
       void Problem::createGrasp (const char* graspName,
-				 const char* jointName,
-				 const char* handleName,
-				 const CORBA::Double* handlePositioninJoint)
-	throw (hpp::Error)
-      {
-	RobotPtr_t robot = problemSolver_->robot ();
-	if (!robot) {
-	  throw Error ("You should build a composite robot before trying to"
-		       " define constraints.");
-	}
-	try {
-	  JointPtr_t joint = robot->getJointByName (jointName);
-	  const HandlePtr_t& handle = robot->handle (handleName);
-	  fcl::Quaternion3f q (handlePositioninJoint [3],
-			       handlePositioninJoint [4],
-			       handlePositioninJoint [5],
-			       handlePositioninJoint [6]);
-	  fcl::Vec3f v (handlePositioninJoint [0], handlePositioninJoint [1],
-			handlePositioninJoint [2]);
-	  GripperPtr_t gripper = Gripper::create (jointName, joint, Transform3f (q, v));
-	  DifferentiableFunctionPtr_t constraint =
-	    handle->createGrasp ( gripper);
-	  problemSolver_->addNumericalConstraint (graspName, constraint);
-	} catch (const std::exception& exc) {
-	  throw Error (exc.what ());
-	}
-      }
-
-      void Problem::createGraspWithGripper (const char* graspName,
 				 const char* gripperName,
 				 const char* handleName)
 	throw (hpp::Error)
@@ -72,7 +43,7 @@ namespace hpp {
 	  const GripperPtr_t gripper = robot->gripper (gripperName);
 	  const HandlePtr_t& handle = robot->handle (handleName);
 	  DifferentiableFunctionPtr_t constraint =
-	    handle->createGrasp ( gripper);
+	    handle->createGrasp (gripper);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
