@@ -57,6 +57,27 @@ namespace hpp {
 	  throw Error (exc.what ());
 	}
       }
+
+      void Problem::createGraspWithGripper (const char* graspName,
+				 const char* gripperName,
+				 const char* handleName)
+	throw (hpp::Error)
+      {
+	RobotPtr_t robot = problemSolver_->robot ();
+	if (!robot) {
+	  throw Error ("You should build a composite robot before trying to"
+		       " define constraints.");
+	}
+	try {
+	  const GripperPtr_t gripper = robot->gripper (gripperName);
+	  const HandlePtr_t& handle = robot->handle (handleName);
+	  DifferentiableFunctionPtr_t constraint =
+	    handle->createGrasp ( gripper);
+	  problemSolver_->addNumericalConstraint (graspName, constraint);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

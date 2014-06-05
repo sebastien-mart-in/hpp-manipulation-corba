@@ -20,6 +20,7 @@
 #include <hpp/model/urdf/util.hh>
 #include <hpp/manipulation/object.hh>
 #include <hpp/manipulation/handle.hh>
+#include <hpp/manipulation/gripper.hh>
 #include <hpp/manipulation/axial-handle.hh>
 #include "robot.impl.hh"
 
@@ -132,7 +133,40 @@ namespace hpp {
 	  HandlePtr_t handle = Handle::create (handleName, Transform3f (q, v),
 					       joint);
 	  object->addHandle (handle);
+	  /// If manipulation::robot is build, add handle to it
+	  if ( problemSolver_->robot() ) 
+          { 
+    	    HandlePtr_t handleRobot = handle->clone ();
+	    handleRobot->name (object->name () + "/" + handle->name ());
+	    handleRobot->joint (problemSolver_->robot()->joint(handle->joint ()));
+	    problemSolver_->robot()->addHandle (handleRobot->name (), handleRobot);
+            //problemSolver_->robot()->addHandle(std::string(objectName) + "/" + 
+            //                                   std::string(handleName),
+            //                                   handle);
+          }
 	  hppDout (info, *object);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      void Robot::addGripper(const char* robotName, const char* linkName,
+			     const char* gripperName,
+			     const ::hpp::Transform handlePositioninJoint)
+	throw (hpp::Error)
+      {
+	try {
+	  DevicePtr_t robot = problemSolver_->robot (robotName);
+	  JointPtr_t joint = problemSolver_->robot()
+                               ->joint(robot->getJointByBodyName (linkName));
+	  fcl::Quaternion3f q (handlePositioninJoint [3], handlePositioninJoint [4],
+			       handlePositioninJoint [5], handlePositioninJoint [6]);
+	  fcl::Vec3f v (handlePositioninJoint [0], handlePositioninJoint [1],
+			 handlePositioninJoint [2]);
+	  GripperPtr_t gripper = Gripper::create (gripperName, joint, 
+                                                  Transform3f (q, v));
+	  problemSolver_->robot()->addGripper (gripperName, gripper);
+	  hppDout (info, *robot);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}

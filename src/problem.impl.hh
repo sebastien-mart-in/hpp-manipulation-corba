@@ -41,6 +41,11 @@ namespace hpp {
 				  const char* handleName,
 				  const CORBA::Double* handlePositioninJoint)
 	  throw (hpp::Error);
+
+        virtual void createGraspWithGripper (const char* graspName,
+				  const char* gripperName,
+				  const char* handleName)
+	  throw (hpp::Error);
       private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Problem

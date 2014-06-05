@@ -40,7 +40,18 @@ module hpp
 			  in Transform handlePositioninJoint)
 	  raises (Error);
 
-      }; // interface Robot
+        /// Create grasp constraint between robot gripper and object handle
+	///
+	/// \param graspName name of the constraint for storing in a map,
+	/// \param gripperName name of the gripper used when it has been created
+	/// \param handleName name of the handle in the form "object/handle"
+	/// where object is the name of the object owning the handle and handle
+	/// is the name of the handle in this object.
+	void createGraspWithGripper (in string graspName, in string gripperName,
+			  in string handleName)
+	  raises (Error);
+
+      }; // interface Problem
     }; // module manipulation
   }; // module corbaserver
 }; // module hpp

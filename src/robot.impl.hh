@@ -69,6 +69,12 @@ namespace hpp {
 				const char* handleName,
 				const ::hpp::Transform localPosition)
 	  throw (hpp::Error);
+        virtual void addGripper(const char* robotName,
+                                const char* linkName,
+			        const char* gripperName,
+			        const ::hpp::Transform handlePositioninJoint)
+          throw (hpp::Error);
+
 	virtual void addAxialHandle (const char* objectName,
 				     const char* linkName,
 				     const char* handleName,
