@@ -49,7 +49,7 @@ namespace hpp {
 			       handlePositioninJoint [6]);
 	  fcl::Vec3f v (handlePositioninJoint [0], handlePositioninJoint [1],
 			handlePositioninJoint [2]);
-	  GripperPtr_t gripper = Gripper::create (joint, Transform3f (q, v));
+	  GripperPtr_t gripper = Gripper::create (jointName, joint, Transform3f (q, v));
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createGrasp ( gripper);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
