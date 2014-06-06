@@ -75,10 +75,9 @@ class ProblemSolver (object):
     #   \param jointName name of the joint that grasps "robot/joint",
     #   \param handleName name of the handle grasped "object/handle",
     #   \param handlePositioninJoint position of the handle in the joint frame.
-    def createGrasp (self, graspName, jointName, handleName,
-                     handlePositioninJoint) :
+    def createGrasp (self, graspName, gripperName, handleName) :
         return self.client.manipulation.problem.createGrasp \
-            (graspName, jointName, handleName, handlePositioninJoint)
+            (graspName, gripperName, handleName)
 
     ##  Create static stability constraints
     #

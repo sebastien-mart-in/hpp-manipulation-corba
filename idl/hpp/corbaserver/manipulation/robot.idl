@@ -90,6 +90,16 @@ module hpp
     void buildCompositeRobot (in string robotName, in Names_t robotNames)
       raises (Error);
 
+    /// Add Gripper to a robot
+    ///
+    /// \param robotName name of the robot owning the gripper,
+    /// \param linkName name of the link (hpp::model::Body) holding the gripper,
+    /// \param gripperName name of the gripper,
+    /// \param handlePositioninJoint position of the handle in the joint frame.
+    void addGripper (in string robotName, in string linkName,
+		    in string gripperName, in Transform handlePositioninJoint)
+      raises (Error);
+
     /// Add Handle to an object
     ///
     /// \param objectName name of the object holding the handle,
