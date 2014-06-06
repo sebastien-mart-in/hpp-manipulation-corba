@@ -156,6 +156,10 @@ namespace hpp {
 	throw (hpp::Error)
       {
 	try {
+	  if ( !problemSolver_->robot() ) {
+            hppDout(error, "You must run buildCompositeRobot() before adding grippers");
+	    throw Error("You must run buildCompositeRobot() before adding grippers");
+	    }
 	  DevicePtr_t robot = problemSolver_->robot (robotName);
 	  JointPtr_t joint = problemSolver_->robot()
                                ->joint(robot->getJointByBodyName (linkName));
