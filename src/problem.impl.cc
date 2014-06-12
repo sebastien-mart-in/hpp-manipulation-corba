@@ -17,7 +17,7 @@
 
 #include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
-#include <hpp/manipulation/gripper.hh>
+#include <hpp/model/gripper.hh>
 #include <hpp/manipulation/robot.hh>
 #include <hpp/manipulation/object.hh>
 #include "problem.impl.hh"

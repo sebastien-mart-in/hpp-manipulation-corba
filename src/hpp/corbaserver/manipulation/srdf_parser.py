@@ -87,6 +87,34 @@ class Parser (object):
 
             self.client.robot.addAxialHandle (self.objectName, linkName,
                                               handleName, localPosition)
+    def parseGrippers (self):
+        nodeList = self.tree.getElementsByTagName ('robot')
+        if nodeList.length is 0:
+            raise RuntimeError ("file " +
+                                self.filename + ' has no node "robot"')
+        robotElement = nodeList [0]
+        # Parse grippers
+        grippers = robotElement.getElementsByTagName ('gripper')
+        for h in grippers:
+            gripperName = str (h.attributes ['name'].nodeValue)
+            handlePositionsInJoint = h.getElementsByTagName ('handle_position_in_joint')
+            if not handlePositionsInJoint.length is 1:
+                raise RuntimeError ('expected 1 tag "local_position", ' +
+                                    'but found %i.'%handlePositionsInJoint.length)
+            handlePositionInJoint = handlePositionsInJoint [0]
+            position = handlePositionInJoint.childNodes [0].nodeValue
+            handlePositionInJoint = map (float, (filter (isFloat,
+                                                 position.split (' '))))
+            links = h.getElementsByTagName ('link')
+            if not links.length is 1:
+                raise RuntimeError ('expected 1 tag "link", ' +
+                                    'but found %i.'%links.length)
+            link = links [0]
+            linkName = str (link.attributes ['name'].nodeValue)
 
-    def parse (self):
+            self.client.robot.addGripper (self.objectName, linkName, gripperName,
+                                         handlePositionInJoint)
+
+    def parseAll (self):
         self.parseHandles ()
+        self.parseGrippers ()
