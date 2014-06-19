@@ -111,9 +111,14 @@ class Parser (object):
                                     'but found %i.'%links.length)
             link = links [0]
             linkName = str (link.attributes ['name'].nodeValue)
-
-            self.client.robot.addGripper (self.objectName, linkName, gripperName,
-                                         handlePositionInJoint)
+            CollisionNames = list()
+            disabledCollisions = h.getElementsByTagName('disable_collision')
+            for disabledCollision in disabledCollisions:
+                CollisionNames.append(str( disabledCollision.attributes['link'].nodeValue ))
+            self.client.robot.addGripper (self.objectName, linkName,
+                                          gripperName,
+                                          handlePositionInJoint,
+                                          CollisionNames)
 
     def parseAll (self):
         self.parseHandles ()

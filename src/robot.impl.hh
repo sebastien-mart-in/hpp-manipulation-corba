@@ -69,10 +69,12 @@ namespace hpp {
 				const char* handleName,
 				const ::hpp::Transform localPosition)
 	  throw (hpp::Error);
+
         virtual void addGripper(const char* robotName,
                                 const char* linkName,
 			        const char* gripperName,
-			        const ::hpp::Transform handlePositioninJoint)
+			        const ::hpp::Transform handlePositioninJoint,
+                                const hpp::Names_t& bodyInCollisionNames)
           throw (hpp::Error);
 
 	virtual void addAxialHandle (const char* objectName,
@@ -80,7 +82,15 @@ namespace hpp {
 				     const char* handleName,
 				     const ::hpp::Transform localPosition)
 	  throw (hpp::Error);
+
+        Names_t* getDeviceNames () 
+          throw (hpp::Error);
+
+        Names_t* getDeviceJointNames (const char* inDeviceName)
+          throw (hpp::Error);
+
 private:
+        void deleteGripperCollisions(GripperPtr_t& gripper);
 	ProblemSolverPtr_t problemSolver_;
       }; // class Robot
     } // namespace impl

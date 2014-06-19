@@ -138,8 +138,10 @@ namespace hpp {
           { 
     	    HandlePtr_t handleRobot = handle->clone ();
 	    handleRobot->name (object->name () + "/" + handle->name ());
-	    handleRobot->joint (problemSolver_->robot()->joint(handle->joint ()));
-	    problemSolver_->robot()->addHandle (handleRobot->name (), handleRobot);
+	    handleRobot->joint (problemSolver_->robot()->joint(handle
+                                                                ->joint ()));
+	    problemSolver_->robot()->addHandle (handleRobot->name (),
+                                                  handleRobot);
           }
 	  hppDout (info, *object);
 	} catch (const std::exception& exc) {
@@ -149,31 +151,77 @@ namespace hpp {
 
       void Robot::addGripper(const char* robotName, const char* linkName,
 			     const char* gripperName,
-			     const ::hpp::Transform handlePositioninJoint)
+			     const ::hpp::Transform handlePositioninJoint,
+                             const Names_t& bodyInCollisionNames)
 	throw (hpp::Error)
       {
 	try {
 	  DevicePtr_t robot = problemSolver_->robot (robotName);
 	  JointPtr_t joint = robot->getJointByBodyName(linkName);
-	  fcl::Quaternion3f q (handlePositioninJoint [3], handlePositioninJoint [4],
-			       handlePositioninJoint [5], handlePositioninJoint [6]);
+	  fcl::Quaternion3f q (handlePositioninJoint [3],
+                               handlePositioninJoint [4],
+			       handlePositioninJoint [5],
+                               handlePositioninJoint [6]);
 	  fcl::Vec3f v (handlePositioninJoint [0], handlePositioninJoint [1],
 			 handlePositioninJoint [2]);
+          model::JointVector_t jointInCollision;
+          for (CORBA::ULong i=0; i<bodyInCollisionNames.length (); ++i) {     
+	    std::string bodyName (bodyInCollisionNames [i]);
+            jointInCollision.push_back(robot->getJointByBodyName(bodyName));
+          }
 	  GripperPtr_t gripper = model::Gripper::create (gripperName, joint, 
-                                                  Transform3f (q, v));
+                                                  Transform3f (q, v),
+                                                  jointInCollision);
 	  robot->addGripper (gripper);
+          hppDout (info, "add Gripper to robot " << robotName 
+                          << " : "<< gripper); 
           /// If manipulation::robot is build, add gripper to it
           if ( problemSolver_->robot() ) 
           { 
     	    GripperPtr_t gripperRobot = gripper->clone ();
 	    gripperRobot->name (robot->name () + "/" + gripper->name ());
-	    gripperRobot->joint (problemSolver_->robot()->joint(gripper->joint ()));
-	    problemSolver_->robot()->addGripper (gripperRobot->name (), gripperRobot);
+	    gripperRobot->joint (problemSolver_->robot()
+                                  ->joint(gripper->joint ()));
+            gripperRobot->removeAllDisabledCollisions();
+            model::JointVector_t joints = gripper->getDisabledCollisions();
+            for (model::JointVector_t::iterator itJoint = joints.begin() ;
+                  itJoint != joints.end() ; itJoint++ ) {
+              gripperRobot->addDisabledCollision(problemSolver_->
+                                                   robot()->joint(*itJoint));
+            }  
+	    problemSolver_->robot()->addGripper (gripperRobot->name (),
+                                                   gripperRobot);
+            deleteGripperCollisions(gripperRobot);
           }
 	  hppDout (info, *robot);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
+      }
+
+      void Robot::deleteGripperCollisions(GripperPtr_t& gripper)
+      {
+        model::JointVector_t joints = gripper->getDisabledCollisions();
+        Objects_t objects = problemSolver_->robot()->objects();
+        JointPtr_t joint1;
+        JointPtr_t joint2;
+        Object::Handles_t handles;
+        for (Objects_t::iterator itObject = objects.begin() ;
+               itObject != objects.end() ; itObject++) {
+          handles = (*itObject)->handles();
+          for (model::JointVector_t::iterator itJoint = joints.begin() ;
+                 itJoint != joints.end() ; itJoint++ ) {
+            joint1 = (*itJoint);
+            for (Object::Handles_t::iterator itHandle = handles.begin() ;
+                   itHandle != handles.end() ; itHandle++) {
+              joint2 = problemSolver_->robot()->joint((*itHandle)->joint());
+              problemSolver_->robot()->removeCollisionPairs(joint1, joint2,
+                                           hpp::model::COLLISION);
+              problemSolver_->robot()->removeCollisionPairs(joint1, joint2,
+                                           hpp::model::DISTANCE);
+            }
+          }
+        }
       }
 
       void Robot::addAxialHandle (const char* objectName, const char* linkName,
@@ -194,6 +242,60 @@ namespace hpp {
 	  hppDout (info, *object);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
+	}
+      }
+      
+      Names_t* Robot::getDeviceNames () 
+        throw (hpp::Error)
+      {
+        try {
+          std::vector<std::string> nameVector = problemSolver_
+                                                 ->robot()->getDeviceNames();
+          size_type size = nameVector.size();
+          char** nameList = Names_t::allocbuf(size);
+	  Names_t *robotNames = new Names_t (size, size, nameList);
+          for (size_type it=0; it < size ; it++) {
+            nameList [it] =
+		(char*) malloc (sizeof(char)*(nameVector[it].length ()+1));
+	    strcpy (nameList [it], nameVector[it].c_str ());
+          }
+          return robotNames;
+        } catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
+      Names_t* Robot::getDeviceJointNames (const char* inDeviceName)
+        throw (hpp::Error)
+      {
+	try {
+          std::string deviceName(inDeviceName);
+	  DevicePtr_t robot = problemSolver_->robot (deviceName);
+	  // Compute number of real urdf joints
+	  size_type size = 0;
+	  hpp::model::JointVector_t jointVector = robot->getJointVector ();
+	  for (hpp::model::JointVector_t::const_iterator it =
+                                                      jointVector.begin ();
+	       it != jointVector.end (); it++) {
+	    if ((*it)->numberDof () != 0) size ++;
+	  }
+	  char** nameList = Names_t::allocbuf(size);
+	  Names_t *jointNames = new Names_t (size, size, nameList);
+	  std::size_t rankInConfig = 0;
+	  for (std::size_t i = 0; i < jointVector.size (); ++i) {
+	    const JointPtr_t joint = jointVector [i];
+	    std::string name = joint->name ();
+	    std::size_t dimension = joint->numberDof ();
+	    if (dimension != 0) {
+	      nameList [rankInConfig] =
+		(char*) malloc (sizeof(char)*(name.length ()+1));
+	      strcpy (nameList [rankInConfig], name.c_str ());
+	      ++rankInConfig;
+	    }
+	  }
+	  return jointNames;    
+        } catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
 	}
       }
     } // namespace impl

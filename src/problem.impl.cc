@@ -16,6 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <hpp/core/constraint-set.hh>
+#include <hpp/util/debug.hh>
 #include <hpp/core/config-projector.hh>
 #include <hpp/model/gripper.hh>
 #include <hpp/manipulation/robot.hh>

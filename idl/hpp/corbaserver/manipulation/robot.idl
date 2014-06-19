@@ -97,7 +97,9 @@ module hpp
     /// \param gripperName name of the gripper,
     /// \param handlePositioninJoint position of the handle in the joint frame.
     void addGripper (in string robotName, in string linkName,
-		    in string gripperName, in Transform handlePositioninJoint)
+		     in string gripperName, 
+                     in Transform handlePositioninJoint,
+                     in Names_t bodyInCollisionNames)
       raises (Error);
 
     /// Add Handle to an object
@@ -120,6 +122,13 @@ module hpp
     void addAxialHandle (in string objectName, in string linkName,
 			 in string handleName, in Transform localPosition)
       raises (Error);
+
+    Names_t getDeviceNames ()
+      raises (Error);
+
+    Names_t getDeviceJointNames (in string inDeviceName)
+      raises (Error);
+
   }; // interface Robot
   }; // module manipulation
   }; // module corbaserver
