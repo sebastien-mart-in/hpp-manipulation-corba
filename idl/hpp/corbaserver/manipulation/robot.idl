@@ -128,7 +128,9 @@ module hpp
 
     Names_t getDeviceJointNames (in string inDeviceName)
       raises (Error);
-
+    
+    string getRootBody(in string inRootJointType, in string inDeviceName)
+      raises (Error);
   }; // interface Robot
   }; // module manipulation
   }; // module corbaserver

@@ -89,6 +89,9 @@ namespace hpp {
         Names_t* getDeviceJointNames (const char* inDeviceName)
           throw (hpp::Error);
 
+        char* getRootBody(const char* inRootJointType, 
+                          const char* inDeviceName)
+          throw (hpp::Error);
 private:
         void deleteGripperCollisions(GripperPtr_t& gripper);
 	ProblemSolverPtr_t problemSolver_;

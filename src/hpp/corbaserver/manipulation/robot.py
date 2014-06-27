@@ -40,7 +40,7 @@ class CorbaClient:
 class Robot (object):
     def __init__ (self, robotName, rootJointType):
         self.tf_root = "base_link"
-        self.rootJointType = rootJointType
+        self.rootJointType = dict()
         self.robotName = robotName
         self.client = CorbaClient ()
         self.loadModel (robotName, rootJointType)
@@ -69,6 +69,7 @@ class Robot (object):
         self.client.manipulation.robot.loadRobotModel (robotName, rootJointType,
                                                        packageName, modelName,
                                                        urdfSuffix, srdfSuffix)
+        self.rootJointType[robotName] = rootJointType
         # Read srdf file for robot specific informations (grippers).
         # Build filename from ROS_PACKAGE_PATH
         import os
@@ -102,6 +103,7 @@ class Robot (object):
         self.client.manipulation.robot.loadHumanoidModel \
             (robotName, rootJointType, packageName, modelName,
              urdfSuffix, srdfSuffix)
+        self.rootJointType[robotName] = rootJointType
         # Read srdf file for object specific informations (handles/gripper).
         # Build filename from ROS_PACKAGE_PATH
         import os
@@ -136,6 +138,7 @@ class Robot (object):
         self.client.manipulation.robot.loadObjectModel \
             (objectName, rootJointType, packageName, modelName, urdfSuffix,
              srdfSuffix)
+        self.rootJointType[robotName] = rootJointType
         # Read srdf file for object specific informations (handles/gripper).
         # Build filename from ROS_PACKAGE_PATH
         import os

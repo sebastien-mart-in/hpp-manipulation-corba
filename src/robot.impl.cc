@@ -298,6 +298,26 @@ namespace hpp {
 	  throw hpp::Error (exc.what ());
 	}
       }
+
+      char* Robot::getRootBody(const char* inRootJointType, 
+                               const char* inDeviceName)
+        throw (hpp::Error)
+      {
+        std::string deviceName(inDeviceName);
+        std::string rootJointType(inRootJointType);
+        JointPtr_t rootJoint;
+        DevicePtr_t device = problemSolver_->robot(deviceName);
+        if ( rootJointType == "freeflyer" )
+          rootJoint = device->getJointByName("base_joint_SO3");
+        if ( rootJointType == "planar" )
+          rootJoint = device->getJointByName("base_joint_rz");
+        if ( rootJointType == "anchor" )
+          rootJoint = device->rootJoint();
+        std::string rootBodyName = rootJoint->linkedBody()->name();
+        char* name = (char*) malloc (sizeof(char)*(rootBodyName.length()+1));
+        strcpy (name, rootBodyName.c_str());
+        return name;
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp
