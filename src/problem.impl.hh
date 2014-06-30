@@ -40,6 +40,12 @@ namespace hpp {
 				  const char* gripperName,
 				  const char* handleName)
 	  throw (hpp::Error);
+
+	virtual void resetConstraints () throw (hpp::Error);
+	virtual void setNumericalConstraints
+	(const char* constraintName, const hpp::Names_t& constraintNames)
+	  throw (Error);
+
       private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Problem

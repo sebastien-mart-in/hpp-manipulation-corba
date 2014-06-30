@@ -138,7 +138,7 @@ class Robot (object):
         self.client.manipulation.robot.loadObjectModel \
             (objectName, rootJointType, packageName, modelName, urdfSuffix,
              srdfSuffix)
-        self.rootJointType[robotName] = rootJointType
+        self.rootJointType[objectName] = rootJointType
         # Read srdf file for object specific informations (handles/gripper).
         # Build filename from ROS_PACKAGE_PATH
         import os

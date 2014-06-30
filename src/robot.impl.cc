@@ -191,37 +191,11 @@ namespace hpp {
             }  
 	    problemSolver_->robot()->addGripper (gripperRobot->name (),
                                                    gripperRobot);
-            deleteGripperCollisions(gripperRobot);
           }
 	  hppDout (info, *robot);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
-      }
-
-      void Robot::deleteGripperCollisions(GripperPtr_t& gripper)
-      {
-        model::JointVector_t joints = gripper->getDisabledCollisions();
-        Objects_t objects = problemSolver_->robot()->objects();
-        JointPtr_t joint1;
-        JointPtr_t joint2;
-        Object::Handles_t handles;
-        for (Objects_t::iterator itObject = objects.begin() ;
-               itObject != objects.end() ; itObject++) {
-          handles = (*itObject)->handles();
-          for (model::JointVector_t::iterator itJoint = joints.begin() ;
-                 itJoint != joints.end() ; itJoint++ ) {
-            joint1 = (*itJoint);
-            for (Object::Handles_t::iterator itHandle = handles.begin() ;
-                   itHandle != handles.end() ; itHandle++) {
-              joint2 = problemSolver_->robot()->joint((*itHandle)->joint());
-              problemSolver_->robot()->removeCollisionPairs(joint1, joint2,
-                                           hpp::model::COLLISION);
-              problemSolver_->robot()->removeCollisionPairs(joint1, joint2,
-                                           hpp::model::DISTANCE);
-            }
-          }
-        }
       }
 
       void Robot::addAxialHandle (const char* objectName, const char* linkName,
