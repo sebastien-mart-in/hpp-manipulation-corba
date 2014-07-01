@@ -138,7 +138,7 @@ class ProblemSolver (object):
     #  Reset all constraints, including numerical constraints and locked
     #  degrees of freedom.
     def resetConstraints (self):
-        return self.client.manipulation.problem.resetConstraints ()
+        return self.client.basic.problem.resetConstraints ()
 
     ## Set numerical constraints in ConfigProjector
     #
@@ -147,7 +147,7 @@ class ProblemSolver (object):
     #  \param names list of names of the numerical constraints as
     #         inserted by method hpp::core::ProblemSolver::addNumericalConstraint.
     def setNumericalConstraints (self, name, names):
-        return self.client.manipulation.problem.setNumericalConstraints (name, names)
+        return self.client.basic.problem.setNumericalConstraints (name, names)
 
     ## Apply constraints
     #

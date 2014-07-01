@@ -39,21 +39,6 @@ module hpp
 			  in string handleName)
 	  raises (Error);
 
-    /// Set numerical constraints by names in ConfigProjector
-    /// \param constraintName Name of the set of numerical constraint,
-    /// \param constraintNames names of the constraints to apply,
-    ///
-    /// Constraints should have been added in the ProblemSolver local map.
-    /// Disable Collisions between gripper and handle for the grasping 
-    /// constraints 
-    void setNumericalConstraints (in string constraintName,
-				  in Names_t constraintNames)
-      raises (Error);
-
-    /// Reset constraints
-    /// And put back collisions between grippers and handles
-    void resetConstraints () raises (Error);
-
       }; // interface Problem
     }; // module manipulation
   }; // module corbaserver
