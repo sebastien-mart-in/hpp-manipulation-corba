@@ -19,16 +19,20 @@
 #include <hpp/corbaserver/wholebody-step/server.hh>
 #include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/manipulation/problem-solver.hh>
+#include <hpp/manipulation/manipulation-planner.hh>
 
 typedef hpp::wholebodyStep::Server WholebodyServer;
 typedef hpp::corbaServer::Server CorbaServer;
 typedef hpp::manipulation::Server ManipulationServer;
 typedef hpp::manipulation::ProblemSolver ProblemSolver;
 typedef hpp::manipulation::ProblemSolverPtr_t ProblemSolverPtr_t;
+typedef hpp::manipulation::ManipulationPlanner ManipulationPlanner;
+typedef hpp::manipulation::ManipulationPlannerPtr_t ManipulationPlannerPtr_t;
 
 int main (int argc, char* argv [])
 {
   ProblemSolverPtr_t problemSolver = new ProblemSolver;
+  problemSolver->addPathPlannerType ("M-RRT", ManipulationPlanner::create);
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), false);
   WholebodyServer wbsServer (argc, argv, false);
