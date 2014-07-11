@@ -53,8 +53,8 @@ class Robot (object):
 
     ## Load robot model and store in local map
     #
-    #  \param robotName key of the robot in manipulation::ProblemSolver object
-    #         map (see manipulation::ProblemSolver::addRobot)
+    #  \param robotName key of the robot in hpp::manipulation::ProblemSolver object
+    #         map (see hpp::manipulation::ProblemSolver::addRobot)
     #  \param rootJointType type of root joint among "anchor", "freeflyer",
     #         "planar",
     #  \param packageName Name of the ROS package containing the model,
@@ -88,7 +88,7 @@ class Robot (object):
     ## Load humanoid robot model and store in local map
     #
     #  \param robotName key of the robot in ProblemSolver object map
-    #         (see manipulation::ProblemSolver::addRobot)
+    #         (see hpp::manipulation::ProblemSolver::addRobot)
     #  \param rootJointType type of root joint among "anchor", "freeflyer",
     #         "planar",
     #  \param packageName Name of the ROS package containing the model,
@@ -122,7 +122,7 @@ class Robot (object):
     ## Load object model and store in local map
     #
     #  \param robotName key of the object in ProblemSolver object map
-    #         (see manipulation::ProblemSolver::addRobot)
+    #         (see hpp::manipulation::ProblemSolver::addRobot)
     #  \param rootJointType type of root joint among "anchor", "freeflyer",
     #         "planar",
     #  \param packageName Name of the ROS package containing the model,
