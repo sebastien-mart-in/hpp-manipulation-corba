@@ -19,6 +19,7 @@
 
 #include <hpp/util/exception.hh>
 #include <hpp/corbaserver/manipulation/server.hh>
+#include "graph.impl.hh"
 #include "problem.impl.hh"
 #include "robot.impl.hh"
 
@@ -26,18 +27,23 @@ namespace hpp {
   namespace manipulation {
     Server::Server (int argc, char *argv[], bool multiThread,
 		    const std::string& poaName) : 
+      graphImpl_ (new corba::Server <impl::Graph>
+		  (argc, argv, multiThread, poaName)),
       problemImpl_ (new corba::Server <impl::Problem>
 		    (argc, argv, multiThread, poaName)),
       robotImpl_ (new corba::Server <impl::Robot>
 		  (argc, argv, multiThread, poaName)) {}
+
     Server::~Server () 
     {
+      delete graphImpl_;
       delete problemImpl_;
       delete robotImpl_;
     }
     
     void Server::setProblemSolver (ProblemSolverPtr_t problemSolver)
     {
+      graphImpl_->implementation ().setProblemSolver (problemSolver);
       problemImpl_->implementation ().setProblemSolver (problemSolver);
       robotImpl_->implementation ().setProblemSolver (problemSolver);
     }
@@ -47,6 +53,11 @@ namespace hpp {
 				  const std::string& contextKind,
 				  const std::string& objectId)
     {
+      if (graphImpl_->startCorbaServer(contextId, contextKind,
+				       objectId, "graph") != 0) {
+	HPP_THROW_EXCEPTION (hpp::Exception,
+			     "Failed to start corba graph server.");
+      }
       if (robotImpl_->startCorbaServer(contextId, contextKind,
 				       objectId, "robot") != 0) {
 	HPP_THROW_EXCEPTION (hpp::Exception,

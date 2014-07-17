@@ -29,6 +29,7 @@
 /// class:
 ///   \li hpp::manipulation::Server.
 /// The corba services provided by the library are described in interface
+///   \li hpp::corbaserver::manipulation::Graph.
 ///   \li hpp::corbaserver::manipulation::Problem.
 ///   \li hpp::corbaserver::manipulation::Robot.
 ///

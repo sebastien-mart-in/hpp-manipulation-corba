@@ -17,6 +17,7 @@
 
 SET(LIBRARY_NAME ${PROJECT_NAME})
 SET(IDL_SOURCES
+  graph
   problem
   robot
 )
@@ -45,6 +46,10 @@ ENDFOREACH()
 ADD_LIBRARY(${LIBRARY_NAME} SHARED
   common.hh
   commonSK.cc
+  graph.hh
+  graphSK.cc
+  graph.impl.cc
+  graph.impl.hh
   problem.hh
   problemSK.cc
   problem.impl.cc
@@ -55,6 +60,7 @@ ADD_LIBRARY(${LIBRARY_NAME} SHARED
   robot.impl.hh
   server.cc
   ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/common_idl.py
+  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/graph_idl.py
   ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/problem_idl.py
   ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/robot_idl.py
 )

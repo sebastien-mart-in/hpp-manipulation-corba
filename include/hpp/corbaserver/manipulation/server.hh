@@ -27,6 +27,7 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      class Graph;
       class Problem;
       class Robot;
     }
@@ -46,6 +47,7 @@ namespace hpp {
 			    const std::string& contextKind,
 			    const std::string& objectId);
     private:
+      corba::Server <impl::Graph>* graphImpl_;
       corba::Server <impl::Problem>* problemImpl_;
       corba::Server <impl::Robot>* robotImpl_;
     }; // class Server
