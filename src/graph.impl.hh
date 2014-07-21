@@ -18,6 +18,7 @@
 # define HPP_MANIPULATION_CORBA_GRAPH_IMPL_HH
 
 # include <hpp/manipulation/problem-solver.hh>
+# include <hpp/manipulation/graph/graph.hh>
 
 # include "hpp/corbaserver/manipulation/fwd.hh"
 # include "graph.hh"
@@ -25,6 +26,8 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      using CORBA::Short;
+
       class Graph : public virtual POA_hpp::corbaserver::manipulation::Graph
       {
         public:
@@ -34,8 +37,19 @@ namespace hpp {
             problemSolver_ = problemSolver;
           }
 
+          virtual Short createGraph(const char* graphName)
+            throw (hpp::Error);
+
+          virtual Short createSubGraph(const char* subgraphName)
+            throw (hpp::Error);
+
+          virtual Short createNode (const char* subGraphName,
+                                   const char* nodeName,
+                                   const char* constraintName)
+            throw (hpp::Error);
         private:
           ProblemSolverPtr_t problemSolver_;
+          graph::GraphPtr_t graph_;
       }; // class Graph
     } // namespace impl
   } // namespace manipulation

@@ -24,6 +24,19 @@ module hpp {
   module corbaserver {
     module manipulation {
       interface Graph {
+        /// Initialize the graph of constraints.
+        /// \note The composite hpp::manipulation::robot must be completely defined first.
+        short createGraph(in string graphName)
+          raises (Error);
+
+        /// Create a subgraph of the constraint graph for one particular end-effector.
+        short createSubGraph(in string subgraphName)
+          raises (Error);
+
+        /// Add a node to the graph.
+        /// \param nodeName the name of the new node.
+        short createNode (in string subGraphName, in string nodeName, in string constraintName)
+          raises (Error);
       }; // interface Graph
     }; // module manipulation
   }; // module corbaserver

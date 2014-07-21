@@ -16,13 +16,66 @@
 
 #include <hpp/util/debug.hh>
 
+#include <hpp/manipulation/graph/node-selector.hh>
+#include <hpp/manipulation/graph/node.hh>
+#include <hpp/manipulation/graph/graph.hh>
+#include <hpp/manipulation/graph/edge.hh>
+
 #include "graph.impl.hh"
 
 namespace hpp {
   namespace manipulation {
     namespace impl {
-      Graph::Graph () : problemSolver_ (0x0)
+      Graph::Graph () :
+        problemSolver_ (0x0), graph_ ()
+      {}
+
+      Short Graph::createGraph(const char* graphName)
+        throw (hpp::Error)
       {
+        RobotPtr_t robot = problemSolver_->robot ();
+        if (!robot) {
+          throw Error ("You should build a composite robot"
+              " before creating a graph.");
+        }
+        graph_ = graph::Graph::create(robot);
+        graph_->name(graphName);
+        return graph_->id ();
+      }
+
+      Short Graph::createSubGraph(const char* subgraphName)
+        throw (hpp::Error)
+      {
+        if (!graph_)
+          throw Error ("You should create the graph"
+              " before creating subgraph.");
+        graph::NodeSelectorPtr_t ns = graph_->createNodeSelector();
+        ns->name(subgraphName);
+        return ns->id ();
+      }
+
+      Short Graph::createNode(const char* subgraphName, const char* nodeName, const char* constraintName)
+        throw (hpp::Error)
+      {
+        if (!graph_)
+          throw Error ("You should create the graph"
+            " before creating nodes.");
+        graph::NodeSelectorPtr_t ns = graph_->getNodeSelectorByName (subgraphName);
+        if (!ns)
+          throw Error ("You should create a subgraph "
+            " before creating nodes.");
+
+        // TODO: A better way of associating constraint should be thought of.
+        DifferentiableFunctionPtr_t df = problemSolver_->numericalConstraint(constraintName);
+        ConfigProjectorPtr_t constraint = ConfigProjector::create (
+            problemSolver_->robot(),
+            constraintName,
+            problemSolver_->errorThreshold(),
+            problemSolver_->maxIterations());
+        constraint->addConstraint (df);
+        graph::NodePtr_t node = ns->createNode (constraint);
+        node->name (nodeName);
+        return node->id ();
       }
     } // namespace impl
   } // namespace manipulation
