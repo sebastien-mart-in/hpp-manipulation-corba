@@ -15,6 +15,7 @@
 // hpp-manipulation. If not, see <http://www.gnu.org/licenses/>.
 
 #include <hpp/util/debug.hh>
+#include <hpp/util/pointer.hh>
 
 #include <hpp/manipulation/graph/node-selector.hh>
 #include <hpp/manipulation/graph/node.hh>
@@ -54,13 +55,12 @@ namespace hpp {
         return ns->id ();
       }
 
-      Long Graph::createNode(const char* subgraphName, const char* nodeName, const char* constraintName)
+      Long Graph::createNode(const Long subgraphId, const char* nodeName, const char* constraintName)
         throw (hpp::Error)
       {
-        if (!graph_)
-          throw Error ("You should create the graph"
-            " before creating nodes.");
-        graph::NodeSelectorPtr_t ns = graph_->getNodeSelectorByName (subgraphName);
+        graph::NodeSelectorPtr_t ns =
+          HPP_DYNAMIC_PTR_CAST(graph::NodeSelector,
+              graph::GraphComponent::get(subgraphId).lock());
         if (!ns)
           throw Error ("You should create a subgraph "
             " before creating nodes.");

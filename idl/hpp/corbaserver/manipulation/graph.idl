@@ -34,8 +34,10 @@ module hpp {
           raises (Error);
 
         /// Add a node to the graph.
+        /// \param subGraphId is the ID of the subgraph to which the node should be added.
         /// \param nodeName the name of the new node.
-        long createNode (in string subGraphName, in string nodeName, in string constraintName)
+        /// \param constraintName is the name of the constraint in the ProblemSolver map.
+        long createNode (in long subGraphId, in string nodeName, in string constraintName)
           raises (Error);
       }; // interface Graph
     }; // module manipulation

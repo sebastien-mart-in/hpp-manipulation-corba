@@ -43,7 +43,7 @@ namespace hpp {
           virtual Long createSubGraph(const char* subgraphName)
             throw (hpp::Error);
 
-          virtual Long createNode (const char* subGraphName,
+          virtual Long createNode (const Long subGraphId,
                                    const char* nodeName,
                                    const char* constraintName)
             throw (hpp::Error);
