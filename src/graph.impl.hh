@@ -26,7 +26,7 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
-      using CORBA::Short;
+      using CORBA::Long;
 
       class Graph : public virtual POA_hpp::corbaserver::manipulation::Graph
       {
@@ -37,13 +37,13 @@ namespace hpp {
             problemSolver_ = problemSolver;
           }
 
-          virtual Short createGraph(const char* graphName)
+          virtual Long createGraph(const char* graphName)
             throw (hpp::Error);
 
-          virtual Short createSubGraph(const char* subgraphName)
+          virtual Long createSubGraph(const char* subgraphName)
             throw (hpp::Error);
 
-          virtual Short createNode (const char* subGraphName,
+          virtual Long createNode (const char* subGraphName,
                                    const char* nodeName,
                                    const char* constraintName)
             throw (hpp::Error);

@@ -30,7 +30,7 @@ namespace hpp {
         problemSolver_ (0x0), graph_ ()
       {}
 
-      Short Graph::createGraph(const char* graphName)
+      Long Graph::createGraph(const char* graphName)
         throw (hpp::Error)
       {
         RobotPtr_t robot = problemSolver_->robot ();
@@ -43,7 +43,7 @@ namespace hpp {
         return graph_->id ();
       }
 
-      Short Graph::createSubGraph(const char* subgraphName)
+      Long Graph::createSubGraph(const char* subgraphName)
         throw (hpp::Error)
       {
         if (!graph_)
@@ -54,7 +54,7 @@ namespace hpp {
         return ns->id ();
       }
 
-      Short Graph::createNode(const char* subgraphName, const char* nodeName, const char* constraintName)
+      Long Graph::createNode(const char* subgraphName, const char* nodeName, const char* constraintName)
         throw (hpp::Error)
       {
         if (!graph_)
