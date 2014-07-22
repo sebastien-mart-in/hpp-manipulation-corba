@@ -47,6 +47,12 @@ namespace hpp {
                                    const char* nodeName,
                                    const char* constraintName)
             throw (hpp::Error);
+
+          virtual Long createEdge (const Long nodeFromId,
+                                   const Long nodeToId,
+                                   const char* edgeName,
+                                   const char* constraintName)
+            throw (hpp::Error);
         private:
           ProblemSolverPtr_t problemSolver_;
           graph::GraphPtr_t graph_;

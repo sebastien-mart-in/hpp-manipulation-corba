@@ -77,6 +77,27 @@ namespace hpp {
         node->name (nodeName);
         return node->id ();
       }
+
+      Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const char* constraintName)
+        throw (hpp::Error)
+      {
+        graph::NodePtr_t from = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeFromId).lock());
+        graph::NodePtr_t to   = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeToId  ).lock());
+        if (!from || !to)
+          throw Error ("The nodes could not be found.");
+
+        // TODO: A better way of associating constraint should be thought of.
+        DifferentiableFunctionPtr_t df = problemSolver_->numericalConstraint(constraintName);
+        ConfigProjectorPtr_t constraint = ConfigProjector::create (
+            problemSolver_->robot(),
+            constraintName,
+            problemSolver_->errorThreshold(),
+            problemSolver_->maxIterations());
+        constraint->addConstraint (df);
+        graph::EdgePtr_t edge = from->linkTo (to, constraint);
+        edge->name (edgeName);
+        return edge->id ();
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

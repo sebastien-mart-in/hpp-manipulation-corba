@@ -39,6 +39,13 @@ module hpp {
         /// \param constraintName is the name of the constraint in the ProblemSolver map.
         long createNode (in long subGraphId, in string nodeName, in string constraintName)
           raises (Error);
+
+        /// Add an edge between two nodes of the graph.
+        /// \param nodeFromId, nodeToId the ID of the ends of the new edge.
+        /// \param edgeName name of the new edge.
+        /// \param constraintName is the name of the constraint in the ProblemSolver map.
+        long createEdge (in long nodeFromId, in long nodeToId, in string edgeName, in string constraintName)
+          raises (Error);
       }; // interface Graph
     }; // module manipulation
   }; // module corbaserver
