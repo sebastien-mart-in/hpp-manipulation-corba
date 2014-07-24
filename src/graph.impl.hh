@@ -44,14 +44,19 @@ namespace hpp {
             throw (hpp::Error);
 
           virtual Long createNode (const Long subGraphId,
-                                   const char* nodeName,
-                                   const char* constraintName)
+                                   const char* nodeName)
             throw (hpp::Error);
 
           virtual Long createEdge (const Long nodeFromId,
                                    const Long nodeToId,
-                                   const char* edgeName,
-                                   const char* constraintName)
+                                   const char* edgeName)
+            throw (hpp::Error);
+
+          virtual void setNumericalConstraints (const Long graphComponentId,
+                                       const hpp::Names_t& constraintNames)
+            throw (hpp::Error);
+
+          virtual void display ()
             throw (hpp::Error);
         private:
           ProblemSolverPtr_t problemSolver_;

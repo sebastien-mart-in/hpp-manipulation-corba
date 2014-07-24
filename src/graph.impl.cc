@@ -41,6 +41,8 @@ namespace hpp {
         }
         graph_ = graph::Graph::create(robot);
         graph_->name(graphName);
+        graph_->maxIterations (problemSolver_->maxIterations ());
+        graph_->errorThreshold (problemSolver_->errorThreshold ());
         return graph_->id ();
       }
 
@@ -55,48 +57,67 @@ namespace hpp {
         return ns->id ();
       }
 
-      Long Graph::createNode(const Long subgraphId, const char* nodeName, const char* constraintName)
+      Long Graph::createNode(const Long subgraphId, const char* nodeName)
         throw (hpp::Error)
       {
-        graph::NodeSelectorPtr_t ns =
-          HPP_DYNAMIC_PTR_CAST(graph::NodeSelector,
+        graph::NodeSelectorPtr_t ns;
+        try {
+          ns = HPP_DYNAMIC_PTR_CAST(graph::NodeSelector,
               graph::GraphComponent::get(subgraphId).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
         if (!ns)
           throw Error ("You should create a subgraph "
-            " before creating nodes.");
+              " before creating nodes.");
 
-        // TODO: A better way of associating constraint should be thought of.
-        DifferentiableFunctionPtr_t df = problemSolver_->numericalConstraint(constraintName);
-        ConfigProjectorPtr_t constraint = ConfigProjector::create (
-            problemSolver_->robot(),
-            constraintName,
-            problemSolver_->errorThreshold(),
-            problemSolver_->maxIterations());
-        constraint->addConstraint (df);
-        graph::NodePtr_t node = ns->createNode (constraint);
+        graph::NodePtr_t node = ns->createNode ();
         node->name (nodeName);
         return node->id ();
       }
 
-      Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const char* constraintName)
+      Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName)
         throw (hpp::Error)
       {
-        graph::NodePtr_t from = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeFromId).lock());
-        graph::NodePtr_t to   = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeToId  ).lock());
+        graph::NodePtr_t from, to;
+        try {
+          from = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeFromId).lock());
+          to   = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeToId  ).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
         if (!from || !to)
           throw Error ("The nodes could not be found.");
 
-        // TODO: A better way of associating constraint should be thought of.
-        DifferentiableFunctionPtr_t df = problemSolver_->numericalConstraint(constraintName);
-        ConfigProjectorPtr_t constraint = ConfigProjector::create (
-            problemSolver_->robot(),
-            constraintName,
-            problemSolver_->errorThreshold(),
-            problemSolver_->maxIterations());
-        constraint->addConstraint (df);
-        graph::EdgePtr_t edge = from->linkTo (to, constraint);
+        graph::EdgePtr_t edge = from->linkTo (to);
         edge->name (edgeName);
         return edge->id ();
+      }
+
+      void Graph::setNumericalConstraints (const Long graphComponentId,
+          const hpp::Names_t& constraintNames)
+        throw (hpp::Error)
+      {
+        graph::GraphComponentPtr_t component = graph::GraphComponent::get(graphComponentId).lock();
+        if (!component)
+          throw Error ("The ID does not exist.");
+
+        if (constraintNames.length () > 0) {
+          try {
+            for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
+              std::string name (constraintNames [i]);
+              component->addNumericalConstraint (problemSolver_->numericalConstraint(name));
+            }
+          } catch (graph::Bad_function_call& err) {
+            throw Error (err.what());
+          }
+        }
+      }
+
+      void Graph::display ()
+        throw (hpp::Error)
+      {
+        std::cout << *graph_;
       }
     } // namespace impl
   } // namespace manipulation
