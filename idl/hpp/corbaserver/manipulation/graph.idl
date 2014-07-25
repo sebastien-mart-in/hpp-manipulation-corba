@@ -60,6 +60,9 @@ module hpp {
         void setLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
           raises (Error);
 
+        /// Get one node per subgraph corresponding to the state of the configuration.
+        /// \param dofArray the configuration.
+        /// \return a list of IDs corresponding to the nodes.
         void getNodes (in floatSeq dofArray, out IDseq nodeIDs)
           raises (Error);
 
