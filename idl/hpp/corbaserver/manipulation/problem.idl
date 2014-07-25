@@ -56,6 +56,14 @@ module hpp
             in unsigned short rankInVelocity)
           raises (Error);
 
+        /// Make a LockedDof constraint parametric or non-parametric
+        /// \param constraintName Name of the numerical constraint,
+        /// \param value True is parametric
+        ///
+        /// Constraints should have been added in the ProblemSolver local map.
+        void isLockedDofParametric (in string constraintName, in boolean parametric)
+          raises (Error);
+
       }; // interface Problem
     }; // module manipulation
   }; // module corbaserver

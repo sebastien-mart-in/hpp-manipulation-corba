@@ -73,6 +73,16 @@ namespace hpp {
 	}
       }
 
+      void Problem::isLockedDofParametric (const char* constraintName,
+          CORBA::Boolean value)
+        throw (hpp::Error)
+      {
+        LockedDofPtr_t l =
+          problemSolver_->lockedDofConstraint (constraintName);
+        if (!l)
+          throw hpp::Error ("The LockedDof constraint could not be found.");
+        l->isParametric (value);
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

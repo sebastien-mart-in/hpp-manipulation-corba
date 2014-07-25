@@ -49,6 +49,10 @@ namespace hpp {
 			      UShort rankInConfiguration,
 			      UShort rankInVelocity)
 	  throw (hpp::Error);
+
+        virtual void isLockedDofParametric (const char* constraintName,
+            CORBA::Boolean value)
+          throw (hpp::Error);
       private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Problem
