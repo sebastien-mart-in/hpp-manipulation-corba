@@ -15,8 +15,9 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#include <hpp/core/constraint-set.hh>
 #include <hpp/util/debug.hh>
+#include <hpp/core/locked-dof.hh>
+#include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
 #include <hpp/model/gripper.hh>
 #include <hpp/manipulation/robot.hh>
@@ -51,6 +52,27 @@ namespace hpp {
 	  throw Error (exc.what ());
 	}
       }
+
+      void Problem::createLockedDofConstraint (const char* lockedDofName,
+                             const char* jointName, Double value,
+			     UShort rankInConfiguration, UShort rankInVelocity)
+	throw (hpp::Error)
+      {
+	try {
+	  // Get robot in hppPlanner object.
+	  RobotPtr_t robot = problemSolver_->robot ();
+	  JointPtr_t joint = robot->getJointByName (jointName);
+
+	  LockedDofPtr_t lockedDof (LockedDof::create (lockedDofName, joint,
+						       value,
+						       rankInConfiguration,
+						       rankInVelocity));
+          problemSolver_->addLockedDofConstraint (lockedDofName, lockedDof);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

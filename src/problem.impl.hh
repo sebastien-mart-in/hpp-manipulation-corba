@@ -26,6 +26,8 @@ namespace hpp {
   namespace manipulation {
     namespace impl {
       using CORBA::Short;
+      using CORBA::UShort;
+      using CORBA::Double;
 
       class Problem : public virtual POA_hpp::corbaserver::manipulation::Problem
       {
@@ -41,6 +43,12 @@ namespace hpp {
 				  const char* handleName)
 	  throw (hpp::Error);
 
+	virtual void createLockedDofConstraint (const char* lockedDofName,
+                              const char* jointName,
+                              Double value,
+			      UShort rankInConfiguration,
+			      UShort rankInVelocity)
+	  throw (hpp::Error);
       private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Problem

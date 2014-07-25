@@ -157,6 +157,21 @@ class ProblemSolver (object):
     def applyConstraints (self, q):
         return self.client.basic.problem.applyConstraints (q)
 
+    ## Insert a new LockedDof constraint with given value in the
+    #        hpp::manipulation::ProblemSolver map
+    # \param lockedDofName key of the constraint in the map
+    # \param jointName name of the joint
+    # \param value value of the locked degree of freedom,
+    # \param rankInConfiguration rank of the locked dof in the joint
+    #        configuration vector (should be 0 for rotation and translation
+    #        joints)
+    # \param rankInVelocity rank of the locked dof in the joint
+    #        velocity vector (should be 0 for rotation and translation
+    #        joints)
+    def createLockedDofConstraint (self, lockedDofName, jointName, value, rankInConfiguration, rankInVelocity):
+        return self.client.manipulation.problem.createLockedDofConstraint \
+            (lockedDofName, jointName, value, rankInConfiguration, rankInVelocity)
+
     ## Lock degree of freedom with given value
     # \param jointName name of the joint
     # \param value value of the locked degree of freedom,

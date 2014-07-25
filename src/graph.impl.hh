@@ -58,6 +58,7 @@ namespace hpp {
 
           virtual void display ()
             throw (hpp::Error);
+
         private:
           ProblemSolverPtr_t problemSolver_;
           graph::GraphPtr_t graph_;
