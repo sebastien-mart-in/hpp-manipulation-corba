@@ -108,7 +108,7 @@ namespace hpp {
               std::string name (constraintNames [i]);
               component->addNumericalConstraint (problemSolver_->numericalConstraint(name));
             }
-          } catch (graph::Bad_function_call& err) {
+          } catch (std::exception& err) {
             throw Error (err.what());
           }
         }
