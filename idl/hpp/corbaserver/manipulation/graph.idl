@@ -45,10 +45,16 @@ module hpp {
         long createEdge (in long nodeFromId, in long nodeToId, in string edgeName)
           raises (Error);
 
-        /// Set the constraints of a component.
+        /// Set the numerical constraints of a component.
         /// \param graphComponentId ID of the component.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
         void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames)
+          raises (Error);
+
+        /// Set the LockedDof constraints of a component.
+        /// \param graphComponentId ID of the component.
+        /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
+        void setLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
           raises (Error);
 
         void display ()

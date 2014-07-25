@@ -114,6 +114,26 @@ namespace hpp {
         }
       }
 
+      void Graph::setLockedDofConstraints (const Long graphComponentId,
+          const hpp::Names_t& constraintNames)
+        throw (hpp::Error)
+      {
+        graph::GraphComponentPtr_t component = graph::GraphComponent::get(graphComponentId).lock();
+        if (!component)
+          throw Error ("The ID does not exist.");
+
+        if (constraintNames.length () > 0) {
+          try {
+            for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
+              std::string name (constraintNames [i]);
+              component->addLockedDofConstraint (problemSolver_->lockedDofConstraint(name));
+            }
+          } catch (std::exception& err) {
+            throw Error (err.what());
+          }
+        }
+      }
+
       void Graph::display ()
         throw (hpp::Error)
       {

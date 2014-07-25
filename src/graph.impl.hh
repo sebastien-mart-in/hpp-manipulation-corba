@@ -56,6 +56,10 @@ namespace hpp {
                                        const hpp::Names_t& constraintNames)
             throw (hpp::Error);
 
+          virtual void setLockedDofConstraints (const Long graphComponentId,
+                                       const hpp::Names_t& constraintNames)
+            throw (hpp::Error);
+
           virtual void display ()
             throw (hpp::Error);
 
