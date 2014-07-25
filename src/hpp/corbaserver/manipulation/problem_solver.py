@@ -172,6 +172,15 @@ class ProblemSolver (object):
         return self.client.manipulation.problem.createLockedDofConstraint \
             (lockedDofName, jointName, value, rankInConfiguration, rankInVelocity)
 
+    ## Make a LockedDof constraint parametric or non-parametric
+    # \param constraintName Name of the numerical constraint,
+    # \param value True is parametric
+    #
+    # Constraints should have been added in the ProblemSolver local map.
+    def isLockedDofParametric (self, constraintName, parametric):
+        self.client.manipulation.problem.isLockedDofParametric \
+                (constraintName, parametric)
+
     ## Lock degree of freedom with given value
     # \param jointName name of the joint
     # \param value value of the locked degree of freedom,
