@@ -21,6 +21,9 @@
 # include <hpp/corbaserver/common.idl>
 
 module hpp {
+  typedef long ID;
+  typedef sequence<ID> IDseq;
+
   module corbaserver {
     module manipulation {
       interface Graph {
@@ -55,6 +58,9 @@ module hpp {
         /// \param graphComponentId ID of the component.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
         void setLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
+          raises (Error);
+
+        void getNodes (in floatSeq dofArray, out IDseq nodeIDs)
           raises (Error);
 
         void display ()

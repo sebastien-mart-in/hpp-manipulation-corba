@@ -134,6 +134,29 @@ namespace hpp {
         }
       }
 
+      void Graph::getNodes (const hpp::floatSeq& dofArray, IDseq_out output)
+        throw (hpp::Error)
+      {
+        try {
+          vector_t config; config.resize (dofArray.length());
+          for (std::size_t iDof = 0; iDof < config.size(); iDof++) {
+            config [iDof] = dofArray[iDof];
+          }
+          graph::Nodes_t nodes = graph_->getNode (config);
+          IDseq* ret_ptr = new IDseq ();
+          ret_ptr->length(nodes.size());
+          size_t s = 0;
+          graph::Nodes_t::iterator it;
+          for (it = nodes.begin (); it != nodes.end(); it++) {
+            (*ret_ptr)[s] = (*it)->id();
+            s++;
+          }
+          output = ret_ptr;
+        } catch (std::exception& e) {
+          throw Error (e.what());
+        }
+      }
+
       void Graph::display ()
         throw (hpp::Error)
       {
