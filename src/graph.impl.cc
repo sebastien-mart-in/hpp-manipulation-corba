@@ -17,6 +17,7 @@
 #include <hpp/util/debug.hh>
 #include <hpp/util/pointer.hh>
 
+#include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/graph/node-selector.hh>
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/graph.hh>
@@ -43,6 +44,7 @@ namespace hpp {
         graph_->name(graphName);
         graph_->maxIterations (problemSolver_->maxIterations ());
         graph_->errorThreshold (problemSolver_->errorThreshold ());
+        problemSolver_->constraintGraph (graph_);
         return graph_->id ();
       }
 
