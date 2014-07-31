@@ -22,11 +22,38 @@
 #include <hpp/model/gripper.hh>
 #include <hpp/manipulation/robot.hh>
 #include <hpp/manipulation/object.hh>
+#include <hpp/manipulation/manipulation-planner.hh>
 #include "problem.impl.hh"
 
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      static ConfigurationPtr_t floatSeqToConfig
+      (hpp::manipulation::ProblemSolverPtr_t problemSolver,
+       const hpp::floatSeq& dofArray)
+      {
+	size_type configDim = (size_type)dofArray.length();
+	ConfigurationPtr_t config (new Configuration_t (configDim));
+
+	// Get robot in hppPlanner object.
+	DevicePtr_t robot = problemSolver->robot ();
+
+	// Compare size of input array with number of degrees of freedom of
+	// robot.
+	if (configDim != robot->configSize ()) {
+	  hppDout (error, "robot nb dof=" << configDim <<
+		   " is different from config size=" << robot->configSize());
+	  throw std::runtime_error
+	    ("robot nb dof is different from config size");
+	}
+
+	// Fill dof vector with dof array.
+	for (size_type iDof=0; iDof < configDim; ++iDof) {
+	  (*config) [iDof] = dofArray [iDof];
+	}
+	return config;
+      }
+
       Problem::Problem () : problemSolver_ (0x0)
       {
       }
@@ -82,6 +109,34 @@ namespace hpp {
         if (!l)
           throw hpp::Error ("The LockedDof constraint could not be found.");
         l->isParametric (value);
+      }
+
+      void Problem::extend (const hpp::floatSeq& q_near,
+          const hpp::floatSeq& q_rand,
+          hpp::floatSeq_out output)
+      {
+	ConfigurationPtr_t cfg_near = floatSeqToConfig (problemSolver_, q_near);
+	ConfigurationPtr_t cfg_rand = floatSeqToConfig (problemSolver_, q_rand);
+        Configuration_t cfg_new;
+	try {
+          ManipulationPlannerPtr_t planner =
+            HPP_DYNAMIC_PTR_CAST(ManipulationPlanner, problemSolver_->pathPlanner ());
+          if (!planner)
+            throw hpp::Error ("The planner must be a ManipulationPlanner");
+          core::PathPtr_t path;
+          planner->extend (cfg_near, cfg_rand, path);
+          cfg_new = (*path) (path->length());
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+	ULong size = (ULong) cfg_new.size ();
+	hpp::floatSeq* q_ptr = new hpp::floatSeq ();
+	q_ptr->length (size);
+
+	for (std::size_t i=0; i<size; ++i) {
+	  (*q_ptr) [i] = cfg_new [i];
+	}
+	output = q_ptr;
       }
     } // namespace impl
   } // namespace manipulation

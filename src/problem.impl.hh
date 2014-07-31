@@ -27,6 +27,7 @@ namespace hpp {
     namespace impl {
       using CORBA::Short;
       using CORBA::UShort;
+      using CORBA::ULong;
       using CORBA::Double;
 
       class Problem : public virtual POA_hpp::corbaserver::manipulation::Problem
@@ -53,6 +54,10 @@ namespace hpp {
         virtual void isLockedDofParametric (const char* constraintName,
             CORBA::Boolean value)
           throw (hpp::Error);
+
+        virtual void extend (const hpp::floatSeq& q_near,
+            const hpp::floatSeq& q_rand,
+            hpp::floatSeq_out q_new);
       private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Problem
