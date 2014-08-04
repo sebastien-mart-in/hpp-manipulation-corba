@@ -80,6 +80,9 @@ namespace hpp {
                                 const hpp::floatSeq& gripperClosed)
           throw (hpp::Error);
 
+        virtual void setGripperParam (const char* gripperName, float param)
+          throw (hpp::Error);
+
 	virtual void addAxialHandle (const char* objectName,
 				     const char* linkName,
 				     const char* handleName,
