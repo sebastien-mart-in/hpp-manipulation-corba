@@ -27,6 +27,18 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      static vector_t floatSeqToVector (const hpp::floatSeq& dofArray)
+      {
+	size_type configDim = (size_type)dofArray.length();
+	vector_t config (configDim);
+
+	// Fill dof vector with dof array.
+	for (size_type iDof=0; iDof < configDim; ++iDof) {
+	  config [iDof] = dofArray [iDof];
+	}
+	return config;
+      }
+
       Robot::Robot () : problemSolver_ (0x0)
       {
       }
@@ -152,7 +164,10 @@ namespace hpp {
       void Robot::addGripper(const char* robotName, const char* linkName,
 			     const char* gripperName,
 			     const ::hpp::Transform handlePositioninJoint,
-                             const Names_t& bodyInCollisionNames)
+                             const Names_t& bodyInCollisionNames,
+                             const Names_t& jointNames,
+                             const hpp::floatSeq& gripperOpen,
+                             const hpp::floatSeq& gripperClosed)
 	throw (hpp::Error)
       {
 	try {
@@ -172,6 +187,20 @@ namespace hpp {
 	  GripperPtr_t gripper = model::Gripper::create (gripperName, joint, 
                                                   Transform3f (q, v),
                                                   jointInCollision);
+          int sizeJoints = jointNames.length (),
+            sizeOpen = gripperOpen.length (),
+            sizeClosed = gripperClosed.length ();
+          model::JointVector_t innerJoints;
+          if (sizeJoints > 0 && sizeOpen == sizeClosed && sizeOpen == sizeJoints) {
+            for (CORBA::ULong i=0; i<jointNames.length (); ++i) {
+              std::string jointName (jointNames [i]);
+              innerJoints.push_back(robot->getJointByName(jointName));
+            }
+            gripper->innerJoints (innerJoints);
+            gripper->openConfig (floatSeqToVector(gripperOpen));
+            gripper->closedConfig (floatSeqToVector(gripperClosed));
+          }
+
 	  robot->addGripper (gripper);
           hppDout (info, "add Gripper to robot " << robotName 
                           << " : "<< gripper); 
@@ -189,6 +218,16 @@ namespace hpp {
               gripperRobot->addDisabledCollision(problemSolver_->
                                                    robot()->joint(*itJoint));
             }  
+            if (sizeJoints > 0 && sizeOpen == sizeClosed && sizeOpen == sizeJoints) {
+              model::JointVector_t innerJointsRobot;
+              for (core::JointVector_t::const_iterator it = innerJoints.begin ();
+                  it != innerJoints.end(); it++)
+                innerJointsRobot.push_back(problemSolver_->
+                    robot()->joint(*it));
+              gripperRobot->innerJoints (innerJointsRobot);
+              gripperRobot->openConfig (floatSeqToVector(gripperOpen));
+              gripperRobot->closedConfig (floatSeqToVector(gripperClosed));
+            }
 	    problemSolver_->robot()->addGripper (gripperRobot->name (),
                                                    gripperRobot);
           }

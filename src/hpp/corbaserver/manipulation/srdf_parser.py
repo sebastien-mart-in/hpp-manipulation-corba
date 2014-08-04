@@ -115,10 +115,23 @@ class Parser (object):
             disabledCollisions = h.getElementsByTagName('disable_collision')
             for disabledCollision in disabledCollisions:
                 CollisionNames.append(str( disabledCollision.attributes['link'].nodeValue ))
+            states = h.getElementsByTagName ('state')
+            jointNames = list ()
+            jointValuesOpen = list ()
+            jointValuesClosed = list ()
+            if states.length is 1:
+                state = states[0]
+                for joint in state.getElementsByTagName ('joint'):
+                    jointNames.append (str (joint.attributes['name'].nodeValue))
+                    jointValuesOpen.append (float (joint.attributes['valueopen'].nodeValue))
+                    jointValuesClosed.append (float (joint.attributes['valueclosed'].nodeValue))
             self.client.robot.addGripper (self.objectName, linkName,
                                           gripperName,
                                           handlePositionInJoint,
-                                          CollisionNames)
+                                          CollisionNames,
+                                          jointNames,
+                                          jointValuesOpen,
+                                          jointValuesClosed)
 
     def parseAll (self):
         self.parseHandles ()
