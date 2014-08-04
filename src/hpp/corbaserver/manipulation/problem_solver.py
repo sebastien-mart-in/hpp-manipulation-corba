@@ -157,6 +157,14 @@ class ProblemSolver (object):
     def applyConstraints (self, q):
         return self.client.basic.problem.applyConstraints (q)
 
+    ## Generate a configuration satisfying the constraints
+    #
+    #  \param maxIter maximum number of tries,
+    #  \return configuration projected in success,
+    #  \throw Error if projection failed.
+    def generateValidConfig (self, maxIter):
+        return self.client.basic.problem.generateValidConfig (maxIter)
+
     ## Insert a new LockedDof constraint with given value in the
     #        hpp::manipulation::ProblemSolver map
     # \param lockedDofName key of the constraint in the map
