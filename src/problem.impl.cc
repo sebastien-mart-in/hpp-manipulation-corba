@@ -124,8 +124,10 @@ namespace hpp {
           if (!planner)
             throw hpp::Error ("The planner must be a ManipulationPlanner");
           core::PathPtr_t path;
-          planner->extend (cfg_near, cfg_rand, path);
-          cfg_new = (*path) (path->length());
+          if (planner->extend (cfg_near, cfg_rand, path))
+            cfg_new = (*path) (path->length());
+          else
+            cfg_new = *cfg_near;
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
