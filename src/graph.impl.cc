@@ -45,6 +45,7 @@ namespace hpp {
         graph_->maxIterations (problemSolver_->maxIterations ());
         graph_->errorThreshold (problemSolver_->errorThreshold ());
         problemSolver_->constraintGraph (graph_);
+        problemSolver_->problem()->constraintGraph (graph_);
         return graph_->id ();
       }
 
