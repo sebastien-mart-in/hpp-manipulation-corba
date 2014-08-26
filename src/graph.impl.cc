@@ -137,12 +137,35 @@ namespace hpp {
         }
       }
 
+      void Graph::statOnConstraint (const hpp::IDseq& IDedges)
+        throw (hpp::Error)
+      {
+        graph::Edges_t edges;
+        graph::EdgePtr_t edge;
+        for (CORBA::ULong i=0; i < IDedges.length (); ++i) {
+          size_t id (IDedges [i]);
+          try {
+            edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+                graph::GraphComponent::get(id).lock ());
+          } catch (std::exception& e ) {
+            throw Error (e.what());
+          }
+          if (!edge) {
+            std::stringstream ss;
+            ss << "ID " << id << " is not an edge";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
+          }
+          edges.push_back (edge);
+        }
+      }
+
       void Graph::getNodes (const hpp::floatSeq& dofArray, IDseq_out output)
         throw (hpp::Error)
       {
         try {
           vector_t config; config.resize (dofArray.length());
-          for (std::size_t iDof = 0; iDof < config.size(); iDof++) {
+          for (int iDof = 0; iDof < config.size(); iDof++) {
             config [iDof] = dofArray[iDof];
           }
           graph::Nodes_t nodes = graph_->getNode (config);
