@@ -23,6 +23,7 @@
 #include <hpp/manipulation/robot.hh>
 #include <hpp/manipulation/object.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
+#include <hpp/manipulation/graph/node.hh>
 #include "problem.impl.hh"
 
 namespace hpp {
@@ -109,6 +110,62 @@ namespace hpp {
         if (!l)
           throw hpp::Error ("The LockedDof constraint could not be found.");
         l->isParametric (value);
+      }
+
+      bool Problem::applyConstraints (const hpp::IDseq& IDnodes,
+          const hpp::floatSeq& input,
+          hpp::floatSeq_out output,
+          double& residualError)
+        throw (hpp::Error)
+      {
+        if (IDnodes.length() == 0)
+          throw Error ("ID lists is empty.");
+        /// First get the constraint.
+        ConstraintSetPtr_t constraint;
+        try {
+            graph::Nodes_t nodes;
+            graph::NodePtr_t node;
+            for (CORBA::ULong i=0; i < IDnodes.length (); ++i) {
+              size_t id (IDnodes [i]);
+              try {
+                node = HPP_DYNAMIC_PTR_CAST(graph::Node,
+                    graph::GraphComponent::get(id).lock ());
+              } catch (std::exception& e ) {
+                throw Error (e.what());
+              }
+              if (!node) {
+                std::stringstream ss;
+                ss << "ID " << id << " is not an node";
+                std::string errmsg = ss.str();
+                throw Error (errmsg.c_str());
+              }
+              nodes.push_back (node);
+            }
+            constraint = problemSolver_->constraintGraph ()->configConstraint (nodes);
+        } catch (std::exception& e ) {
+          throw Error (e.what());
+        }
+
+	bool success = false;
+	ConfigurationPtr_t config = floatSeqToConfig (problemSolver_, input);
+	try {
+	  success = constraint->apply (*config);
+	  if (hpp::core::ConfigProjectorPtr_t configProjector =
+	      constraint ->configProjector ()) {
+	    residualError = configProjector->residualError ();
+	  }
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+	ULong size = (ULong) config->size ();
+	hpp::floatSeq* q_ptr = new hpp::floatSeq ();
+	q_ptr->length (size);
+
+	for (std::size_t i=0; i<size; ++i) {
+	  (*q_ptr) [i] = (*config) [i];
+	}
+	output = q_ptr;
+	return success;
       }
 
       void Problem::extend (const hpp::floatSeq& q_near,

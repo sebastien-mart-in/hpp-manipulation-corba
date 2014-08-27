@@ -68,6 +68,17 @@ module hpp {
         void extend (in floatSeq q_near, in floatSeq q_rand, out floatSeq q_new)
           raises (Error);
 
+        /// Apply constaints to a configuration
+        ///
+        /// constraints are stored in ProblemSolver object
+        /// \param IDnodes list of node ID
+        /// \param input input configuration,
+        /// \retval output output configuration,
+        /// \retval error norm of the residual error.
+        boolean applyConstraints (in IDseq IDnodes, in floatSeq input, out floatSeq output,
+            out double residualError)
+          raises (Error);
+
       }; // interface Problem
     }; // module manipulation
   }; // module corbaserver

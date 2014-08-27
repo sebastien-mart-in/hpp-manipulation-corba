@@ -55,6 +55,12 @@ namespace hpp {
             CORBA::Boolean value)
           throw (hpp::Error);
 
+        virtual bool applyConstraints (const hpp::IDseq& IDnodes,
+            const hpp::floatSeq& input,
+            hpp::floatSeq_out output,
+            double& residualError)
+          throw (hpp::Error);
+
         virtual void extend (const hpp::floatSeq& q_near,
             const hpp::floatSeq& q_rand,
             hpp::floatSeq_out q_new);
