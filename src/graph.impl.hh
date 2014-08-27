@@ -49,7 +49,8 @@ namespace hpp {
 
           virtual Long createEdge (const Long nodeFromId,
                                    const Long nodeToId,
-                                   const char* edgeName)
+                                   const char* edgeName,
+                                   const Long weight)
             throw (hpp::Error);
 
           virtual void setNumericalConstraints (const Long graphComponentId,

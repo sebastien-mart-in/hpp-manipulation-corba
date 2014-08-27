@@ -43,7 +43,8 @@ module hpp {
         /// Add an edge between two nodes of the graph.
         /// \param nodeFromId, nodeToId the ID of the ends of the new edge.
         /// \param edgeName name of the new edge.
-        long createEdge (in long nodeFromId, in long nodeToId, in string edgeName)
+        /// \param weight weight of the edge.
+        long createEdge (in long nodeFromId, in long nodeToId, in string edgeName, in long weight)
           raises (Error);
 
         /// Set the numerical constraints of a component.
