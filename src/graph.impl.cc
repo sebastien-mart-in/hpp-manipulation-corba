@@ -18,6 +18,7 @@
 #include <hpp/util/pointer.hh>
 
 #include <hpp/manipulation/problem.hh>
+#include <hpp/manipulation/roadmap.hh>
 #include <hpp/manipulation/graph/node-selector.hh>
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/graph.hh>
@@ -157,6 +158,14 @@ namespace hpp {
             throw Error (errmsg.c_str());
           }
           edges.push_back (edge);
+        }
+        try {
+          RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver_->roadmap());
+          if (!roadmap)
+            throw Error ("The roadmap is not of type hpp::manipulation::Roadmap.");
+          roadmap->statAddFoliation (graph_->configConstraint (edges));
+        } catch (std::exception& e) {
+          throw Error (e.what());
         }
       }
 
