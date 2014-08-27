@@ -18,10 +18,11 @@
 #ifndef HPP_MANIPULATION_CORBA_ROBOT_IDL
 # define HPP_MANIPULATION_CORBA_ROBOT_IDL
 
+# include "hpp/corbaserver/manipulation/gcommon.idl"
 # include <hpp/corbaserver/common.idl>
 
-module hpp
-{
+
+module hpp {
   module corbaserver {
     module manipulation {
       interface Problem
