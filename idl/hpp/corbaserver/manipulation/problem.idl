@@ -70,12 +70,22 @@ module hpp {
 
         /// Apply constaints to a configuration
         ///
-        /// constraints are stored in ProblemSolver object
         /// \param IDnodes list of node ID
         /// \param input input configuration,
         /// \retval output output configuration,
         /// \retval error norm of the residual error.
         boolean applyConstraints (in IDseq IDnodes, in floatSeq input, out floatSeq output,
+            out double residualError)
+          raises (Error);
+
+        /// Apply constaints to a configuration
+        ///
+        /// \param IDnodes list of edge ID
+        /// \param qnear configuration to initiliaze the projector,
+        /// \param input input configuration,
+        /// \retval output output configuration,
+        /// \retval error norm of the residual error.
+        boolean applyConstraintsWithOffset (in IDseq IDnodes, in floatSeq qnear, in floatSeq input, out floatSeq output,
             out double residualError)
           raises (Error);
 

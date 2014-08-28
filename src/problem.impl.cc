@@ -24,6 +24,7 @@
 #include <hpp/manipulation/object.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node.hh>
+#include <hpp/manipulation/graph/edge.hh>
 #include "problem.impl.hh"
 
 namespace hpp {
@@ -142,6 +143,65 @@ namespace hpp {
               nodes.push_back (node);
             }
             constraint = problemSolver_->constraintGraph ()->configConstraint (nodes);
+        } catch (std::exception& e ) {
+          throw Error (e.what());
+        }
+
+	bool success = false;
+	ConfigurationPtr_t config = floatSeqToConfig (problemSolver_, input);
+	try {
+	  success = constraint->apply (*config);
+	  if (hpp::core::ConfigProjectorPtr_t configProjector =
+	      constraint ->configProjector ()) {
+	    residualError = configProjector->residualError ();
+	  }
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+	ULong size = (ULong) config->size ();
+	hpp::floatSeq* q_ptr = new hpp::floatSeq ();
+	q_ptr->length (size);
+
+	for (std::size_t i=0; i<size; ++i) {
+	  (*q_ptr) [i] = (*config) [i];
+	}
+	output = q_ptr;
+	return success;
+      }
+
+      bool Problem::applyConstraintsWithOffset (const hpp::IDseq& IDedges,
+          const hpp::floatSeq& qnear,
+          const hpp::floatSeq& input,
+          hpp::floatSeq_out output,
+          double& residualError)
+        throw (hpp::Error)
+      {
+        if (IDedges.length() == 0)
+          throw Error ("ID lists is empty.");
+        /// First get the constraint.
+        ConstraintSetPtr_t constraint;
+        try {
+          graph::Edges_t edges;
+          graph::EdgePtr_t edge;
+          for (CORBA::ULong i=0; i < IDedges.length (); ++i) {
+            size_t id (IDedges [i]);
+            try {
+              edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+                  graph::GraphComponent::get(id).lock ());
+            } catch (std::exception& e ) {
+              throw Error (e.what());
+            }
+            if (!edge) {
+              std::stringstream ss;
+              ss << "ID " << id << " is not an edge";
+              std::string errmsg = ss.str();
+              throw Error (errmsg.c_str());
+            }
+            edges.push_back (edge);
+          }
+          constraint = problemSolver_->constraintGraph ()->configConstraint (edges);
+          ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
+          constraint->offsetFromConfig (*qoffset);
         } catch (std::exception& e ) {
           throw Error (e.what());
         }

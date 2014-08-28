@@ -61,6 +61,13 @@ namespace hpp {
             double& residualError)
           throw (hpp::Error);
 
+        virtual bool applyConstraintsWithOffset (const hpp::IDseq& IDedges,
+            const hpp::floatSeq& qnear,
+            const hpp::floatSeq& input,
+            hpp::floatSeq_out output,
+            double& residualError)
+          throw (hpp::Error);
+
         virtual void extend (const hpp::floatSeq& q_near,
             const hpp::floatSeq& q_rand,
             hpp::floatSeq_out q_new);
