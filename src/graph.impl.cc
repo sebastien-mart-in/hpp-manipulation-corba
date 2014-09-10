@@ -80,7 +80,7 @@ namespace hpp {
         return node->id ();
       }
 
-      Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w)
+      Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
         throw (hpp::Error)
       {
         graph::NodePtr_t from, to;
@@ -93,7 +93,7 @@ namespace hpp {
         if (!from || !to)
           throw Error ("The nodes could not be found.");
 
-        graph::EdgePtr_t edge = from->linkTo (to, w);
+        graph::EdgePtr_t edge = from->linkTo (to, w, isInNodeFrom);
         edge->name (edgeName);
         return edge->id ();
       }
