@@ -146,6 +146,22 @@ namespace hpp {
         /// First get the constraint.
         ConstraintSetPtr_t constraint;
         try {
+          bool idAreAllEdges = true;
+          graph::Edges_t edges;
+          graph::EdgePtr_t edge;
+          for (CORBA::ULong i=0; i < IDnodes.length (); ++i) {
+            size_t id (IDnodes [i]);
+            edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+                graph::GraphComponent::get(id).lock ());
+            if (!edge) {
+              idAreAllEdges = false;
+              break;
+            }
+            edges.push_back (edge);
+          }
+          if (idAreAllEdges)
+            constraint = problemSolver_->constraintGraph ()->configConstraint (edges);
+          else {
             graph::Nodes_t nodes;
             graph::NodePtr_t node;
             for (CORBA::ULong i=0; i < IDnodes.length (); ++i) {
@@ -165,6 +181,7 @@ namespace hpp {
               nodes.push_back (node);
             }
             constraint = problemSolver_->constraintGraph ()->configConstraint (nodes);
+          }
         } catch (std::exception& e ) {
           throw Error (e.what());
         }
