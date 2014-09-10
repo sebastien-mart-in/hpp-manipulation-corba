@@ -44,6 +44,11 @@ namespace hpp {
 				  const char* handleName)
 	  throw (hpp::Error);
 
+        virtual void createPreGrasp (const char* graspName,
+                                     const char* gripperName,
+                                     const char* handleName)
+	  throw (hpp::Error);
+
 	virtual void createLockedDofConstraint (const char* lockedDofName,
                               const char* jointName,
                               Double value,

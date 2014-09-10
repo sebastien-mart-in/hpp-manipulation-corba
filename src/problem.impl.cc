@@ -82,6 +82,28 @@ namespace hpp {
 	}
       }
 
+      void Problem::createPreGrasp (const char* graspName,
+                                    const char* gripperName,
+                                    const char* handleName)
+	throw (hpp::Error)
+      {
+	RobotPtr_t robot = problemSolver_->robot ();
+	if (!robot) {
+	  throw Error ("You should build a composite robot before trying to"
+		       " define constraints.");
+	}
+	try {
+	  const GripperPtr_t gripper = robot->gripper (gripperName);
+	  const HandlePtr_t& handle = robot->handle (handleName);
+	  DifferentiableFunctionPtr_t constraint =
+	    handle->createPreGrasp (gripper);
+	  problemSolver_->addNumericalConstraint (graspName, constraint);
+          problemSolver_->addGrasp(constraint, gripper, handle);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       void Problem::createLockedDofConstraint (const char* lockedDofName,
                              const char* jointName, Double value,
 			     UShort rankInConfiguration, UShort rankInVelocity)

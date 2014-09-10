@@ -40,6 +40,18 @@ module hpp {
 			  in string handleName)
 	  raises (Error);
 
+        /// Create pre-grasp constraint between robot gripper and object handle
+	///
+	/// \param graspName name of the constraint for storing in ProblemSolver
+	///        map,
+	/// \param gripperName name of the gripper used when it has been created
+	/// \param handleName name of the handle in the form "object/handle"
+	/// where object is the name of the object owning the handle and handle
+	/// is the name of the handle in this object.
+	void createPreGrasp (in string graspName, in string gripperName,
+			  in string handleName)
+	  raises (Error);
+
         /// Insert a new LockedDof constraint with given value in the
         ///        hpp::manipulation::ProblemSolver map
         /// \param lockedDofName key of the constraint in the map
