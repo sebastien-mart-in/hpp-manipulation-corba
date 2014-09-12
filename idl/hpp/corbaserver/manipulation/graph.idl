@@ -53,6 +53,12 @@ module hpp {
         void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames)
           raises (Error);
 
+        /// Set the numerical constraints for path of a node.
+        /// \param nodeId ID of the node.
+        /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
+        void setNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames)
+          raises (Error);
+
         /// Set the LockedDof constraints of a component.
         /// \param graphComponentId ID of the component.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.

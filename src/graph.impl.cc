@@ -118,6 +118,31 @@ namespace hpp {
         }
       }
 
+      void Graph::setNumericalConstraintsForPath (const Long nodeId,
+          const hpp::Names_t& constraintNames)
+        throw (hpp::Error)
+      {
+        graph::NodePtr_t n;
+        try {
+          n = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeId).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
+        if (!n)
+          throw Error ("The nodes could not be found.");
+
+        if (constraintNames.length () > 0) {
+          try {
+            for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
+              std::string name (constraintNames [i]);
+              n->addNumericalConstraintForPath (problemSolver_->numericalConstraint(name));
+            }
+          } catch (std::exception& err) {
+            throw Error (err.what());
+          }
+        }
+      }
+
       void Graph::setLockedDofConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames)
         throw (hpp::Error)
