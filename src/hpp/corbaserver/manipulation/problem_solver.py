@@ -111,6 +111,19 @@ class ProblemSolver (object):
                                     constraintName + "/orientation-left-foot",
                                     constraintName + "/position-left-foot"]
 
+    ##  Create complement of static stability constraints
+    #
+    #   Call corba request
+    #   hpp::corbaserver::wholebody_step::Problem::addComplementStaticStabilityConstraints
+    #
+    #   The ankles are defined by members leftAnkle and rightAnkle of variable
+    #   robot passed at construction of this object.
+    #   \param constraintName name of the resulting constraint,
+    #   \param q0 configuration that satisfies the constraints
+    def createComplementStaticStabilityConstraints (self, constraintName, q0):
+        self.client.wholebodyStep.problem.addComplementStaticStabilityConstraints \
+            (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle)
+
     ## Return balance constraints created by method
     #  ProblemSolver.createStaticStabilityConstraints
     def balanceConstraints (self):
