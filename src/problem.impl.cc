@@ -144,52 +144,27 @@ namespace hpp {
         l->isParametric (value);
       }
 
-      bool Problem::applyConstraints (const hpp::IDseq& IDnodes,
+      bool Problem::applyConstraints (hpp::ID id,
           const hpp::floatSeq& input,
           hpp::floatSeq_out output,
           double& residualError)
         throw (hpp::Error)
       {
-        if (IDnodes.length() == 0)
-          throw Error ("ID lists is empty.");
         /// First get the constraint.
         ConstraintSetPtr_t constraint;
         try {
-          bool idAreAllEdges = true;
-          graph::Edges_t edges;
-          graph::EdgePtr_t edge;
-          for (CORBA::ULong i=0; i < IDnodes.length (); ++i) {
-            size_t id (IDnodes [i]);
-            edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
-                graph::GraphComponent::get(id).lock ());
-            if (!edge) {
-              idAreAllEdges = false;
-              break;
-            }
-            edges.push_back (edge);
-          }
-          if (idAreAllEdges)
-            constraint = problemSolver_->constraintGraph ()->configConstraint (edges);
+          graph::GraphComponentPtr_t comp = graph::GraphComponent::get ((size_t)id).lock ();
+          graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
+          graph::NodePtr_t node = HPP_DYNAMIC_PTR_CAST(graph::Node, comp);
+          if (edge)
+            constraint = problemSolver_->constraintGraph ()->configConstraint (edge);
+          else if (node)
+            constraint = problemSolver_->constraintGraph ()->configConstraint (node);
           else {
-            graph::Nodes_t nodes;
-            graph::NodePtr_t node;
-            for (CORBA::ULong i=0; i < IDnodes.length (); ++i) {
-              size_t id (IDnodes [i]);
-              try {
-                node = HPP_DYNAMIC_PTR_CAST(graph::Node,
-                    graph::GraphComponent::get(id).lock ());
-              } catch (std::exception& e ) {
-                throw Error (e.what());
-              }
-              if (!node) {
-                std::stringstream ss;
-                ss << "ID " << id << " is not an node";
-                std::string errmsg = ss.str();
-                throw Error (errmsg.c_str());
-              }
-              nodes.push_back (node);
-            }
-            constraint = problemSolver_->constraintGraph ()->configConstraint (nodes);
+            std::stringstream ss;
+            ss << "ID " << id << " is neither an edge nor a node";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
           }
         } catch (std::exception& e ) {
           throw Error (e.what());
@@ -217,37 +192,25 @@ namespace hpp {
 	return success;
       }
 
-      bool Problem::applyConstraintsWithOffset (const hpp::IDseq& IDedges,
+      bool Problem::applyConstraintsWithOffset (hpp::ID IDedge,
           const hpp::floatSeq& qnear,
           const hpp::floatSeq& input,
           hpp::floatSeq_out output,
           double& residualError)
         throw (hpp::Error)
       {
-        if (IDedges.length() == 0)
-          throw Error ("ID lists is empty.");
         /// First get the constraint.
         ConstraintSetPtr_t constraint;
         try {
-          graph::Edges_t edges;
-          graph::EdgePtr_t edge;
-          for (CORBA::ULong i=0; i < IDedges.length (); ++i) {
-            size_t id (IDedges [i]);
-            try {
-              edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
-                  graph::GraphComponent::get(id).lock ());
-            } catch (std::exception& e ) {
-              throw Error (e.what());
-            }
-            if (!edge) {
-              std::stringstream ss;
-              ss << "ID " << id << " is not an edge";
-              std::string errmsg = ss.str();
-              throw Error (errmsg.c_str());
-            }
-            edges.push_back (edge);
+          graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+                  graph::GraphComponent::get((size_t)IDedge).lock ());
+          if (!edge) {
+            std::stringstream ss;
+            ss << "ID " << IDedge << " is not an edge";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
           }
-          constraint = problemSolver_->constraintGraph ()->configConstraint (edges);
+          constraint = problemSolver_->constraintGraph ()->configConstraint (edge);
           ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
           constraint->offsetFromConfig (*qoffset);
         } catch (std::exception& e ) {

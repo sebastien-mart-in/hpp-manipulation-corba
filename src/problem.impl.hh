@@ -60,13 +60,13 @@ namespace hpp {
             CORBA::Boolean value)
           throw (hpp::Error);
 
-        virtual bool applyConstraints (const hpp::IDseq& IDnodes,
+        virtual bool applyConstraints (hpp::ID id,
             const hpp::floatSeq& input,
             hpp::floatSeq_out output,
             double& residualError)
           throw (hpp::Error);
 
-        virtual bool applyConstraintsWithOffset (const hpp::IDseq& IDedges,
+        virtual bool applyConstraintsWithOffset (hpp::ID IDedge,
             const hpp::floatSeq& qnear,
             const hpp::floatSeq& input,
             hpp::floatSeq_out output,

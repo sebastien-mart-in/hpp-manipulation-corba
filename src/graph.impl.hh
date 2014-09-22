@@ -66,10 +66,10 @@ namespace hpp {
                                        const hpp::Names_t& constraintNames)
             throw (hpp::Error);
 
-          virtual void statOnConstraint (const hpp::IDseq& IDedges)
+          virtual void statOnConstraint (hpp::ID IDedge)
             throw (hpp::Error);
 
-          virtual void getNodes (const hpp::floatSeq& dofArray, IDseq_out output)
+          virtual void getNode (const hpp::floatSeq& dofArray, ID_out output)
             throw (hpp::Error);
 
           virtual void display ()

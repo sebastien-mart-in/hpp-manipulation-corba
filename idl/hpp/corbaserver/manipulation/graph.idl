@@ -66,14 +66,14 @@ module hpp {
           raises (Error);
 
         /// Activate statistic analysis for this sequence of edges.
-        /// \param IDedges list of edges ID.
-        void statOnConstraint (in IDseq IDedges)
+        /// \param IDedge edge ID.
+        void statOnConstraint (in ID IDedge)
           raises (Error);
 
-        /// Get one node per subgraph corresponding to the state of the configuration.
+        /// Get the node corresponding to the state of the configuration.
         /// \param dofArray the configuration.
-        /// \return a list of IDs corresponding to the nodes.
-        void getNodes (in floatSeq dofArray, out IDseq nodeIDs)
+        /// \return the ID corresponding to the node.
+        void getNode (in floatSeq dofArray, out ID nodeId)
           raises (Error);
 
         void display ()

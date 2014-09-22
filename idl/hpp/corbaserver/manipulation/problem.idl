@@ -82,22 +82,22 @@ module hpp {
 
         /// Apply constaints to a configuration
         ///
-        /// \param IDnodes list of node ID
+        /// \param idComp ID of a node or a configuration
         /// \param input input configuration,
         /// \retval output output configuration,
         /// \retval error norm of the residual error.
-        boolean applyConstraints (in IDseq IDnodes, in floatSeq input, out floatSeq output,
+        boolean applyConstraints (in ID idComp, in floatSeq input, out floatSeq output,
             out double residualError)
           raises (Error);
 
         /// Apply constaints to a configuration
         ///
-        /// \param IDnodes list of edge ID
+        /// \param IDedge ID of an edge
         /// \param qnear configuration to initiliaze the projector,
         /// \param input input configuration,
         /// \retval output output configuration,
         /// \retval error norm of the residual error.
-        boolean applyConstraintsWithOffset (in IDseq IDnodes, in floatSeq qnear, in floatSeq input, out floatSeq output,
+        boolean applyConstraintsWithOffset (in ID IDedge, in floatSeq qnear, in floatSeq input, out floatSeq output,
             out double residualError)
           raises (Error);
 

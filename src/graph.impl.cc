@@ -165,38 +165,34 @@ namespace hpp {
         }
       }
 
-      void Graph::statOnConstraint (const hpp::IDseq& IDedges)
+      void Graph::statOnConstraint (hpp::ID IDedge)
         throw (hpp::Error)
       {
-        graph::Edges_t edges;
         graph::EdgePtr_t edge;
-        for (CORBA::ULong i=0; i < IDedges.length (); ++i) {
-          size_t id (IDedges [i]);
-          try {
-            edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
-                graph::GraphComponent::get(id).lock ());
-          } catch (std::exception& e ) {
-            throw Error (e.what());
-          }
-          if (!edge) {
-            std::stringstream ss;
-            ss << "ID " << id << " is not an edge";
-            std::string errmsg = ss.str();
-            throw Error (errmsg.c_str());
-          }
-          edges.push_back (edge);
+        size_t id (IDedge);
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+              graph::GraphComponent::get(id).lock ());
+        } catch (std::exception& e ) {
+          throw Error (e.what());
+        }
+        if (!edge) {
+          std::stringstream ss;
+          ss << "ID " << id << " is not an edge";
+          std::string errmsg = ss.str();
+          throw Error (errmsg.c_str());
         }
         try {
           RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver_->roadmap());
           if (!roadmap)
             throw Error ("The roadmap is not of type hpp::manipulation::Roadmap.");
-          roadmap->statAddFoliation (graph_->configConstraint (edges));
+          roadmap->statAddFoliation (graph_->configConstraint (edge));
         } catch (std::exception& e) {
           throw Error (e.what());
         }
       }
 
-      void Graph::getNodes (const hpp::floatSeq& dofArray, IDseq_out output)
+      void Graph::getNode (const hpp::floatSeq& dofArray, ID_out output)
         throw (hpp::Error)
       {
         try {
@@ -204,16 +200,8 @@ namespace hpp {
           for (int iDof = 0; iDof < config.size(); iDof++) {
             config [iDof] = dofArray[iDof];
           }
-          graph::Nodes_t nodes = graph_->getNode (config);
-          IDseq* ret_ptr = new IDseq ();
-          ret_ptr->length(nodes.size());
-          size_t s = 0;
-          graph::Nodes_t::iterator it;
-          for (it = nodes.begin (); it != nodes.end(); it++) {
-            (*ret_ptr)[s] = (*it)->id();
-            s++;
-          }
-          output = ret_ptr;
+          graph::NodePtr_t node = graph_->getNode (config);
+          output = node->id();
         } catch (std::exception& e) {
           throw Error (e.what());
         }
