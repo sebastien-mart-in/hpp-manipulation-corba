@@ -98,6 +98,24 @@ namespace hpp {
         return edge->id ();
       }
 
+      Long Graph::addWaypoint (const Long edgeId, const char* edgeName, hpp::ID_out nodeId)
+        throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge;
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, graph::GraphComponent::get(edgeId).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
+        if (!edge)
+          throw Error ("The edge could not be found.");
+        graph::EdgePtr_t waypoint = edge->createWaypoint ();
+        waypoint->name (edgeName);
+        waypoint->to ()->name (std::string(edgeName) + "_node");
+        nodeId = waypoint->to ()->id ();
+        return waypoint->id ();
+      }
+
       void Graph::setNumericalConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames)
         throw (hpp::Error)

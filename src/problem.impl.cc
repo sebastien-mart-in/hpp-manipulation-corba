@@ -99,7 +99,7 @@ namespace hpp {
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createPreGrasp (gripper);
 	  DifferentiableFunctionPtr_t ineq_positive =
-	    handle->createPreGraspOnLine (gripper, 0);
+	    handle->createPreGraspOnLine (gripper, 0.05);
 	  DifferentiableFunctionPtr_t ineq_negative =
 	    handle->createPreGraspOnLine (gripper, 0.1);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
