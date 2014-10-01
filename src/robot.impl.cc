@@ -132,7 +132,7 @@ namespace hpp {
       }
       void Robot::addHandle (const char* objectName, const char* linkName,
 			     const char* handleName,
-			     const ::hpp::Transform localPosition)
+			     const ::hpp::Transform_ localPosition)
 	throw (hpp::Error)
       {
 	try {
@@ -181,7 +181,7 @@ namespace hpp {
 
       void Robot::addGripper(const char* robotName, const char* linkName,
 			     const char* gripperName,
-			     const ::hpp::Transform handlePositioninJoint,
+			     const ::hpp::Transform_ handlePositioninJoint,
                              const Names_t& bodyInCollisionNames,
                              const Names_t& jointNames,
                              const hpp::floatSeq& gripperOpen,
@@ -257,7 +257,7 @@ namespace hpp {
 
       void Robot::addAxialHandle (const char* objectName, const char* linkName,
 				  const char* handleName,
-				  const ::hpp::Transform localPosition)
+				  const ::hpp::Transform_ localPosition)
 	throw (hpp::Error)
       {
 	try {

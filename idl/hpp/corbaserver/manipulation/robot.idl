@@ -107,7 +107,7 @@ module hpp
     ///       the same length.
     void addGripper (in string robotName, in string linkName,
 		     in string gripperName, 
-                     in Transform handlePositioninJoint,
+                     in Transform_ handlePositioninJoint,
                      in Names_t bodyInCollisionNames,
                      in Names_t jointNames,
                      in floatSeq gripperOpen,
@@ -124,7 +124,7 @@ module hpp
     /// \param handleName name of the handle,
     /// \param localPosition position of the handle in the joint frame.
     void addHandle (in string objectName, in string linkName,
-		    in string handleName, in Transform localPosition)
+		    in string handleName, in Transform_ localPosition)
       raises (Error);
 
     /// Add axial handle to an object
@@ -135,7 +135,7 @@ module hpp
     /// \param localPosition position of the handle in the joint frame,
     ///        rotation around x-axis is not constrained.
     void addAxialHandle (in string objectName, in string linkName,
-			 in string handleName, in Transform localPosition)
+			 in string handleName, in Transform_ localPosition)
       raises (Error);
 
     Names_t getDeviceNames ()
