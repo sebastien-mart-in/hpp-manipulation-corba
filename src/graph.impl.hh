@@ -54,9 +54,26 @@ namespace hpp {
                                    const bool isInNodeFrom)
             throw (hpp::Error);
 
-          virtual Long addWaypoint (const Long edgeId,
-                                    const char* edgeName,
-                                    hpp::ID_out nodeId)
+          virtual Long createWaypointEdge (const Long nodeFromId,
+                                           const Long nodeToId,
+                                           const char* edgeName,
+                                           const Long weight,
+                                           const bool isInNodeFrom)
+            throw (hpp::Error);
+
+          virtual Long getWaypoint (const Long edgeId, hpp::ID_out nodeId)
+            throw (hpp::Error);
+
+          virtual Long createLevelSetEdge(const Long nodeFromId,
+                                          const Long nodeToId,
+                                          const char* edgeName,
+                                          const Long w,
+                                          const bool isInNodeFrom)
+            throw (hpp::Error);
+
+          virtual void setLevelSetConstraints (const Long edgeId,
+              const hpp::Names_t& numericalConstraintNames,
+              const hpp::Names_t& lockedDofNames)
             throw (hpp::Error);
 
           virtual void setNumericalConstraints (const Long graphComponentId,

@@ -98,22 +98,92 @@ namespace hpp {
         return edge->id ();
       }
 
-      Long Graph::addWaypoint (const Long edgeId, const char* edgeName, hpp::ID_out nodeId)
+      Long Graph::createWaypointEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
         throw (hpp::Error)
       {
-        graph::EdgePtr_t edge;
+        graph::NodePtr_t from, to;
         try {
-          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, graph::GraphComponent::get(edgeId).lock());
+          from = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeFromId).lock());
+          to   = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeToId  ).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
+        if (!from || !to)
+          throw Error ("The nodes could not be found.");
+
+        graph::EdgePtr_t edge = from->linkTo (to, w, isInNodeFrom, graph::WaypointEdge::create);
+        edge->name (edgeName);
+        return edge->id ();
+      }
+
+      Long Graph::getWaypoint (const Long edgeId, hpp::ID_out nodeId)
+        throw (hpp::Error)
+      {
+        graph::WaypointEdgePtr_t edge;
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST(graph::WaypointEdge, graph::GraphComponent::get(edgeId).lock());
         } catch (std::out_of_range& e) {
           throw Error (e.what());
         }
         if (!edge)
           throw Error ("The edge could not be found.");
-        graph::EdgePtr_t waypoint = edge->createWaypoint ();
-        waypoint->name (edgeName);
-        waypoint->to ()->name (std::string(edgeName) + "_node");
+        graph::EdgePtr_t waypoint = edge->waypoint ();
+        waypoint->name (edge->name () + "_waypoint");
+        waypoint->to ()->name (edge->name () + "_waypoint_node");
         nodeId = waypoint->to ()->id ();
         return waypoint->id ();
+      }
+
+      Long Graph::createLevelSetEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
+        throw (hpp::Error)
+      {
+        graph::NodePtr_t from, to;
+        try {
+          from = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeFromId).lock());
+          to   = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeToId  ).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
+        if (!from || !to)
+          throw Error ("The nodes could not be found.");
+
+        graph::EdgePtr_t edge = from->linkTo (to, w, isInNodeFrom, graph::LevelSetEdge::create);
+        edge->name (edgeName);
+        return edge->id ();
+      }
+
+      void Graph::setLevelSetConstraints (const Long edgeId,
+          const hpp::Names_t& numericalConstraintNames,
+          const hpp::Names_t& lockedDofNames)
+        throw (hpp::Error)
+      {
+        graph::LevelSetEdgePtr_t edge;
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST(graph::LevelSetEdge, graph::GraphComponent::get(edgeId).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
+        if (!edge)
+          throw Error ("The edge could not be found.");
+        try {
+          for (CORBA::ULong i=0; i<numericalConstraintNames.length (); ++i) {
+            std::string name (numericalConstraintNames [i]);
+            edge->insertConfigConstraint (
+                problemSolver_->numericalConstraint(name),
+                problemSolver_->inequality (name));
+          }
+          for (CORBA::ULong i=0; i<lockedDofNames.length (); ++i) {
+            std::string name (lockedDofNames [i]);
+            edge->insertConfigConstraint (problemSolver_->lockedDofConstraint (name));
+          }
+          RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver_->roadmap());
+          if (!roadmap)
+            throw Error ("The roadmap is not of type hpp::manipulation::Roadmap.");
+          edge->buildHistogram ();
+          roadmap->insertHistogram (edge->histogram ());
+        } catch (std::exception& err) {
+          throw Error (err.what());
+        }
       }
 
       void Graph::setNumericalConstraints (const Long graphComponentId,

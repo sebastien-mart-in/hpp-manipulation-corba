@@ -47,11 +47,23 @@ module hpp {
         long createEdge (in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in boolean isInNodeFrom)
           raises (Error);
 
-        /// Add a waypoint to an edge.
+        /// Add an edge with waypoint between two nodes of the graph.
+        /// \param nodeFromId, nodeToId the ID of the ends of the new edge.
+        /// \param edgeName name of the new edge.
+        /// \param weight weight of the edge.
+        long createWaypointEdge (in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in boolean isInNodeFrom)
+          raises (Error);
+
+        /// Get waypoint IDs of an edge.
         /// \param edgeId the ID of the edge.
-        /// \param edgeName name of the waypoint.
-        /// \return the ID of the waypoint.
-        long addWaypoint (in long edgeId, in string edgeName, out ID nodeId)
+        /// \return the ID of the edge and the node associated with the node.
+        long getWaypoint (in long edgeId, out ID nodeId)
+          raises (Error);
+
+        long createLevelSetEdge(in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in boolean isInNodeFrom)
+          raises (Error);
+
+        void setLevelSetConstraints (in long edgeId, in Names_t numericalConstraintNames, in Names_t lockedDofNames)
           raises (Error);
 
         /// Set the numerical constraints of a component.
