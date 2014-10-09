@@ -60,9 +60,17 @@ module hpp {
         long getWaypoint (in long edgeId, out ID nodeId)
           raises (Error);
 
+        /// Add an edge of type LevelSetEdge between two nodes.
+        /// \param nodeFromId, nodeToId the ID of the ends of the new edge.
+        /// \param edgeName name of the new edge.
+        /// \param weight weight of the edge.
         long createLevelSetEdge(in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in boolean isInNodeFrom)
           raises (Error);
 
+        /// Set the numerical constraints of a LevelSetEdge that are create the foliation.
+        /// \param graphComponentId ID of the component.
+        /// \param numericalConstraintNames is an array of names of numerical constraints in the ProblemSolver map.
+        /// \param lockedDofNames is an array of names of LockedDof constraints in the ProblemSolver map.
         void setLevelSetConstraints (in long edgeId, in Names_t numericalConstraintNames, in Names_t lockedDofNames)
           raises (Error);
 
