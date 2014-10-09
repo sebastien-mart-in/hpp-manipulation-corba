@@ -73,9 +73,6 @@ namespace hpp {
             double& residualError)
           throw (hpp::Error);
 
-        virtual void extend (const hpp::floatSeq& q_near,
-            const hpp::floatSeq& q_rand,
-            hpp::floatSeq_out q_new);
       private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Problem

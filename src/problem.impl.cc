@@ -238,36 +238,6 @@ namespace hpp {
 	output = q_ptr;
 	return success;
       }
-
-      void Problem::extend (const hpp::floatSeq& q_near,
-          const hpp::floatSeq& q_rand,
-          hpp::floatSeq_out output)
-      {
-	ConfigurationPtr_t cfg_near = floatSeqToConfig (problemSolver_, q_near);
-	ConfigurationPtr_t cfg_rand = floatSeqToConfig (problemSolver_, q_rand);
-        Configuration_t cfg_new;
-	try {
-          ManipulationPlannerPtr_t planner =
-            HPP_DYNAMIC_PTR_CAST(ManipulationPlanner, problemSolver_->pathPlanner ());
-          if (!planner)
-            throw hpp::Error ("The planner must be a ManipulationPlanner");
-          core::PathPtr_t path;
-          if (planner->extend (cfg_near, cfg_rand, path))
-            cfg_new = (*path) (path->length());
-          else
-            cfg_new = *cfg_near;
-	} catch (const std::exception& exc) {
-	  throw hpp::Error (exc.what ());
-	}
-	ULong size = (ULong) cfg_new.size ();
-	hpp::floatSeq* q_ptr = new hpp::floatSeq ();
-	q_ptr->length (size);
-
-	for (std::size_t i=0; i<size; ++i) {
-	  (*q_ptr) [i] = cfg_new [i];
-	}
-	output = q_ptr;
-      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

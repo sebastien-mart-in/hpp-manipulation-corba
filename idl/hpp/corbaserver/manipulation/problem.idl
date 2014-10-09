@@ -77,9 +77,6 @@ module hpp {
         void isLockedDofParametric (in string constraintName, in boolean parametric)
           raises (Error);
 
-        void extend (in floatSeq q_near, in floatSeq q_rand, out floatSeq q_new)
-          raises (Error);
-
         /// Apply constaints to a configuration
         ///
         /// \param idComp ID of a node or a configuration
