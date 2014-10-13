@@ -25,6 +25,7 @@
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>
+#include <hpp/manipulation/axial-handle.hh>
 #include "problem.impl.hh"
 
 namespace hpp {
@@ -75,7 +76,10 @@ namespace hpp {
 	  const HandlePtr_t& handle = robot->handle (handleName);
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createGrasp (gripper);
+	  DifferentiableFunctionPtr_t complement =
+	    handle->createGraspComplement (gripper);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
+	  problemSolver_->addNumericalConstraint (std::string(graspName) + "/complement", complement);
           problemSolver_->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -93,20 +97,21 @@ namespace hpp {
 		       " define constraints.");
 	}
 	try {
+          using hpp::core::EquationType;
 	  const GripperPtr_t gripper = robot->gripper (gripperName);
 	  const HandlePtr_t& handle = robot->handle (handleName);
           std::string name (graspName);
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createPreGrasp (gripper);
 	  DifferentiableFunctionPtr_t ineq_positive =
-	    handle->createPreGraspOnLine (gripper, 0.05);
+	    handle->createPreGraspComplement (gripper, 0.05);
 	  DifferentiableFunctionPtr_t ineq_negative =
-	    handle->createPreGraspOnLine (gripper, 0.1);
+	    handle->createPreGraspComplement (gripper, 0.1);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
 	  problemSolver_->addNumericalConstraint (name + "/ineq_0", ineq_positive);
-	  problemSolver_->addInequalityVector (name + "/ineq_0", - vector_t::Ones(1));
 	  problemSolver_->addNumericalConstraint (name + "/ineq_0.1", ineq_negative);
-	  problemSolver_->addInequalityVector (name + "/ineq_0.1", vector_t::Ones(1));
+          problemSolver_->addInequalityVector (name + "/ineq_0", EquationType::VectorOfTypes (1, EquationType::Inferior));
+          problemSolver_->addInequalityVector (name + "/ineq_0.1", EquationType::VectorOfTypes (1, EquationType::Superior));
           problemSolver_->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
