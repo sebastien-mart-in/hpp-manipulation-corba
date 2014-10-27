@@ -14,6 +14,8 @@
 // received a copy of the GNU Lesser General Public License along with
 // hpp-manipulation. If not, see <http://www.gnu.org/licenses/>.
 
+#include <fstream>
+
 #include <hpp/util/debug.hh>
 #include <hpp/util/pointer.hh>
 
@@ -299,6 +301,10 @@ namespace hpp {
         throw (hpp::Error)
       {
         std::cout << *graph_;
+        std::ofstream dotfile;
+        dotfile.open ("/tmp/constraintgraph.dot");
+        graph_->dotPrint (dotfile);
+        dotfile.close();
       }
     } // namespace impl
   } // namespace manipulation
