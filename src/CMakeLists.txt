@@ -134,6 +134,7 @@ INSTALL(
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/srdf_parser.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/problem_solver.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/robot.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/constraint_graph.py
   DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
   )
 
