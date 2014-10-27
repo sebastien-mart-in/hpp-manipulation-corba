@@ -40,6 +40,7 @@ int main (int argc, char* argv [])
   problemSolver->addPathPlannerType ("M-RRT", ManipulationPlanner::create);
   problemSolver->addPathValidationType ("Graph-discretized", GraphPathValidation::create <DiscretizedCollisionChecking>);
   problemSolver->pathPlannerType ("M-RRT");
+  problemSolver->pathValidationType ("Graph-discretized", 0.05);
 
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), false);
