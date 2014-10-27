@@ -36,9 +36,10 @@ typedef hpp::manipulation::GraphPathValidation GraphPathValidation;
 int main (int argc, char* argv [])
 {
   ProblemSolverPtr_t problemSolver = new ProblemSolver;
-  /// Add new path planner and path validation classes.
+  /// Add new path planner and path validation classes and make them the default values.
   problemSolver->addPathPlannerType ("M-RRT", ManipulationPlanner::create);
   problemSolver->addPathValidationType ("Graph-discretized", GraphPathValidation::create <DiscretizedCollisionChecking>);
+  problemSolver->pathPlannerType ("M-RRT");
 
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), false);
