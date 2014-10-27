@@ -64,6 +64,12 @@ namespace hpp {
 					  const hpp::Names_t& robotNames)
 	  throw (hpp::Error);
 
+        virtual Transform__slice* getRootJointPosition (const char* robotName)
+          throw (hpp::Error);
+
+        virtual void setRootJointPosition (const char* robotName,
+                                           const ::hpp::Transform_ position)
+          throw (hpp::Error);
 
 	virtual void addHandle (const char* objectName, const char* linkName,
 				const char* handleName,

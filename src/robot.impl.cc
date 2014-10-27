@@ -130,6 +130,51 @@ namespace hpp {
 	  throw Error (exc.what ());
 	}
       }
+
+      Transform__slice* Robot::getRootJointPosition (const char* robotName)
+        throw (Error)
+      {
+        try {
+	  model::DevicePtr_t robot = problemSolver_->robot (std::string (robotName));
+          if (!robot)
+            throw hpp::Error ("Robot was not found.");
+          model::JointPtr_t root = robot->rootJoint ();
+          if (!root) {
+            throw hpp::Error ("robot has no root joint");
+          }
+          const Transform3f& T = root->positionInParentFrame ();
+          double* res = new Transform_;
+          res [0] = T.getTranslation () [0];
+          res [1] = T.getTranslation () [1];
+          res [2] = T.getTranslation () [2];
+          res [3] = T.getQuatRotation () [0];
+          res [4] = T.getQuatRotation () [1];
+          res [5] = T.getQuatRotation () [2];
+          res [6] = T.getQuatRotation () [3];
+          return res;
+        } catch (const std::exception& exc) {
+          throw Error (exc.what ());
+        }
+      }
+
+      void Robot::setRootJointPosition (const char* robotName,
+                                        const ::hpp::Transform_ position)
+        throw (Error)
+      {
+        try {
+	  model::DevicePtr_t robot = problemSolver_->robot (std::string (robotName));
+          if (!robot)
+            throw hpp::Error ("Robot was not found.");
+	  fcl::Quaternion3f q (position [3], position [4],
+			       position [5], position [6]);
+	  fcl::Vec3f v (position [0], position [1],
+			 position [2]);
+          robot->rootJointPosition (fcl::Transform3f (q, v));
+        } catch (const std::exception& exc) {
+          throw Error (exc.what ());
+        }
+      }
+
       void Robot::addHandle (const char* objectName, const char* linkName,
 			     const char* handleName,
 			     const ::hpp::Transform_ localPosition)
