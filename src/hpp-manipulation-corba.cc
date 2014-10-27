@@ -20,6 +20,8 @@
 #include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/manipulation/problem-solver.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
+#include <hpp/core/discretized-collision-checking.hh>
+#include <hpp/manipulation/graph-path-validation.hh>
 
 typedef hpp::wholebodyStep::Server WholebodyServer;
 typedef hpp::corbaServer::Server CorbaServer;
@@ -28,11 +30,16 @@ typedef hpp::manipulation::ProblemSolver ProblemSolver;
 typedef hpp::manipulation::ProblemSolverPtr_t ProblemSolverPtr_t;
 typedef hpp::manipulation::ManipulationPlanner ManipulationPlanner;
 typedef hpp::manipulation::ManipulationPlannerPtr_t ManipulationPlannerPtr_t;
+typedef hpp::core::DiscretizedCollisionChecking DiscretizedCollisionChecking;
+typedef hpp::manipulation::GraphPathValidation GraphPathValidation;
 
 int main (int argc, char* argv [])
 {
   ProblemSolverPtr_t problemSolver = new ProblemSolver;
+  /// Add new path planner and path validation classes.
   problemSolver->addPathPlannerType ("M-RRT", ManipulationPlanner::create);
+  problemSolver->addPathValidationType ("Graph-discretized", GraphPathValidation::create <DiscretizedCollisionChecking>);
+
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), false);
   WholebodyServer wbsServer (argc, argv, false);
