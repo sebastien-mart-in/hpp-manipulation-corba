@@ -38,12 +38,13 @@ class CorbaClient:
 #  A composite robot is a kinematic chain composed of several sub-kinematic
 #  chains rooted at an anchor joint.
 class Robot (object):
-    def __init__ (self, robotName, rootJointType):
+    def __init__ (self, robotName, rootJointType, load = True):
         self.tf_root = "base_link"
         self.rootJointType = dict()
         self.robotName = robotName
         self.client = CorbaClient ()
-        self.loadModel (robotName, rootJointType)
+        if load:
+          self.loadModel (robotName, rootJointType)
 
     ## Virtual function to load the robot model
     def loadModel (self, robotName, rootJointType):
