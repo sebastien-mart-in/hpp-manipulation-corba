@@ -70,6 +70,7 @@ ADD_LIBRARY(${LIBRARY_NAME} SHARED
 )
 
 PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation)
+PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation-urdf)
 PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} omniORB4)
 
 INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION lib)
@@ -131,7 +132,6 @@ INSTALL(
 INSTALL(
   FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/client.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/srdf_parser.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/problem_solver.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/robot.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/constraint_graph.py
@@ -142,6 +142,7 @@ INSTALL(
 ADD_EXECUTABLE (hpp-manipulation-server hpp-manipulation-corba.cc)
 TARGET_LINK_LIBRARIES (hpp-manipulation-server ${LIBRARY_NAME})
 PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-manipulation)
+PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-manipulation-urdf)
 PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-wholebody-step-corba)
 
 INSTALL (TARGETS hpp-manipulation-server DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -47,6 +47,7 @@ ADD_DOC_DEPENDENCY("hpp-core >= 3")
 ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
 ADD_REQUIRED_DEPENDENCY("hpp-wholebody-step-corba >= 3 ")
 ADD_REQUIRED_DEPENDENCY("hpp-manipulation")
+ADD_REQUIRED_DEPENDENCY("hpp-manipulation-urdf")
 ADD_REQUIRED_DEPENDENCY("omniORB4 >= 4.1.4")
 
 PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})

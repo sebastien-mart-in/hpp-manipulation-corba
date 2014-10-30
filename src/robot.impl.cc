@@ -17,10 +17,12 @@
 
 #include <fcl/math/transform.h>
 #include <hpp/util/debug.hh>
-#include <hpp/model/urdf/util.hh>
+#include <hpp/manipulation/srdf/util.hh>
 #include <hpp/manipulation/object.hh>
 #include <hpp/manipulation/handle.hh>
+#include <hpp/model/humanoid-robot.hh>
 #include <hpp/model/gripper.hh>
+#include <hpp/model/body.hh>
 #include <hpp/manipulation/axial-handle.hh>
 #include "robot.impl.hh"
 
@@ -54,7 +56,7 @@ namespace hpp {
 	try {
 	  model::DevicePtr_t robot = model::Device::create
 	    (std::string (robotName));
-	  model::urdf::loadRobotModel (robot,
+	  manipulation::srdf::loadRobotModel (robot,
 				       std::string (rootJointType),
 				       std::string (packageName),
 				       std::string (modelName),
@@ -78,7 +80,7 @@ namespace hpp {
 	try {
 	  model::HumanoidRobotPtr_t robot =
 	    model::HumanoidRobot::create (std::string (robotName));
-	  model::urdf::loadHumanoidModel (robot,
+	  manipulation::srdf::loadHumanoidModel (robot,
 					  std::string (rootJointType),
 					  std::string (packageName),
 					  std::string (modelName),
@@ -102,7 +104,7 @@ namespace hpp {
 	try {
 	  manipulation::ObjectPtr_t object = manipulation::Object::create
 	    (objectName);
-	  model::urdf::loadRobotModel (object,
+	  manipulation::srdf::loadObjectModel (object,
 				       std::string (rootJointType),
 				       std::string (packageName),
 				       std::string (modelName),

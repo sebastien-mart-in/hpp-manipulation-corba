@@ -20,8 +20,6 @@ from hpp.corbaserver.manipulation import Client as ManipulationClient
 from hpp.corbaserver.wholebody_step import Client as WholebodyStepClient
 from hpp.corbaserver import Client as BasicClient
 
-from srdf_parser import Parser as SrdfParser
-
 ## Corba clients to the various servers
 #
 class CorbaClient:
@@ -71,20 +69,6 @@ class Robot (object):
                                                        packageName, modelName,
                                                        urdfSuffix, srdfSuffix)
         self.rootJointType[robotName] = rootJointType
-        # Read srdf file for robot specific informations (grippers).
-        # Build filename from ROS_PACKAGE_PATH
-        import os
-        ros_package_path = os.getenv ('ROS_PACKAGE_PATH').split(":")
-        path = None
-        for p in ros_package_path:
-            if os.path.exists (p + '/' + packageName):
-                path = p + '/' + packageName
-                break
-        if not path:
-            raise IOError ("package " + packageName + " not found")
-        filename = path + '/' + 'srdf/' + modelName + srdfSuffix + '.srdf'
-        parser = SrdfParser (self.client.manipulation, robotName, filename)
-        parser.parseGrippers ()
 
     ## Load humanoid robot model and store in local map
     #
@@ -105,20 +89,6 @@ class Robot (object):
             (robotName, rootJointType, packageName, modelName,
              urdfSuffix, srdfSuffix)
         self.rootJointType[robotName] = rootJointType
-        # Read srdf file for object specific informations (handles/gripper).
-        # Build filename from ROS_PACKAGE_PATH
-        import os
-        ros_package_path = os.getenv ('ROS_PACKAGE_PATH').split(":")
-        path = None
-        for p in ros_package_path:
-            if os.path.exists (p + '/' + packageName):
-                path = p + '/' + packageName
-                break
-        if not path:
-            raise IOError ("package " + packageName + " not found")
-        filename = path + '/' + 'srdf/' + modelName + srdfSuffix + '.srdf'
-        parser = SrdfParser (self.client.manipulation, objectName, filename)
-        parser.parseGrippers ()
 
     ## Load object model and store in local map
     #
@@ -140,20 +110,6 @@ class Robot (object):
             (objectName, rootJointType, packageName, modelName, urdfSuffix,
              srdfSuffix)
         self.rootJointType[objectName] = rootJointType
-        # Read srdf file for object specific informations (handles/gripper).
-        # Build filename from ROS_PACKAGE_PATH
-        import os
-        ros_package_path = os.getenv ('ROS_PACKAGE_PATH').split(":")
-        path = None
-        for p in ros_package_path:
-            if os.path.exists (p + '/' + packageName):
-                path = p + '/' + packageName
-                break
-        if not path:
-            raise IOError ("package " + packageName + " not found")
-        filename = path + '/' + 'srdf/' + modelName + srdfSuffix + '.srdf'
-        parser = SrdfParser (self.client.manipulation, objectName, filename)
-        parser.parseHandles ()
 
     ## Build a composite robot from a set of robots and objects
     #
