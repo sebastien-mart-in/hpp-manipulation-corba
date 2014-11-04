@@ -56,6 +56,13 @@ namespace hpp {
 			      UShort rankInVelocity)
 	  throw (hpp::Error);
 
+	virtual void createPlacementConstraint (const char* placName,
+                              const char* objectName,
+                              const char* objectJointName,
+                              const char* objectTriangleName,
+                              const char* envContactName)
+	  throw (hpp::Error);
+
         virtual void isLockedDofParametric (const char* constraintName,
             CORBA::Boolean value)
           throw (hpp::Error);

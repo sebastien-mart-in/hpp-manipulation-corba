@@ -69,6 +69,11 @@ module hpp {
             in unsigned short rankInVelocity)
           raises (Error);
 
+        void createPlacementConstraint (in string placementName, in string objectName,
+                                        in string objectJointName, in string objectTriangleName,
+                                        in string envContactName)
+          raises (Error);
+
         /// Make a LockedDof constraint parametric or non-parametric
         /// \param constraintName Name of the numerical constraint,
         /// \param value True is parametric

@@ -20,6 +20,7 @@
 #include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
 #include <hpp/model/gripper.hh>
+#include <hpp/constraints/static-stability.hh>
 #include <hpp/manipulation/robot.hh>
 #include <hpp/manipulation/object.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
@@ -133,6 +134,37 @@ namespace hpp {
 						       rankInConfiguration,
 						       rankInVelocity));
           problemSolver_->addLockedDofConstraint (lockedDofName, lockedDof);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
+      void Problem::createPlacementConstraint (const char* placName,
+          const char* objectName,
+          const char* objectJointName,
+          const char* objectTriangleName,
+          const char* envContactName)
+        throw (hpp::Error)
+      {
+	try {
+	  // Get robot in hppPlanner object.
+	  RobotPtr_t robot = problemSolver_->robot ();
+	  JointPtr_t joint = robot->getJointByName (objectJointName);
+
+	  ObjectPtr_t object = problemSolver_->object (objectName);
+
+          using constraints::StaticStabilityGravity;
+          using constraints::StaticStabilityGravityPtr_t;
+          StaticStabilityGravityPtr_t c = StaticStabilityGravity::create (robot, joint);
+
+          TriangleList l = object->contactTriangles (objectTriangleName);
+          for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
+            c->addObjectTriangle (*it);
+          l = problemSolver_->contactTriangles (envContactName);
+          for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
+            c->addFloorTriangle (*it);
+
+          problemSolver_->addNumericalConstraint (placName, c);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
