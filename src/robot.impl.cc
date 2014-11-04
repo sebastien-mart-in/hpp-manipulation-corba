@@ -23,6 +23,7 @@
 #include <hpp/model/humanoid-robot.hh>
 #include <hpp/model/gripper.hh>
 #include <hpp/model/body.hh>
+#include <hpp/model/collision-object.hh>
 #include <hpp/manipulation/axial-handle.hh>
 #include "robot.impl.hh"
 
@@ -115,6 +116,36 @@ namespace hpp {
 	  hppDout (info, *object);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
+	}
+      }
+
+      void Robot::loadEnvironmentModel (const char* package,
+                                        const char* envModelName,
+                                        const char* urdfSuffix,
+                                        const char* srdfSuffix,
+                                        const char* prefix)
+	throw (hpp::Error)
+      {
+	try {
+          ObjectPtr_t object (Object::create (std::string (envModelName)));
+          manipulation::srdf::loadEnvironmentModel (object, std::string (package),
+              std::string (envModelName), std::string (urdfSuffix), std::string (srdfSuffix));
+          std::string p (prefix);
+
+	  // Detach objects from joints
+	  for (model::ObjectIterator itObj = object->objectIterator
+		 (hpp::model::COLLISION); !itObj.isEnd (); ++itObj) {
+            model::CollisionObjectPtr_t obj = model::CollisionObject::create
+	      ((*itObj)->fcl ()->collisionGeometry(), (*itObj)->getTransform (), p + (*itObj)->name ());
+	    problemSolver_->addObstacle (obj, true, true);
+	    hppDout (info, "Adding obstacle " << obj->name ());
+          }
+          const TriangleMap& m = object->contactTriangles ();
+          for (TriangleMap::const_iterator it = m.begin ();
+              it != m.end (); it++)
+            problemSolver_->addContactTriangles (p + it->first, it->second);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
 	}
       }
 

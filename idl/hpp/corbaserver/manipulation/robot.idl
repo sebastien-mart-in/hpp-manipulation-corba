@@ -83,6 +83,11 @@ module hpp
 			  in string urdfSuffix, in string srdfSuffix)
       raises (Error);
 
+    void loadEnvironmentModel (in string packageName, in string envModelName,
+			 in string urdfSuffix, in string srdfSuffix,
+			 in string prefix)
+      raises (Error);
+
     /// Build a composite robot from a set of robots and objects
     ///
     /// \param robotName Name of the composite robot,

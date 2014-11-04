@@ -60,6 +60,13 @@ namespace hpp {
 				      const char* srdfSuffix)
 	  throw (hpp::Error);
 
+        virtual void loadEnvironmentModel (const char* package,
+                                           const char* envModelName,
+                                           const char* urdfSuffix,
+                                           const char* srdfSuffix,
+                                           const char* prefix)
+          throw (hpp::Error);
+
 	virtual void buildCompositeRobot (const char* robotName,
 					  const hpp::Names_t& robotNames)
 	  throw (hpp::Error);
