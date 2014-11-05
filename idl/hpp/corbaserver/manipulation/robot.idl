@@ -131,9 +131,6 @@ module hpp
                      in floatSeq gripperClosed)
       raises (Error);
 
-    void setGripperParam (in string gripperName, in float param)
-      raises (Error);
-
     /// Add Handle to an object
     ///
     /// \param objectName name of the object holding the handle,

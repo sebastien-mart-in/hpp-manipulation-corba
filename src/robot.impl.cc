@@ -239,24 +239,6 @@ namespace hpp {
 	}
       }
 
-      void Robot::setGripperParam (const char* gripperName, const float param)
-	throw (hpp::Error)
-      {
-	try {
-          RobotPtr_t robot = problemSolver_->robot ();
-          GripperPtr_t gripper = robot->gripper (gripperName);
-          if (!gripper->isParameterActive ())
-            throw hpp::Error ("This gripper does not have enough information"
-                " to activate the parameter");
-
-          Configuration_t config = robot->currentConfiguration ();
-          gripper->applyParameter (param, config);
-          robot->currentConfiguration (config);
-	} catch (const std::exception& exc) {
-	  throw Error (exc.what ());
-	}
-      }
-
       void Robot::addGripper(const char* robotName, const char* linkName,
 			     const char* gripperName,
 			     const ::hpp::Transform_ handlePositioninJoint,
