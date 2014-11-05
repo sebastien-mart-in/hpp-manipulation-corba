@@ -56,6 +56,12 @@ namespace hpp {
 			      UShort rankInVelocity)
 	  throw (hpp::Error);
 
+        virtual Names_t* getEnvironmentContactNames ()
+          throw (hpp::Error);
+
+        virtual Names_t* getObjectContactNames (const char* objectName)
+          throw (hpp::Error);
+
 	virtual void createPlacementConstraint (const char* placName,
                               const char* objectName,
                               const char* objectJointName,

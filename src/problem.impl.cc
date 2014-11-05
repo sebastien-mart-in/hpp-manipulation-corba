@@ -139,6 +139,53 @@ namespace hpp {
 	}
       }
 
+      Names_t* Problem::getEnvironmentContactNames ()
+        throw (hpp::Error)
+      {
+        try {
+	  const TriangleMap& m = problemSolver_->contactTriangles ();
+
+	  char** nameList = Names_t::allocbuf(m.size ());
+	  Names_t *jointNames = new Names_t (m.size(), m.size(), nameList);
+
+	  std::size_t rank = 0;
+          for (TriangleMap::const_iterator it = m.begin ();
+              it != m.end (); it++) {
+            nameList[rank] = (char*) malloc (sizeof(char)*(it->first.length ()+1));
+            strcpy (nameList [rank], it->first.c_str ());
+            rank++;
+          }
+	  return jointNames;
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+        }
+      }
+
+      Names_t* Problem::getObjectContactNames (const char* objectName)
+        throw (hpp::Error)
+      {
+        try {
+	  ObjectPtr_t o = problemSolver_->object (std::string (objectName));
+          if (!o)
+            throw Error ("The object does not exists.");
+	  const TriangleMap& m = o->contactTriangles ();
+
+	  char** nameList = Names_t::allocbuf(m.size ());
+	  Names_t *jointNames = new Names_t (m.size(), m.size(), nameList);
+
+	  std::size_t rank = 0;
+          for (TriangleMap::const_iterator it = m.begin ();
+              it != m.end (); it++) {
+            nameList[rank] = (char*) malloc (sizeof(char)*(it->first.length ()+1));
+            strcpy (nameList [rank], it->first.c_str ());
+            rank++;
+          }
+	  return jointNames;
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+        }
+      }
+
       void Problem::createPlacementConstraint (const char* placName,
           const char* objectName,
           const char* objectJointName,

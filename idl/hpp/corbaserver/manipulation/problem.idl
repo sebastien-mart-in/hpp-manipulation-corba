@@ -69,6 +69,12 @@ module hpp {
             in unsigned short rankInVelocity)
           raises (Error);
 
+        Names_t getEnvironmentContactNames ()
+          raises (Error);
+
+        Names_t getObjectContactNames (in string objectName)
+          raises (Error);
+
         void createPlacementConstraint (in string placementName, in string objectName,
                                         in string objectJointName, in string objectTriangleName,
                                         in string envContactName)
