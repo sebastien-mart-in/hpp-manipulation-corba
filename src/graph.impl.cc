@@ -15,6 +15,7 @@
 // hpp-manipulation. If not, see <http://www.gnu.org/licenses/>.
 
 #include <fstream>
+#include <sstream>
 
 #include <hpp/util/debug.hh>
 #include <hpp/util/pointer.hh>
@@ -100,7 +101,8 @@ namespace hpp {
         return edge->id ();
       }
 
-      Long Graph::createWaypointEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
+      void Graph::createWaypointEdge(const Long nodeFromId, const Long nodeToId,
+          const char* edgeBaseName, const Long nb, const Long w, const bool isInNodeFrom, GraphElements_out out_elmts)
         throw (hpp::Error)
       {
         graph::NodePtr_t from, to;
@@ -113,9 +115,40 @@ namespace hpp {
         if (!from || !to)
           throw Error ("The nodes could not be found.");
 
-        graph::EdgePtr_t edge = from->linkTo (to, w, isInNodeFrom, graph::WaypointEdge::create);
-        edge->name (edgeName);
-        return edge->id ();
+        graph::EdgePtr_t edge_pc = from->linkTo (to, w, isInNodeFrom, graph::WaypointEdge::create);
+        graph::WaypointEdgePtr_t edge = HPP_DYNAMIC_PTR_CAST (graph::WaypointEdge, edge_pc);
+        std::ostringstream ss; ss << edgeBaseName << "_e" << nb;
+        edge->name (ss.str ());
+        edge->createWaypoint (nb - 1, edgeBaseName);
+        std::list <graph::EdgePtr_t> edges;
+        graph::WaypointEdgePtr_t cur = edge;
+        while (cur->waypoint <graph::WaypointEdge> ()) {
+          cur = cur->waypoint <graph::WaypointEdge> ();
+          edges.push_front (cur);
+        }
+        edges.push_front (cur->waypoint <graph::Edge> ());
+
+        GraphComps_t n, e;
+        GraphComp gc;
+        e.length (edges.size () + 1);
+        n.length (edges.size ());
+        size_t r = 0;
+        for (std::list <graph::EdgePtr_t>::const_iterator it = edges.begin ();
+            it != edges.end (); it++) {
+          gc.name = (*it)->name ().c_str ();
+          gc.id = (*it)->id ();
+          e[r] = gc;
+          gc.name = (*it)->to ()->name ().c_str ();
+          gc.id = (*it)->to ()->id ();
+          n[r] = gc;
+          r++;
+        }
+        gc.name = edge->name ().c_str ();
+        gc.id = edge->id ();
+        e[r] = gc;
+        out_elmts = new GraphElements;
+        out_elmts->nodes = n;
+        out_elmts->edges = e;
       }
 
       Long Graph::getWaypoint (const Long edgeId, hpp::ID_out nodeId)
@@ -129,7 +162,7 @@ namespace hpp {
         }
         if (!edge)
           throw Error ("The edge could not be found.");
-        graph::EdgePtr_t waypoint = edge->waypoint ();
+        graph::EdgePtr_t waypoint = edge->waypoint <graph::Edge> ();
         waypoint->name (edge->name () + "_waypoint");
         waypoint->to ()->name (edge->name () + "_waypoint_node");
         nodeId = waypoint->to ()->id ();

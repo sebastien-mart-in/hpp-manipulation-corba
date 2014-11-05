@@ -49,9 +49,10 @@ module hpp {
 
         /// Add an edge with waypoint between two nodes of the graph.
         /// \param nodeFromId, nodeToId the ID of the ends of the new edge.
-        /// \param edgeName name of the new edge.
+        /// \param edgeBaseName basename of the new edge.
         /// \param weight weight of the edge.
-        long createWaypointEdge (in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in boolean isInNodeFrom)
+        void createWaypointEdge (in long nodeFromId, in long nodeToId, in string edgeName,
+            in long number, in long weight, in boolean isInNodeFrom, out GraphElements elmts)
           raises (Error);
 
         /// Get waypoint IDs of an edge.

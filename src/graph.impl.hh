@@ -54,11 +54,13 @@ namespace hpp {
                                    const bool isInNodeFrom)
             throw (hpp::Error);
 
-          virtual Long createWaypointEdge (const Long nodeFromId,
+          virtual void createWaypointEdge (const Long nodeFromId,
                                            const Long nodeToId,
-                                           const char* edgeName,
+                                           const char* edgeBaseName,
+                                           const Long number,
                                            const Long weight,
-                                           const bool isInNodeFrom)
+                                           const bool isInNodeFrom,
+                                           GraphElements_out out_elmts)
             throw (hpp::Error);
 
           virtual Long getWaypoint (const Long edgeId, hpp::ID_out nodeId)
