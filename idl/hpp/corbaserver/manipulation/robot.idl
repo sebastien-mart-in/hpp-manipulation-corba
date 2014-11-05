@@ -113,22 +113,10 @@ module hpp
     /// \param linkName name of the link (hpp::model::Body) holding the gripper,
     /// \param gripperName name of the gripper,
     /// \param handlePositioninJoint position of the handle in the joint frame.
-    /// \param jointNames list of names of joints inside the gripper.
-    /// \param gripperOpen list of joint values, in the same order as jointNames,
-    ///        when the gripper is open.
-    /// \param gripperClosed list of joint values, in the same order as jointNames,
-    ///        when the gripper is closed.
-    ///
-    /// \note To disable the opening parameter, jointNames, gripperOpen and
-    ///       gripperClosed must be empty lists. These three lists must have
-    ///       the same length.
     void addGripper (in string robotName, in string linkName,
 		     in string gripperName, 
                      in Transform_ handlePositioninJoint,
-                     in Names_t bodyInCollisionNames,
-                     in Names_t jointNames,
-                     in floatSeq gripperOpen,
-                     in floatSeq gripperClosed)
+                     in Names_t bodyInCollisionNames)
       raises (Error);
 
     /// Add Handle to an object

@@ -87,10 +87,7 @@ namespace hpp {
                                 const char* linkName,
 			        const char* gripperName,
 			        const ::hpp::Transform_ handlePositioninJoint,
-                                const hpp::Names_t& bodyInCollisionNames,
-                                const Names_t& jointNames,
-                                const hpp::floatSeq& gripperOpen,
-                                const hpp::floatSeq& gripperClosed)
+                                const hpp::Names_t& bodyInCollisionNames)
           throw (hpp::Error);
 
 	virtual void addAxialHandle (const char* objectName,
