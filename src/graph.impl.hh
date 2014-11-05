@@ -96,7 +96,7 @@ namespace hpp {
           virtual void getNode (const hpp::floatSeq& dofArray, ID_out output)
             throw (hpp::Error);
 
-          virtual void display ()
+          virtual void display (const char* filename)
             throw (hpp::Error);
 
         private:

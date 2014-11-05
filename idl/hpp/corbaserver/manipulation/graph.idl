@@ -104,7 +104,7 @@ module hpp {
         void getNode (in floatSeq dofArray, out ID nodeId)
           raises (Error);
 
-        void display ()
+        void display (in string filename)
           raises (Error);
       }; // interface Graph
     }; // module manipulation

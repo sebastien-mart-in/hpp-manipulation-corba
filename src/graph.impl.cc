@@ -330,12 +330,12 @@ namespace hpp {
         }
       }
 
-      void Graph::display ()
+      void Graph::display (const char* filename)
         throw (hpp::Error)
       {
         std::cout << *graph_;
         std::ofstream dotfile;
-        dotfile.open ("/tmp/constraintgraph.dot");
+        dotfile.open (filename);
         graph_->dotPrint (dotfile);
         dotfile.close();
       }
