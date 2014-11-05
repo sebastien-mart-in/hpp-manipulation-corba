@@ -216,6 +216,26 @@ class ProblemSolver (object):
         self.client.manipulation.problem.isLockedDofParametric \
                 (constraintName, parametric)
 
+    ## Lock degree of freedom of a FreeFlyer joint
+    # \param freeflyerBname base name of the joint (It will be completed by '_xyz' and '_SO3'),
+    # \param lockDofBname base name of the lockdof constraints (It will be completed by '_r?[xyz]'),
+    # \param values value of the locked degree of freedom as a quaternion,
+    # \param parametric whether the lockDofs are parametric.
+    def lockFreeFlyerJoint (self, freeflyerBname, lockDofBname, values = [0,0,0,1,0,0,0], parametric = False)
+        rankcfg = 0; rankvel = 0; lockbox = list ();
+        for axis in ['x','y','z']:
+            self.createLockedDofConstraint (lockDofBname + ''   + axis,\
+                    freeflyerBname + '_xyz', values[rankcfg    ], rankcfg    , rankvel)
+            self.createLockedDofConstraint (lockDofBname + '_r' + axis,\
+                    freeflyerBname + '_SO3', values[rankcfg + 4], rankcfg + 1, rankvel)
+            self.isLockedDofParametric (lockDofBname + ''   + axis , parametric)
+            self.isLockedDofParametric (lockDofBname + '_r' + axis , parametric)
+            lockbox.append ('box_lock_'  + axis)
+            lockbox.append ('box_lock_r' + axis)
+            rankcfg = rankcfg + 1
+            rankvel = rankvel + 1
+        return lockbox
+
     ## Lock degree of freedom with given value
     # \param jointName name of the joint
     # \param value value of the locked degree of freedom,
