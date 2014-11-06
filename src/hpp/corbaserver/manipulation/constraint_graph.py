@@ -17,14 +17,14 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-## Definition of a constraint graph.
-#
-#  This class wraps the Corba client to the server implemented by
-#  libhpp-manipulation-corba.so
-#
-#  Some method implemented by the server can be considered as private. The
-#  goal of this class is to hide them and to expose those that can be
-#  considered as public.
+### Definition of a constraint graph.
+##
+##  This class wraps the Corba client to the server implemented by
+##  libhpp-manipulation-corba.so
+##
+##  Some method implemented by the server can be considered as private. The
+##  goal of this class is to hide them and to expose those that can be
+##  considered as public.
 
 from subprocess import Popen
 
@@ -42,6 +42,13 @@ class ConstraintGraph (object):
         self.graphId = self.graph.createGraph (graphName)
         self.subGraphId = self.graph.createSubGraph (graphName + "_sg")
 
+    ### Display the current graph.
+    ## The graph is printed in DOT format. Command dot must be
+    ## available.
+    ## \param dotOut full path of the generated DOT file.
+    ## \param pdfOut fill path of the generated PDF document.
+    ## \note DOT and PDF files will be overwritten and are not automatically
+    ## deleted so you can keep them.
     def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph.pdf'):
         self.client.manipulation.graph.display (dotOut)
         dotCmd = self.dotCmd[:]
@@ -53,12 +60,11 @@ class ConstraintGraph (object):
         pdfviewCmd.append (pdfOut)
         Popen (pdfviewCmd)
 
+    ### Create one or several node
+    ## \param node name (resp. list of names) of the node(s) to be created.
+    ## \note The order is important. The first should be the most restrictive one as a configuration
+    ## will be in the first node for which the constraint are satisfied.
     def createNode (self, node)
-        '''
-        Create one node if node is a string and several if node is a list of string.
-        The order is important. The first should be the most restrictive one as a configuration
-        will be in the first node for which the constraint are satisfied.
-        '''
         if type (node) is str:
             node = [node]
         for n in node:
