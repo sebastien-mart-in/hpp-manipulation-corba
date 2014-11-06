@@ -233,6 +233,8 @@ namespace hpp {
           try {
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
+              if (!problemSolver_->numericalConstraint (name))
+                throw Error ("The numerical function does not exist.");
               component->addNumericalConstraint (
                   problemSolver_->numericalConstraint(name),
                   problemSolver_->inequality (name));
