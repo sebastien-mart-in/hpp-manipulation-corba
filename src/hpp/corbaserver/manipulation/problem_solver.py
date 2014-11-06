@@ -221,17 +221,17 @@ class ProblemSolver (object):
     # \param lockDofBname base name of the lockdof constraints (It will be completed by '_r?[xyz]'),
     # \param values value of the locked degree of freedom as a quaternion,
     # \param parametric whether the lockDofs are parametric.
-    def lockFreeFlyerJoint (self, freeflyerBname, lockDofBname, values = [0,0,0,1,0,0,0], parametric = False)
-        rankcfg = 0; rankvel = 0; lockbox = list ();
+    def lockFreeFlyerJoint (self, freeflyerBname, lockDofBname, values = (0,0,0,1,0,0,0), parametric = False):
+        rankcfg = 0; rankvel = 0; lockbox = list ()
         for axis in ['x','y','z']:
-            self.createLockedDofConstraint (lockDofBname + ''   + axis,\
+            self.createLockedDofConstraint (lockDofBname + '_'  + axis,\
                     freeflyerBname + '_xyz', values[rankcfg    ], rankcfg    , rankvel)
             self.createLockedDofConstraint (lockDofBname + '_r' + axis,\
                     freeflyerBname + '_SO3', values[rankcfg + 4], rankcfg + 1, rankvel)
-            self.isLockedDofParametric (lockDofBname + ''   + axis , parametric)
+            self.isLockedDofParametric (lockDofBname + '_'  + axis , parametric)
             self.isLockedDofParametric (lockDofBname + '_r' + axis , parametric)
-            lockbox.append ('box_lock_'  + axis)
-            lockbox.append ('box_lock_r' + axis)
+            lockbox.append (lockDofBname + '_'  + axis)
+            lockbox.append (lockDofBname + '_r' + axis)
             rankcfg = rankcfg + 1
             rankvel = rankvel + 1
         return lockbox
