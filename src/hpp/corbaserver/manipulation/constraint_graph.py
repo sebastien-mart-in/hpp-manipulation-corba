@@ -37,6 +37,8 @@ class ConstraintGraph (object):
         self.clientBasic = robot.client.basic
         self.graph = robot.client.manipulation.graph
         self.name = graphName
+        self.grasps = dict ()
+        self.pregrasps = dict ()
         self.nodes = dict ()
         self.edges = dict ()
         self.graphId = self.graph.createGraph (graphName)
@@ -50,11 +52,11 @@ class ConstraintGraph (object):
     ## \note DOT and PDF files will be overwritten and are not automatically
     ## deleted so you can keep them.
     def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph.pdf'):
-        self.client.manipulation.graph.display (dotOut)
+        self.graph.display (dotOut)
         dotCmd = self.dotCmd[:]
-        dotCmd.append ('-o' + dotOut)
-        dotCmd.append (pdfOut)
-        dot = Popen (self.dotCmd)
+        dotCmd.append ('-o' + pdfOut)
+        dotCmd.append (dotOut)
+        dot = Popen (dotCmd)
         dot.wait ()
         pdfviewCmd = self.pdfviewCmd[:]
         pdfviewCmd.append (pdfOut)
@@ -64,7 +66,7 @@ class ConstraintGraph (object):
     ## \param node name (resp. list of names) of the node(s) to be created.
     ## \note The order is important. The first should be the most restrictive one as a configuration
     ## will be in the first node for which the constraint are satisfied.
-    def createNode (self, node)
+    def createNode (self, node):
         if type (node) is str:
             node = [node]
         for n in node:
@@ -86,8 +88,51 @@ class ConstraintGraph (object):
             self.nodes [n.name] = n.id
         return elmts
 
+    def createLevelSetEdge (self, nodeFrom, nodeTo, name, weight = 1, isInNodeFrom = None):
+        if isInNodeFrom is None:
+            isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
+        self.edges [name] =\
+            self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], name, weight, isInNodeFrom)
+
     def createGrasp (self, name, gripper, handle, passiveJoints = None):
         self.client.problem.createGrasp (name, gripper, handle)
+        self.grasps [(name, False)] = [name]
         if passiveJoints is not None:
             self.client.problem.createGrasp (name + "_passive", gripper, handle)
             self.clientBasic.problem.setPassiveDofs (name + "_passive", passiveJoints)
+            self.grasps [(name, True)] = [name + "_passive"]
+        else:
+            self.grasps [(name, True)] = [name]
+
+    def createPreGrasp (self, name, gripper, handle, passiveJoints = None):
+        self.client.problem.createPreGrasp (name, gripper, handle)
+        self.pregrasps [(name, False)] = [name, name + "/ineq_0", name + "/ineq_0.1"]
+        if passiveJoints is not None:
+            self.client.problem.createPreGrasp (name + "_passive", gripper, handle)
+            self.clientBasic.problem.setPassiveDofs (name + "_passive", passiveJoints)
+            #self.pregrasps [(name, True)] = [name + "_passive", name + "_passive/ineq_0", name + "_passive/ineq_0.1"]
+            self.pregrasps [(name, True)] = [name]
+        else:
+            #self.pregrasps [(name, True)] = [name, name + "/ineq_0", name + "/ineq_0.1"]
+            self.pregrasps [(name, True)] = [name]
+
+    def setConstraints (self, graph = False, node = None, edge = None, grasp = None, pregrasp = None, lockDof = [], numConstraints = []):
+        nc = numConstraints [:]
+        nc_p = numConstraints [:]
+        if grasp is not None:
+            nc.extend (self.grasps[(grasp, False)])
+            nc_p.extend (self.grasps[(grasp, True)])
+        if pregrasp is not None:
+            nc.extend (self.pregrasps[(pregrasp, False)])
+            nc_p.extend (self.pregrasps[(pregrasp, True)])
+
+        if node is not None:
+            self.graph.setNumericalConstraints (self.nodes [node], nc)
+            self.graph.setNumericalConstraintsForPath (self.nodes [node], nc_p)
+            self.graph.setLockedDofConstraints (self.nodes [node], lockDof)
+        elif edge is not None:
+            self.graph.setNumericalConstraints (self.edges [edge], nc)
+            self.graph.setLockedDofConstraints (self.edges [edge], lockDof)
+        elif graph:
+            self.graph.setNumericalConstraints (self.graphId, nc)
+            self.graph.setLockedDofConstraints (self.graphId, lockDof)
