@@ -224,14 +224,16 @@ class ProblemSolver (object):
     def lockFreeFlyerJoint (self, freeflyerBname, lockDofBname, values = (0,0,0,1,0,0,0), parametric = False):
         rankcfg = 0; rankvel = 0; lockbox = list ()
         for axis in ['x','y','z']:
-            self.createLockedDofConstraint (lockDofBname + '_'  + axis,\
+            namet = lockDofBname + '_'  + axis
+            namer = lockDofBname + '_r' + axis
+            self.createLockedDofConstraint (namet,\
                     freeflyerBname + '_xyz', values[rankcfg    ], rankcfg    , rankvel)
-            self.createLockedDofConstraint (lockDofBname + '_r' + axis,\
+            self.createLockedDofConstraint (namer,\
                     freeflyerBname + '_SO3', values[rankcfg + 4], rankcfg + 1, rankvel)
-            self.isLockedDofParametric (lockDofBname + '_'  + axis , parametric)
-            self.isLockedDofParametric (lockDofBname + '_r' + axis , parametric)
-            lockbox.append (lockDofBname + '_'  + axis)
-            lockbox.append (lockDofBname + '_r' + axis)
+            self.isLockedDofParametric (namet, parametric)
+            self.isLockedDofParametric (namer, parametric)
+            lockbox.append (namet)
+            lockbox.append (namer)
             rankcfg = rankcfg + 1
             rankvel = rankvel + 1
         return lockbox
