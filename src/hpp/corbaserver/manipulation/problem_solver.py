@@ -238,6 +238,27 @@ class ProblemSolver (object):
             rankvel = rankvel + 1
         return lockbox
 
+    ## Lock degree of freedom of a Planar joint
+    # \param planarBname base name of the joint (It will be completed by '_xy' and '_rz'),
+    # \param lockDofBname base name of the lockdof constraints (It will be completed by '(_rz)?_xy'),
+    # \param values value of the locked degree of freedom as (t_x, t_y, cos (r_z), sin (r_z)),
+    # \param parametric whether the lockDofs are parametric.
+    def lockPlanarJoint (self, freeflyerBname, lockDofBname, values = (0,0,1,0), parametric = False):
+        rank = 0; lockbox = list ()
+        for axis in ['_x','_y']:
+            namet = lockDofBname + axis
+            namer = lockDofBname + '_rz' + axis
+            self.createLockedDofConstraint (namet,\
+                    freeflyerBname + '_xy', values[rank], rank, rank)
+            self.createLockedDofConstraint (namer,\
+                    freeflyerBname + '_rz', values[rank], rank, rank)
+            self.isLockedDofParametric (namet, parametric)
+            self.isLockedDofParametric (namer, parametric)
+            lockbox.append (namet)
+            lockbox.append (namer)
+            rank = rank + 1
+        return lockbox
+
     ## Lock degree of freedom with given value
     # \param jointName name of the joint
     # \param value value of the locked degree of freedom,
