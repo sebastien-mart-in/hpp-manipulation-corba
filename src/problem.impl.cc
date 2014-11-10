@@ -99,20 +99,17 @@ namespace hpp {
 	}
 	try {
           using hpp::core::EquationType;
+          using hpp::core::DoubleInequality;
 	  const GripperPtr_t gripper = robot->gripper (gripperName);
 	  const HandlePtr_t& handle = robot->handle (handleName);
           std::string name (graspName);
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createPreGrasp (gripper);
 	  DifferentiableFunctionPtr_t ineq_positive =
-	    handle->createPreGraspComplement (gripper, 0.05);
-	  DifferentiableFunctionPtr_t ineq_negative =
-	    handle->createPreGraspComplement (gripper, 0.1);
+	    handle->createPreGraspComplement (gripper, 0.025);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
-	  problemSolver_->addNumericalConstraint (name + "/ineq_0", ineq_positive);
-	  problemSolver_->addNumericalConstraint (name + "/ineq_0.1", ineq_negative);
-          problemSolver_->addInequalityVector (name + "/ineq_0", EquationType::VectorOfTypes (1, EquationType::Inferior));
-          problemSolver_->addInequalityVector (name + "/ineq_0.1", EquationType::VectorOfTypes (1, EquationType::Superior));
+	  problemSolver_->addNumericalConstraint (name + "/0_f_0.05", ineq_positive);
+          problemSolver_->addInequalityVector (name + "/0_f_0.05", DoubleInequality::create (0.05));
           problemSolver_->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());

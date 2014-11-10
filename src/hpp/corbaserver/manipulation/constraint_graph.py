@@ -106,15 +106,13 @@ class ConstraintGraph (object):
 
     def createPreGrasp (self, name, gripper, handle, passiveJoints = None):
         self.client.problem.createPreGrasp (name, gripper, handle)
-        self.pregrasps [(name, False)] = [name, name + "/ineq_0", name + "/ineq_0.1"]
+        self.pregrasps [(name, False)] = [name, name + "/0_f_0.05"]
         if passiveJoints is not None:
             self.client.problem.createPreGrasp (name + "_passive", gripper, handle)
             self.clientBasic.problem.setPassiveDofs (name + "_passive", passiveJoints)
-            #self.pregrasps [(name, True)] = [name + "_passive", name + "_passive/ineq_0", name + "_passive/ineq_0.1"]
-            self.pregrasps [(name, True)] = [name]
+            self.pregrasps [(name, True)] = [name + "_passive", name + "_passive/0_f_0.05"]
         else:
-            #self.pregrasps [(name, True)] = [name, name + "/ineq_0", name + "/ineq_0.1"]
-            self.pregrasps [(name, True)] = [name]
+            self.pregrasps [(name, True)] = [name, name + "/0_f_0.05"]
 
     def setConstraints (self, graph = False, node = None, edge = None, grasp = None, pregrasp = None, lockDof = [], numConstraints = []):
         nc = numConstraints [:]
