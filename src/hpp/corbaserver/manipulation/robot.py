@@ -41,14 +41,14 @@ class Robot (object):
         self.rootJointType = dict()
         self.robotName = robotName
         self.client = CorbaClient ()
-        if load:
-          self.loadModel (robotName, rootJointType)
+        self.load = load
+        self.loadModel (robotName, rootJointType)
 
     ## Virtual function to load the robot model
     def loadModel (self, robotName, rootJointType):
         self.loadRobotModel \
-            (robotName, rootJointType, self.packageName, self.urdfName,
-             self.urdfSuffix, self.srdfSuffix)
+                (robotName, rootJointType, self.packageName, self.urdfName,
+                        self.urdfSuffix, self.srdfSuffix)
 
     ## Load robot model and store in local map
     #
@@ -65,9 +65,10 @@ class Robot (object):
     #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
     def loadRobotModel (self, robotName, rootJointType, packageName, modelName,
                         urdfSuffix, srdfSuffix):
-        self.client.manipulation.robot.loadRobotModel (robotName, rootJointType,
-                                                       packageName, modelName,
-                                                       urdfSuffix, srdfSuffix)
+        if self.load:
+            self.client.manipulation.robot.loadRobotModel (robotName, rootJointType,
+                                                           packageName, modelName,
+                                                           urdfSuffix, srdfSuffix)
         self.rootJointType[robotName] = rootJointType
 
     ## Load humanoid robot model and store in local map
@@ -85,9 +86,10 @@ class Robot (object):
     #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
     def loadHumanoidModel (self, robotName, rootJointType, packageName,
                            modelName, urdfSuffix, srdfSuffix):
-        self.client.manipulation.robot.loadHumanoidModel \
-            (robotName, rootJointType, packageName, modelName,
-             urdfSuffix, srdfSuffix)
+        if self.load:
+            self.client.manipulation.robot.loadHumanoidModel \
+                (robotName, rootJointType, packageName, modelName,
+                 urdfSuffix, srdfSuffix)
         self.rootJointType[robotName] = rootJointType
 
     ## Load object model and store in local map
@@ -106,9 +108,10 @@ class Robot (object):
     def loadObjectModel (self, objectName, rootJointType,
                          packageName, modelName,
                          urdfSuffix, srdfSuffix):
-        self.client.manipulation.robot.loadObjectModel \
-            (objectName, rootJointType, packageName, modelName, urdfSuffix,
-             srdfSuffix)
+        if self.load:
+            self.client.manipulation.robot.loadObjectModel \
+                (objectName, rootJointType, packageName, modelName, urdfSuffix,
+                 srdfSuffix)
         self.rootJointType[objectName] = rootJointType
 
     ## Build a composite robot from a set of robots and objects
@@ -116,8 +119,9 @@ class Robot (object):
     #  \param robotName Name of the composite robot,
     #  \param robotNames list of names of the robots and objects.
     def buildCompositeRobot (self, robotName, robotNames):
-        self.client.manipulation.robot.buildCompositeRobot (robotName,
-                                                            robotNames)
+        if self.load:
+            self.client.manipulation.robot.buildCompositeRobot (robotName,
+                    robotNames)
         self.jointNames = self.client.basic.robot.getJointNames ()
         self.__setattr__ (self.robotName + 'JointNames',
                           map (lambda n : n [len(self.robotName)+1:],
