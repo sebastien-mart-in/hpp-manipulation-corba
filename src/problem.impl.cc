@@ -237,9 +237,12 @@ namespace hpp {
           graph::GraphComponentPtr_t comp = graph::GraphComponent::get ((size_t)id).lock ();
           graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
           graph::NodePtr_t node = HPP_DYNAMIC_PTR_CAST(graph::Node, comp);
-          if (edge)
+          if (edge) {
             constraint = problemSolver_->constraintGraph ()->configConstraint (edge);
-          else if (node)
+            RobotPtr_t robot = problemSolver_->robot ();
+            if (!robot) throw Error ("You must have a robot to do that.");
+            constraint->offsetFromConfig (robot->currentConfiguration());
+          } else if (node)
             constraint = problemSolver_->constraintGraph ()->configConstraint (node);
           else {
             std::stringstream ss;
