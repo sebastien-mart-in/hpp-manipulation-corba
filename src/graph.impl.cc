@@ -262,7 +262,9 @@ namespace hpp {
           try {
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
-              n->addNumericalConstraintForPath (problemSolver_->numericalConstraint(name));
+              n->addNumericalConstraintForPath (
+                  problemSolver_->numericalConstraint(name),
+                  problemSolver_->inequality (name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
