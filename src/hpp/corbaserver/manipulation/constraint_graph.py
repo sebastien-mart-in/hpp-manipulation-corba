@@ -72,12 +72,34 @@ class ConstraintGraph (object):
         for n in node:
             self.nodes [n] = self.graph.createNode (self.subGraphId, n)
 
+    ### Create an edge
+    ## \param nodeFrom, nodeTo the extremities of the edge,
+    ## \param name name of the edge,
+    ## \param weight see note,
+    ## \param isInNodeFrom true if a path corresponding to this edge lies in nodeFrom;
+    ##       this will be automatically set if you leave it.
+    ## \note The weights define the probability of selecting an edge among all the
+    ## outgoing edges of a node. The probability of an edge is \f$ \frac{w_i}{\sum_j{w_j}} \f$,
+    ## where each \f$ w_j \f$ corresponds to an outgoing edge from a given node.
+    ## To have an edge that cannot be selected by the M-RRT algorithm but is still acceptable,
+    ## set its weight to zero.
     def createEdge (self, nodeFrom, nodeTo, name, weight = 1, isInNodeFrom = None):
         if isInNodeFrom is None:
             isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
         self.edges [name] =\
             self.graph.createEdge (self.nodes[nodeFrom], self.nodes[nodeTo], name, weight, isInNodeFrom)
 
+    ### Create a WaypointEdge.
+    ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note,
+    ## \param nb number of waypoints,
+    ## \return an object containing two list:
+    ##         \code
+    ##           returnValue.edges
+    ##           returnValue.nodes
+    ##         \endcode
+    ##         Each element of each list contains a name and an id.
+    ##         Nevertheless, the information is stored in the instance of this class.
+    ## \note See documentation of class hpp::manipulation::graph::WaypointEdge for more information.
     def createWaypointEdge (self, nodeFrom, nodeTo, name, nb = 1, weight = 1, isInNodeFrom = None):
         if isInNodeFrom is None:
             isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
@@ -88,12 +110,20 @@ class ConstraintGraph (object):
             self.nodes [n.name] = n.id
         return elmts
 
+    ### Create a LevelSetEdge.
+    ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note.
+    ## \note See documentation of class hpp::manipulation::graph::LevelSetEdge for more information.
     def createLevelSetEdge (self, nodeFrom, nodeTo, name, weight = 1, isInNodeFrom = None):
         if isInNodeFrom is None:
             isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
         self.edges [name] =\
             self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], name, weight, isInNodeFrom)
 
+    ### Create grasp constraints between a gripper and a handle
+    ## \param name basename of the constraints,
+    ## \param gripper, handle names of the gripper and handle,
+    ## \param passiveJoints a list of joints that should not be modified by the constraint.
+    ## \note The passive joints are only used for path constraints and are for optimization only.
     def createGrasp (self, name, gripper, handle, passiveJoints = None):
         self.client.problem.createGrasp (name, gripper, handle)
         self.grasps [(name, False)] = [name]
@@ -104,6 +134,8 @@ class ConstraintGraph (object):
         else:
             self.grasps [(name, True)] = [name]
 
+    ### Create pre-grasp constraints between a gripper and a handle
+    ## See createGrasp.
     def createPreGrasp (self, name, gripper, handle, passiveJoints = None):
         self.client.problem.createPreGrasp (name, gripper, handle)
         self.pregrasps [(name, False)] = [name, name + "/0_f_0.05"]
@@ -114,6 +146,13 @@ class ConstraintGraph (object):
         else:
             self.pregrasps [(name, True)] = [name, name + "/0_f_0.05"]
 
+    ### Set the constraints of an edge or a node.
+    ## This method sets the constraints of an element of the graph and handles the
+    ## special cases of grasps constraints.
+    ## \param graph set to true if you are defining constraints for every nodes,
+    ## \param node, edge name of a component of the graph,
+    ## \param grasp, pregrasp name of a grasp or pregrasp.
+    ## \note Exaclty one of the parameter graph, node and edge must be set.
     def setConstraints (self, graph = False, node = None, edge = None, grasp = None, pregrasp = None, lockDof = [], numConstraints = []):
         nc = numConstraints [:]
         nc_p = numConstraints [:]
