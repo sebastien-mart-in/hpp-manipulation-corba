@@ -151,17 +151,23 @@ class ConstraintGraph (object):
     ## special cases of grasps constraints.
     ## \param graph set to true if you are defining constraints for every nodes,
     ## \param node, edge name of a component of the graph,
-    ## \param grasp, pregrasp name of a grasp or pregrasp.
+    ## \param grasp, pregrasp name, or list of names, of grasp or pregrasp.
     ## \note Exaclty one of the parameter graph, node and edge must be set.
     def setConstraints (self, graph = False, node = None, edge = None, grasp = None, pregrasp = None, lockDof = [], numConstraints = []):
         nc = numConstraints [:]
         nc_p = numConstraints [:]
         if grasp is not None:
-            nc.extend (self.grasps[(grasp, False)])
-            nc_p.extend (self.grasps[(grasp, True)])
+            if type(grasp) is str:
+                grasp = [grasp]
+            for g in grasp:
+                nc.extend (self.grasps[(g, False)])
+                nc_p.extend (self.grasps[(g, True)])
         if pregrasp is not None:
-            nc.extend (self.pregrasps[(pregrasp, False)])
-            nc_p.extend (self.pregrasps[(pregrasp, True)])
+            if type(pregrasp) is str:
+                pregrasp = [pregrasp]
+            for g in pregrasp:
+                nc.extend (self.pregrasps[(g, False)])
+                nc_p.extend (self.pregrasps[(g, True)])
 
         if node is not None:
             self.graph.setNumericalConstraints (self.nodes [node], nc)
