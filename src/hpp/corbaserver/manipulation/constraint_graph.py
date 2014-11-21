@@ -49,18 +49,20 @@ class ConstraintGraph (object):
     ## available.
     ## \param dotOut full path of the generated DOT file.
     ## \param pdfOut fill path of the generated PDF document.
+    ## \param openPDF set to False if you just want to generate the PDF.
     ## \note DOT and PDF files will be overwritten and are not automatically
     ## deleted so you can keep them.
-    def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph.pdf'):
+    def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph.pdf', openPDF = True):
         self.graph.display (dotOut)
         dotCmd = self.dotCmd[:]
         dotCmd.append ('-o' + pdfOut)
         dotCmd.append (dotOut)
         dot = Popen (dotCmd)
         dot.wait ()
-        pdfviewCmd = self.pdfviewCmd[:]
-        pdfviewCmd.append (pdfOut)
-        Popen (pdfviewCmd)
+        if openPDF:
+            pdfviewCmd = self.pdfviewCmd[:]
+            pdfviewCmd.append (pdfOut)
+            Popen (pdfviewCmd)
 
     ### Create one or several node
     ## \param node name (resp. list of names) of the node(s) to be created.
