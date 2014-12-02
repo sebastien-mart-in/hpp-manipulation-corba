@@ -73,6 +73,10 @@ namespace hpp {
                                           const bool isInNodeFrom)
             throw (hpp::Error);
 
+          virtual void isInNodeFrom (const Long edgeId,
+                                     const bool isInNodeFrom)
+            throw (hpp::Error);
+
           virtual void setLevelSetConstraints (const Long edgeId,
               const hpp::Names_t& numericalConstraintNames,
               const hpp::Names_t& lockedDofNames)

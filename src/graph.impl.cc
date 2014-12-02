@@ -221,6 +221,24 @@ namespace hpp {
         }
       }
 
+      void Graph::isInNodeFrom (const Long edgeId, const bool isInNodeFrom)
+        throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge;
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, graph::GraphComponent::get(edgeId).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
+        if (!edge)
+          throw Error ("The edge could not be found.");
+        try {
+          edge->isInNodeFrom (isInNodeFrom);
+        } catch (std::exception& err) {
+          throw Error (err.what());
+        }
+      }
+
       void Graph::setNumericalConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames)
         throw (hpp::Error)
