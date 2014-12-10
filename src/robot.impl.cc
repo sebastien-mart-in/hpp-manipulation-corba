@@ -15,7 +15,7 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#include <fcl/math/transform.h>
+#include <hpp/fcl/math/transform.h>
 #include <hpp/util/debug.hh>
 #include <hpp/manipulation/srdf/util.hh>
 #include <hpp/manipulation/object.hh>
