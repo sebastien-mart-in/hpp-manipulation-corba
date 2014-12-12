@@ -16,7 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <hpp/util/debug.hh>
-#include <hpp/core/locked-dof.hh>
+#include <hpp/core/locked-joint.hh>
 #include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
 #include <hpp/model/gripper.hh>
@@ -56,6 +56,16 @@ namespace hpp {
 	  (*config) [iDof] = dofArray [iDof];
 	}
 	return config;
+      }
+
+      static vector_t floatSeqToVector (const hpp::floatSeq& dofArray)
+      {
+	// Fill dof vector with dof array.
+	vector_t result (dofArray.length ());
+	for (size_type iDof=0; iDof < result.size (); ++iDof) {
+	  result [iDof] = dofArray [iDof];
+	}
+	return result;
       }
 
       Problem::Problem () : problemSolver_ (0x0)
@@ -98,7 +108,6 @@ namespace hpp {
 		       " define constraints.");
 	}
 	try {
-          using hpp::core::EquationType;
           using hpp::core::DoubleInequality;
 	  const GripperPtr_t gripper = robot->gripper (gripperName);
 	  const HandlePtr_t& handle = robot->handle (handleName);
@@ -109,28 +118,28 @@ namespace hpp {
 	    handle->createPreGraspComplement (gripper, 0.023);
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
 	  problemSolver_->addNumericalConstraint (name + "/0_f_0.05", ineq_positive);
-          problemSolver_->addInequalityVector (name + "/0_f_0.05", DoubleInequality::create (0.05));
+          problemSolver_->comparisonType (name + "/0_f_0.05", DoubleInequality::create (0.05));
           problemSolver_->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
       }
 
-      void Problem::createLockedDofConstraint (const char* lockedDofName,
-                             const char* jointName, Double value,
-			     UShort rankInConfiguration, UShort rankInVelocity)
+      void Problem::createLockedJointConstraint
+      (const char* lockedJointName, const char* jointName,
+       const hpp::floatSeq& value)
 	throw (hpp::Error)
       {
 	try {
 	  // Get robot in hppPlanner object.
 	  RobotPtr_t robot = problemSolver_->robot ();
 	  JointPtr_t joint = robot->getJointByName (jointName);
+	  vector_t config = floatSeqToVector (value);
 
-	  LockedDofPtr_t lockedDof (LockedDof::create (lockedDofName, joint,
-						       value,
-						       rankInConfiguration,
-						       rankInVelocity));
-          problemSolver_->addLockedDofConstraint (lockedDofName, lockedDof);
+	  LockedJointPtr_t lockedJoint (LockedJoint::create
+					(lockedJointName, joint, config));
+          problemSolver_->addLockedJointConstraint (lockedJointName,
+						    lockedJoint);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
@@ -214,17 +223,6 @@ namespace hpp {
 	}
       }
 
-      void Problem::isLockedDofParametric (const char* constraintName,
-          CORBA::Boolean value)
-        throw (hpp::Error)
-      {
-        LockedDofPtr_t l =
-          problemSolver_->lockedDofConstraint (constraintName);
-        if (!l)
-          throw hpp::Error ("The LockedDof constraint could not be found.");
-        l->isParametric (value);
-      }
-
       bool Problem::applyConstraints (hpp::ID id,
           const hpp::floatSeq& input,
           hpp::floatSeq_out output,
@@ -238,12 +236,17 @@ namespace hpp {
           graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
           graph::NodePtr_t node = HPP_DYNAMIC_PTR_CAST(graph::Node, comp);
           if (edge) {
-            constraint = problemSolver_->constraintGraph ()->configConstraint (edge);
+            constraint =
+	      problemSolver_->constraintGraph ()->configConstraint (edge);
             RobotPtr_t robot = problemSolver_->robot ();
             if (!robot) throw Error ("You must have a robot to do that.");
-            constraint->offsetFromConfig (robot->currentConfiguration());
+	    if (core::ConfigProjectorPtr_t cp =
+		constraint->configProjector ()) {
+	      cp->rightHandSideFromConfig (robot->currentConfiguration());
+	    }
           } else if (node)
-            constraint = problemSolver_->constraintGraph ()->configConstraint (node);
+            constraint =
+	      problemSolver_->constraintGraph ()->configConstraint (node);
           else {
             std::stringstream ss;
             ss << "ID " << id << " is neither an edge nor a node";
@@ -294,9 +297,12 @@ namespace hpp {
             std::string errmsg = ss.str();
             throw Error (errmsg.c_str());
           }
-          constraint = problemSolver_->constraintGraph ()->configConstraint (edge);
+          constraint =
+	    problemSolver_->constraintGraph ()->configConstraint (edge);
           ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
-          constraint->offsetFromConfig (*qoffset);
+	  if (core::ConfigProjectorPtr_t cp = constraint->configProjector ()) {
+	    cp->rightHandSideFromConfig (*qoffset);
+	  }
         } catch (std::exception& e ) {
           throw Error (e.what());
         }

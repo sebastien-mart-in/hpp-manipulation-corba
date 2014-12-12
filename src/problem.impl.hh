@@ -49,11 +49,9 @@ namespace hpp {
                                      const char* handleName)
 	  throw (hpp::Error);
 
-	virtual void createLockedDofConstraint (const char* lockedDofName,
-                              const char* jointName,
-                              Double value,
-			      UShort rankInConfiguration,
-			      UShort rankInVelocity)
+	virtual void createLockedJointConstraint (const char* lockedJointName,
+						  const char* jointName,
+						  const hpp::floatSeq& value)
 	  throw (hpp::Error);
 
         virtual Names_t* getEnvironmentContactNames ()
@@ -68,10 +66,6 @@ namespace hpp {
                               const char* objectTriangleName,
                               const char* envContactName)
 	  throw (hpp::Error);
-
-        virtual void isLockedDofParametric (const char* constraintName,
-            CORBA::Boolean value)
-          throw (hpp::Error);
 
         virtual bool applyConstraints (hpp::ID id,
             const hpp::floatSeq& input,

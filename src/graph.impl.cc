@@ -205,7 +205,7 @@ namespace hpp {
             std::string name (numericalConstraintNames [i]);
             edge->insertConfigConstraint (
                 problemSolver_->numericalConstraint(name),
-                problemSolver_->inequality (name));
+                problemSolver_->comparisonType (name));
           }
           for (CORBA::ULong i=0; i<lockedDofNames.length (); ++i) {
             std::string name (lockedDofNames [i]);
@@ -237,7 +237,7 @@ namespace hpp {
                 throw Error ("The numerical function does not exist.");
               component->addNumericalConstraint (
                   problemSolver_->numericalConstraint(name),
-                  problemSolver_->inequality (name));
+                  problemSolver_->comparisonType (name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -264,7 +264,7 @@ namespace hpp {
               std::string name (constraintNames [i]);
               n->addNumericalConstraintForPath (
                   problemSolver_->numericalConstraint(name),
-                  problemSolver_->inequality (name));
+                  problemSolver_->comparisonType (name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -284,7 +284,8 @@ namespace hpp {
           try {
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
-              component->addLockedDofConstraint (problemSolver_->lockedDofConstraint(name));
+              component->addLockedJointConstraint
+		(problemSolver_->lockedDofConstraint(name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());

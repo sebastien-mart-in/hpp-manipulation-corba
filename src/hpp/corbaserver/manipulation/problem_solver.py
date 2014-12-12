@@ -17,8 +17,6 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-from srdf_parser import Parser as SrdfParser
-
 ## Definition of a manipulation planning problem
 #
 #  This class wraps the Corba client to the server implemented by
@@ -196,16 +194,10 @@ class ProblemSolver (object):
     #        hpp::manipulation::ProblemSolver map
     # \param lockedDofName key of the constraint in the map
     # \param jointName name of the joint
-    # \param value value of the locked degree of freedom,
-    # \param rankInConfiguration rank of the locked dof in the joint
-    #        configuration vector (should be 0 for rotation and translation
-    #        joints)
-    # \param rankInVelocity rank of the locked dof in the joint
-    #        velocity vector (should be 0 for rotation and translation
-    #        joints)
-    def createLockedDofConstraint (self, lockedDofName, jointName, value, rankInConfiguration, rankInVelocity):
-        return self.client.manipulation.problem.createLockedDofConstraint \
-            (lockedDofName, jointName, value, rankInConfiguration, rankInVelocity)
+    # \param value value of the joint configuration
+    def createLockedJointConstraint (self, lockedDofName, jointName, value):
+        return self.client.manipulation.problem.createLockedJointConstraint \
+            (lockedDofName, jointName, value)
 
     ## Make a LockedDof constraint parametric or non-parametric
     # \param constraintName Name of the numerical constraint,
@@ -217,47 +209,42 @@ class ProblemSolver (object):
                 (constraintName, parametric)
 
     ## Lock degree of freedom of a FreeFlyer joint
-    # \param freeflyerBname base name of the joint (It will be completed by '_xyz' and '_SO3'),
-    # \param lockDofBname base name of the lockdof constraints (It will be completed by '_r?[xyz]'),
-    # \param values value of the locked degree of freedom as a quaternion,
-    # \param parametric whether the lockDofs are parametric.
-    def lockFreeFlyerJoint (self, freeflyerBname, lockDofBname, values = (0,0,0,1,0,0,0), parametric = False):
-        rankcfg = 0; rankvel = 0; lockbox = list ()
-        for axis in ['x','y','z']:
-            namet = lockDofBname + '_'  + axis
-            namer = lockDofBname + '_r' + axis
-            self.createLockedDofConstraint (namet,\
-                    freeflyerBname + '_xyz', values[rankcfg    ], rankcfg    , rankvel)
-            self.createLockedDofConstraint (namer,\
-                    freeflyerBname + '_SO3', values[rankcfg + 4], rankcfg + 1, rankvel)
-            self.isLockedDofParametric (namet, parametric)
-            self.isLockedDofParametric (namer, parametric)
-            lockbox.append (namet)
-            lockbox.append (namer)
-            rankcfg = rankcfg + 1
-            rankvel = rankvel + 1
-        return lockbox
+    # \param freeflyerBname base name of the joint
+    #        (It will be completed by '_xyz' and '_SO3'),
+    # \param lockJointBname base name of the LockedJoint constraints
+    #        (It will be completed by '_xyz' and '_SO3'),
+    # \param values config of the locked joints (7 float)
+    def lockFreeFlyerJoint (self, freeflyerBname, lockJointBname,
+                            values = (0,0,0,1,0,0,0)):
+        lockedJoints = list ()
+        namet = lockJointBname + '_xyz'
+        namer = lockJointBname + '_SO3'
+        self.createLockedJointConstraint (namet, freeflyerBname + '_xyz',
+                                          values[:3])
+        lockedJoints.append (namet)
+        self.createLockedJointConstraint (namer, freeflyerBname + '_SO3',
+                                          values[3:])
+        lockedJoints.append (namer)
+        return lockedJoints
 
-    ## Lock degree of freedom of a Planar joint
-    # \param planarBname base name of the joint (It will be completed by '_xy' and '_rz'),
-    # \param lockDofBname base name of the lockdof constraints (It will be completed by '(_rz)?_xy'),
-    # \param values value of the locked degree of freedom as (t_x, t_y, cos (r_z), sin (r_z)),
-    # \param parametric whether the lockDofs are parametric.
-    def lockPlanarJoint (self, freeflyerBname, lockDofBname, values = (0,0,1,0), parametric = False):
-        rank = 0; lockbox = list ()
-        for axis in ['_x','_y']:
-            namet = lockDofBname + axis
-            namer = lockDofBname + '_rz' + axis
-            self.createLockedDofConstraint (namet,\
-                    freeflyerBname + '_xy', values[rank], rank, rank)
-            self.createLockedDofConstraint (namer,\
-                    freeflyerBname + '_rz', values[rank], rank, rank)
-            self.isLockedDofParametric (namet, parametric)
-            self.isLockedDofParametric (namer, parametric)
-            lockbox.append (namet)
-            lockbox.append (namer)
-            rank = rank + 1
-        return lockbox
+    ## Lock degree of freedom of a planar joint
+    # \param planar base name of the joint
+    #        (It will be completed by '_xy' and '_rz'),
+    # \param lockJointBname base name of the LockedJoint constraints
+    #        (It will be completed by '_xy' and '_rz'),
+    # \param values config of the locked joints (4 float)
+    def lockPlanarJoint (self, planarBname, lockJointBname,
+                         values = (0,0,1,0)):
+        lockedJoints = list ()
+        namet = lockJointBname + '_xy'
+        namer = lockJointBname + '_rz'
+        self.createLockedJointConstraint (namet, planarBname + '_xy',
+                                          values[:2])
+        lockedJoints.append (namet)
+        self.createLockedJointConstraint (namer, planarBname + '_rz',
+                                          values[2:])
+        lockedJoints.append (namer)
+        return lockedJoints
 
     ## Lock degree of freedom with given value
     # \param jointName name of the joint
@@ -270,7 +257,7 @@ class ProblemSolver (object):
         return self.client.basic.problem.lockDof \
             (jointName, value, rankInConfiguration, rankInVelocity)
 
-    ## Lock joint with one degree of freedom with given value 
+    ## Lock joint with one degree of freedom with given value
     # \param jointName name of the joint
     # \param value value of the locked degree of freedom,
     def lockOneDofJoint (self, jointName, value):

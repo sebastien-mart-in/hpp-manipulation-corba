@@ -52,21 +52,14 @@ module hpp {
 			  in string handleName)
 	  raises (Error);
 
-        /// Insert a new LockedDof constraint with given value in the
+        /// Insert a new LockedJoint constraint with given value in the
         ///        hpp::manipulation::ProblemSolver map
-        /// \param lockedDofName key of the constraint in the map
+        /// \param lockedJointName key of the constraint in the map
         /// \param jointName name of the joint
-        /// \param value value of the locked degree of freedom,
-        /// \param rankInConfiguration rank of the locked dof in the joint
-        ///        configuration vector (should be 0 for rotation and translation
-        ///        joints)
-        /// \param rankInVelocity rank of the locked dof in the joint
-        ///        velocity vector (should be 0 for rotation and translation
-        ///        joints)
-        void createLockedDofConstraint (in string lockedDofName, in string jointName,
-            in double value,
-            in unsigned short rankInConfiguration,
-            in unsigned short rankInVelocity)
+        /// \param value value of the joint configuration,
+        void createLockedJointConstraint (in string lockedJointName,
+					  in string jointName,
+					  in floatSeq value)
           raises (Error);
 
         Names_t getEnvironmentContactNames ()
@@ -78,14 +71,6 @@ module hpp {
         void createPlacementConstraint (in string placementName, in string objectName,
                                         in string objectJointName, in string objectTriangleName,
                                         in string envContactName)
-          raises (Error);
-
-        /// Make a LockedDof constraint parametric or non-parametric
-        /// \param constraintName Name of the numerical constraint,
-        /// \param value True is parametric
-        ///
-        /// Constraints should have been added in the ProblemSolver local map.
-        void isLockedDofParametric (in string constraintName, in boolean parametric)
           raises (Error);
 
         /// Apply constaints to a configuration
