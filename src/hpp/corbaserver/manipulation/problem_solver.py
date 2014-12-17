@@ -17,8 +17,6 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-from srdf_parser import Parser as SrdfParser
-
 ## Definition of a manipulation planning problem
 #
 #  This class wraps the Corba client to the server implemented by
