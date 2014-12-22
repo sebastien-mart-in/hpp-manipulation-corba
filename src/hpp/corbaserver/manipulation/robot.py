@@ -154,23 +154,23 @@ class Robot (object):
     ## \name Joints
     #\{
 
-    # Get joint names in the same order as in the configuration.
+    ## Get joint names in the same order as in the configuration.
     def getJointNames (self):
         return self.client.basic.robot.getJointNames ()
 
-    # Get joint position.
+    ## Get joint position.
     def getJointPosition (self, jointName):
         return self.client.basic.robot.getJointPosition (jointName)
 
-    # Get joint number degrees of freedom.
+    ## Get joint number degrees of freedom.
     def getJointNumberDof (self, jointName):
         return self.client.basic.robot.getJointNumberDof (jointName)
 
-    # Get joint number config size.
+    ## Get joint number config size.
     def getJointConfigSize (self, jointName):
         return self.client.basic.robot.getJointConfigSize (jointName)
 
-    # set bounds for the joint
+    ## set bounds for the joint
     def setJointBounds (self, jointName, inJointBound):
         return self.client.basic.robot.setJointBounds (jointName, inJointBound)
 
