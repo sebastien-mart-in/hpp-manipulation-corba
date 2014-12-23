@@ -37,10 +37,19 @@ class CorbaClient:
 #  A composite robot is a kinematic chain composed of several sub-kinematic
 #  chains rooted at an anchor joint.
 class Robot (object):
-    def __init__ (self, robotName, rootJointType, load = True):
+    ## Constructor
+    # \param compositeName name of the composite robot that will be built later,
+    # \param robotName name of the first robot that is loaded now,
+    # \param rootJointType type of root joint among ("freeflyer", "planar",
+    #        "anchor"),
+    # \param load whether to actually load urdf files. Set to no if you only
+    #        want to initialize a corba client to an already initialized
+    #        problem.
+    def __init__ (self, compositeName, robotName, rootJointType, load = True):
         self.tf_root = "base_link"
         self.rootJointType = dict()
-        self.robotName = robotName
+        self.name = compositeName
+        self.displayName = robotName
         self.client = CorbaClient ()
         self.load = load
         self.loadModel (robotName, rootJointType)
@@ -117,17 +126,16 @@ class Robot (object):
 
     ## Build a composite robot from a set of robots and objects
     #
-    #  \param robotName Name of the composite robot,
     #  \param robotNames list of names of the robots and objects.
-    def buildCompositeRobot (self, robotName, robotNames):
+    def buildCompositeRobot (self, robotNames):
         if self.load:
-            self.client.manipulation.robot.buildCompositeRobot (robotName,
-                    robotNames)
+            self.client.manipulation.robot.buildCompositeRobot (self.name,
+                                                                robotNames)
         self.jointNames = self.client.basic.robot.getJointNames ()
-        self.__setattr__ (self.robotName + 'JointNames',
-                          map (lambda n : n [len(self.robotName)+1:],
-                               filter (lambda n: n[:len (self.robotName)]
-                                       == self.robotName, self.jointNames)))
+        self.__setattr__ (self.displayName + 'JointNames',
+                          map (lambda n : n [len(self.displayName)+1:],
+                               filter (lambda n: n[:len (self.displayName)]
+                                       == self.displayName, self.jointNames)))
         self.rankInConfiguration = dict ()
         self.rankInVelocity = dict ()
         rankInConfiguration = rankInVelocity = 0
@@ -183,12 +191,12 @@ class Robot (object):
     #
     #  Valid only if the robot has a freeflyer joint.
     def setTranslationBounds (self, xmin, xmax, ymin, ymax, zmin, zmax):
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_x",
-                                                [xmin, xmax])
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_y",
-                                                [ymin, ymax])
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_z",
-                                                [zmin, zmax])
+        self.client.basic.robot.setJointBounds \
+            (self.displayName + "base_joint_x", [xmin, xmax])
+        self.client.basic.robot.setJointBounds \
+            (self.displayName + "base_joint_y", [ymin, ymax])
+        self.client.basic.robot.setJointBounds \
+            (self.displayName + "base_joint_z", [zmin, zmax])
     ## \}
 
     ## \name Access to current configuration
@@ -301,9 +309,13 @@ class Robot (object):
     ##\}
 
 class HumanoidRobot (Robot):
-
-    def __init__ (self, robotName, rootJointType):
-        Robot.__init__ (self, robotName, rootJointType)
+    ## Constructor
+    # \param compositeName name of the composite robot that will be built later,
+    # \param robotName name of the first robot that is loaded now,
+    # \param rootJointType type of root joint among ("freeflyer", "planar",
+    #        "anchor"),
+    def __init__ (self, compositeName, robotName, rootJointType):
+        Robot.__init__ (self, compositeName, robotName, rootJointType)
 
     def loadModel (self, robotName, rootJointType):
         self.client.manipulation.robot.loadHumanoidModel \
