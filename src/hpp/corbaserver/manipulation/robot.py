@@ -197,6 +197,25 @@ class Robot (object):
             (self.displayName + "base_joint_y", [ymin, ymax])
         self.client.basic.robot.setJointBounds \
             (self.displayName + "base_joint_z", [zmin, zmax])
+
+    ## Get link position in joint frame
+    #
+    # Joints are oriented in a different way as in urdf standard since
+    # rotation and uni-dimensional translation joints act around or along
+    # their x-axis. This method returns the position of the urdf link in
+    # world frame.
+    #
+    # \param jointName name of the joint
+    # \return position of the link in world frame.
+    def getLinkPosition (self, jointName):
+        return self.client.basic.robot.getLinkPosition (jointName)
+
+    ## Get link name
+    #
+    # \param jointName name of the joint,
+    # \return name of the link.
+    def getLinkName (self, jointName):
+        return self.client.basic.robot.getLinkName (jointName)
     ## \}
 
     ## \name Access to current configuration
