@@ -60,6 +60,65 @@ class ProblemSolver (object):
         return self.client.basic.problem.resetGoalConfigs ()
     ## \}
 
+    ## \name Obstacles
+    # \{
+
+    ## Load obstacle from urdf file
+    #  \param package Name of the package containing the model,
+    #  \param filename name of the urdf file in the package
+    #         (without suffix .urdf)
+    #  \param prefix prefix added to object names in case the same file is
+    #         loaded several times
+    #
+    #  The ros url is built as follows:
+    #  "package://${package}/urdf/${filename}.urdf"
+    #
+    #  The kinematic structure of the urdf file is ignored. Only the geometric
+    #  objects are loaded as obstacles.
+    def loadObstacleFromUrdf (self, package, filename, prefix):
+        return self.client.basic.obstacle.loadObstacleModel (package, filename,
+                                                       prefix)
+
+    ## Remove an obstacle from outer objects of a joint body
+    #
+    #  \param objectName name of the object to remove,
+    #  \param jointName name of the joint owning the body,
+    #  \param collision whether collision with object should be computed,
+    #  \param distance whether distance to object should be computed.
+    #  \throw Error.
+    def removeObstacleFromJoint (self, objectName, jointName, collision,
+                                 distance):
+        return self.client.basic.obstacle.removeObstacleFromJoint \
+            (objectName, jointName, collision, distance)
+
+    ## Move an obstacle to a given configuration.
+    #  \param objectName name of the polyhedron.
+    #  \param cfg the configuration of the obstacle.
+    #  \throw Error.
+    #
+    #  \note The obstacle is not added to local map
+    #  impl::Obstacle::collisionListMap.
+    #
+    #  \note Build the collision entity of polyhedron for KCD.
+    def moveObstacle (self, objectName, cfg):
+        return self.client.basic.obstacle.moveObstacle (objectName, cfg)
+    ## Get the position of an obstacle
+    #
+    #  \param objectName name of the polyhedron.
+    #  \retval cfg Position of the obstacle.
+    #  \throw Error.
+    def getObstaclePosition (self, objectName):
+        return self.client.basic.obstacle.getObstaclePosition (objectName)
+
+    ## Get list of obstacles
+    #
+    #  \param collision whether to return obstacle for collision,
+    #  \param distance whether to return obstacles for distance computation
+    # \return list of obstacles
+    def getObstacleNames (self, collision, distance):
+        return self.client.basic.obstacle.getObstacleNames (collision, distance)
+
+    ##\}
     ## \name Constraints
     #  \{
 
@@ -268,7 +327,7 @@ class ProblemSolver (object):
         return self.client.basic.problem.lockDof \
             (jointName, value, rankInConfiguration, rankInVelocity)
 
-    ## Lock joint with one degree of freedom with given value 
+    ## Lock joint with one degree of freedom with given value
     # \param jointName name of the joint
     # \param value value of the locked degree of freedom,
     def lockOneDofJoint (self, jointName, value):
