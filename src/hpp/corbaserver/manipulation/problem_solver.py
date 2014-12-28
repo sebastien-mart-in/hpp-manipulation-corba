@@ -44,7 +44,7 @@ class ProblemSolver (object):
     def getInitialConfig (self):
         return self.client.basic.problem.getInitialConfig ()
 
-    ## \brief Add goal configuration to specified problem.
+    ## Add goal configuration to specified problem.
     #	\param dofArray Array of degrees of freedom
     #	\throw Error.
     def addGoalConfig (self, dofArray):
@@ -119,6 +119,7 @@ class ProblemSolver (object):
         return self.client.basic.obstacle.getObstacleNames (collision, distance)
 
     ##\}
+
     ## \name Constraints
     #  \{
 
@@ -196,13 +197,14 @@ class ProblemSolver (object):
     #  \param joint2Name name of second joint
     #  \param p quaternion representing the desired orientation
     #         of joint2 in the frame of joint1.
+    #  \param mask Select which axis to be constrained.
     #  If joint1 of joint2 is "", the corresponding joint is replaced by
     #  the global frame.
     #  constraints are stored in ProblemSolver object
     def createOrientationConstraint (self, constraintName, joint1Name,
-                                     joint2Name, p):
+                                     joint2Name, p, mask):
         return self.client.basic.problem.createOrientationConstraint \
-            (constraintName, joint1Name, joint2Name, p)
+            (constraintName, joint1Name, joint2Name, p, mask)
 
     ## Create position constraint between two joints
     #
@@ -211,14 +213,17 @@ class ProblemSolver (object):
     #  \param joint2Name name of second joint
     #  \param point1 point in local frame of joint1,
     #  \param point2 point in local frame of joint2.
+    #  \param mask Select which axis to be constrained.
     #  If joint1 of joint2 is "", the corresponding joint is replaced by
     #  the global frame.
     #  constraints are stored in ProblemSolver object
     def createPositionConstraint (self, constraintName, joint1Name,
-                                  joint2Name, point1, point2):
+                                  joint2Name, point1, point2, mask):
         return self.client.basic.problem.createPositionConstraint \
-            (constraintName, joint1Name, joint2Name, point1, point2)
+            (constraintName, joint1Name, joint2Name, point1, point2, mask)
 
+    ## Reset Constraints
+    #
     #  Reset all constraints, including numerical constraints and locked
     #  degrees of freedom.
     def resetConstraints (self):
@@ -332,10 +337,42 @@ class ProblemSolver (object):
     # \param value value of the locked degree of freedom,
     def lockOneDofJoint (self, jointName, value):
         return self.client.basic.problem.lockDof (jointName, value, 0, 0)
+
+    ## error threshold in numerical constraint resolution
+    def setErrorThreshold (self, threshold):
+        return self.client.basic.problem.setErrorThreshold (threshold)
+
+    ## Set the maximal number of iterations
+    def setMaxIterations (self, iterations):
+	return self.client.basic.problem.setMaxIterations (iterations)
+
+
     ## \}
 
     ## \name Solve problem and get paths
     # \{
+
+    ## Select path planner type
+    #  \param Name of the path planner type, either "DiffusingPlanner",
+    #         "VisibilityPrmPlanner", or any type added by method
+    #         core::ProblemSolver::addPathPlannerType
+    def selectPathPlanner (self, pathPlannerType):
+        return self.client.basic.problem.selectPathPlanner (pathPlannerType)
+
+    ## Select path optimizer type
+    #  \param Name of the path optimizer type, either "RandomShortcut" or
+    #   any type added by core::ProblemSolver::addPathOptimizerType
+    def selectPathOptimizer (self, pathOptimizerType):
+        return self.client.basic.problem.selectPathOptimizer (pathOptimizerType)
+
+    ## Select path validation method
+    #  \param Name of the path validation method, either "Discretized"
+    #  "Progressive", "Dichotomy", or any type added by
+    #  core::ProblemSolver::addPathValidationType,
+    #  \param tolerance maximal acceptable penetration.
+    def selectPathValidation (self, pathValidationType, tolerance):
+        return self.client.basic.problem.selectPathValidation \
+            (pathValidationType, tolerance)
 
     ## Solve the problem of corresponding ChppPlanner object
     def solve (self):
@@ -370,4 +407,49 @@ class ProblemSolver (object):
     # \return dofseq : the config at param
     def configAtDistance(self, inPathId, atDistance):
         return self.client.basic.problem.configAtDistance(inPathId, atDistance)
+
+    ## Get way points of a path
+    #  \param pathId rank of the path in the problem
+    def getWaypoints (self, pathId):
+        return self.client.basic.problem.getWaypoints (pathId)
+
+    ## \name Interruption of a path planning request
+    #  \{
+
+    ## \brief Interrupt path planning activity
+    #   \note this method is effective only when multi-thread policy is used
+    #         by CORBA server.
+    #         See constructor of class Server for details.
+    def interruptPathPlanning (self):
+        return self.client.basic.problem.interruptPathPlanning ()
+    # \}
+
+    ## \name exploring the roadmap
+    #  \{
+
+    ## Get nodes of the roadmap.
+    def nodes(self):
+	return self.client.basic.problem.nodes ()
+
+    ## Number of edges
+    def numberEdges (self):
+        return self.client.basic.problem.numberEdges ()
+
+    ## Edge at given rank
+    def edge (self, edgeId):
+        return self.client.basic.problem.edge (edgeId)
+
+    ## Number of connected components
+    def numberConnectedComponents (self):
+        return self.client.basic.problem.numberConnectedComponents ()
+
+    ## Nodes of a connected component
+    #  \param connectedComponentId index of connected component in roadmap
+    #  \return list of nodes of the connected component.
+    def nodesConnectedComponent (self, ccId):
+        return self.client.basic.problem.nodesConnectedComponent (ccId)
+
+    ## Clear the roadmap
+    def clearRoadmap (self):
+        return self.client.basic.problem.clearRoadmap ()
     ## \}
