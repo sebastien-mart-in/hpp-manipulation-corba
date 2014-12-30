@@ -16,6 +16,7 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
+from hpp import Transform
 from hpp.corbaserver.manipulation import Client as ManipulationClient
 from hpp.corbaserver.wholebody_step import Client as WholebodyStepClient
 from hpp.corbaserver import Client as BasicClient
@@ -36,10 +37,19 @@ class CorbaClient:
 #  A composite robot is a kinematic chain composed of several sub-kinematic
 #  chains rooted at an anchor joint.
 class Robot (object):
-    def __init__ (self, robotName, rootJointType, load = True):
+    ## Constructor
+    # \param compositeName name of the composite robot that will be built later,
+    # \param robotName name of the first robot that is loaded now,
+    # \param rootJointType type of root joint among ("freeflyer", "planar",
+    #        "anchor"),
+    # \param load whether to actually load urdf files. Set to no if you only
+    #        want to initialize a corba client to an already initialized
+    #        problem.
+    def __init__ (self, compositeName, robotName, rootJointType, load = True):
         self.tf_root = "base_link"
         self.rootJointType = dict()
-        self.robotName = robotName
+        self.name = compositeName
+        self.displayName = robotName
         self.client = CorbaClient ()
         self.load = load
         self.loadModel (robotName, rootJointType)
@@ -116,17 +126,16 @@ class Robot (object):
 
     ## Build a composite robot from a set of robots and objects
     #
-    #  \param robotName Name of the composite robot,
     #  \param robotNames list of names of the robots and objects.
-    def buildCompositeRobot (self, robotName, robotNames):
+    def buildCompositeRobot (self, robotNames):
         if self.load:
-            self.client.manipulation.robot.buildCompositeRobot (robotName,
-                    robotNames)
+            self.client.manipulation.robot.buildCompositeRobot (self.name,
+                                                                robotNames)
         self.jointNames = self.client.basic.robot.getJointNames ()
-        self.__setattr__ (self.robotName + 'JointNames',
-                          map (lambda n : n [len(self.robotName)+1:],
-                               filter (lambda n: n[:len (self.robotName)]
-                                       == self.robotName, self.jointNames)))
+        self.__setattr__ (self.displayName + 'JointNames',
+                          map (lambda n : n [len(self.displayName)+1:],
+                               filter (lambda n: n[:len (self.displayName)]
+                                       == self.displayName, self.jointNames)))
         self.rankInConfiguration = dict ()
         self.rankInVelocity = dict ()
         rankInConfiguration = rankInVelocity = 0
@@ -154,23 +163,27 @@ class Robot (object):
     ## \name Joints
     #\{
 
-    # Get joint names in the same order as in the configuration.
+    ## Get joint names in the same order as in the configuration.
     def getJointNames (self):
         return self.client.basic.robot.getJointNames ()
 
-    # Get joint position.
+    ## Get joint names in the same order as in the configuration.
+    def getAllJointNames (self):
+        return self.client.basic.robot.getAllJointNames ()
+
+    ## Get joint position.
     def getJointPosition (self, jointName):
         return self.client.basic.robot.getJointPosition (jointName)
 
-    # Get joint number degrees of freedom.
+    ## Get joint number degrees of freedom.
     def getJointNumberDof (self, jointName):
         return self.client.basic.robot.getJointNumberDof (jointName)
 
-    # Get joint number config size.
+    ## Get joint number config size.
     def getJointConfigSize (self, jointName):
         return self.client.basic.robot.getJointConfigSize (jointName)
 
-    # set bounds for the joint
+    ## set bounds for the joint
     def setJointBounds (self, jointName, inJointBound):
         return self.client.basic.robot.setJointBounds (jointName, inJointBound)
 
@@ -178,12 +191,31 @@ class Robot (object):
     #
     #  Valid only if the robot has a freeflyer joint.
     def setTranslationBounds (self, xmin, xmax, ymin, ymax, zmin, zmax):
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_x",
-                                                [xmin, xmax])
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_y",
-                                                [ymin, ymax])
-        self.client.basic.robot.setJointBounds (self.robotName + "base_joint_z",
-                                                [zmin, zmax])
+        self.client.basic.robot.setJointBounds \
+            (self.displayName + "base_joint_x", [xmin, xmax])
+        self.client.basic.robot.setJointBounds \
+            (self.displayName + "base_joint_y", [ymin, ymax])
+        self.client.basic.robot.setJointBounds \
+            (self.displayName + "base_joint_z", [zmin, zmax])
+
+    ## Get link position in joint frame
+    #
+    # Joints are oriented in a different way as in urdf standard since
+    # rotation and uni-dimensional translation joints act around or along
+    # their x-axis. This method returns the position of the urdf link in
+    # world frame.
+    #
+    # \param jointName name of the joint
+    # \return position of the link in world frame.
+    def getLinkPosition (self, jointName):
+        return self.client.basic.robot.getLinkPosition (jointName)
+
+    ## Get link name
+    #
+    # \param jointName name of the joint,
+    # \return name of the link.
+    def getLinkName (self, jointName):
+        return self.client.basic.robot.getLinkName (jointName)
     ## \}
 
     ## \name Access to current configuration
@@ -205,6 +237,44 @@ class Robot (object):
     #  \return dofArray Array of degrees of freedom.
     def shootRandomConfig(self):
         return self.client.basic.robot.shootRandomConfig ()
+
+    ## \}
+
+    ## \name Bodies
+    #  \{
+
+    ##  Get the list of objects attached to a joint.
+    #  \param inJointName name of the joint.
+    #  \return list of names of CollisionObject attached to the body.
+    def getJointInnerObjects (self, jointName):
+        return self.client.basic.robot.getJointInnerObjects (jointName)
+
+
+    ##  Get list of collision objects tested with the body attached to a joint
+    #  \param inJointName name of the joint.
+    #  \return list of names of CollisionObject
+    def getJointOuterObjects (self, jointName):
+        return self.client.basic.robot.getJointOuterObjects (jointName)
+
+    ## Get position of robot object
+    #  \param objectName name of the object.
+    #  \return transformation as a hpp.Transform object
+    def getObjectPosition (self, objectName):
+        return Transform (self.client.basic.robot.getObjectPosition
+                          (objectName))
+
+    ## \brief Remove an obstacle from outer objects of a joint body
+    #
+    #  \param objectName name of the object to remove,
+    #  \param jointName name of the joint owning the body,
+    #  \param collision whether collision with object should be computed,
+    #  \param distance whether distance to object should be computed.
+    def removeObstacleFromJoint (self, objectName, jointName, collision,
+                                 distance):
+        return self.client.basic.obstacle.removeObstacleFromJoint \
+            (objectName, jointName, collision, distance)
+
+
     ## \}
 
     ## \name Collision checking and distance computation
@@ -215,8 +285,18 @@ class Robot (object):
     # Check whether current configuration of robot is valid by calling
     # CkwsDevice::collisionTest ().
     # \return whether configuration is valid
+    # \note Deprecated. Use isConfigValid instead.
     def collisionTest (self):
+        print "Deprecated. Use isConfigValid instead"
         return self.client.basic.robot.collisionTest ()
+
+    ## Check the validity of a configuration.
+    #
+    # Check whether a configuration of robot is valid.
+    # \param cfg a configuration
+    # \return whether configuration is valid
+    def isConfigValid (self, cfg):
+        return self.client.basic.robot.isConfigValid (cfg)
 
     ## Compute distances between bodies and obstacles
     #
@@ -236,21 +316,25 @@ class Robot (object):
     # \{
 
     ## Get mass of robot
-    def getMass ():
-        return self.client.robot.getMass ()
+    def getMass (self):
+        return self.client.basic.robot.getMass ()
 
     ## Get position of center of mass
-    def getCenterOfMass ():
-        return self.client.robot.getCenterOfMass ()
+    def getCenterOfMass (self):
+        return self.client.basic.robot.getCenterOfMass ()
     ## Get Jacobian of the center of mass
-    def getJacobianCenterOfMass ():
-        return self.client.robot.getJacobianCenterOfMass ()
+    def getJacobianCenterOfMass (self):
+        return self.client.basic.robot.getJacobianCenterOfMass ()
     ##\}
 
 class HumanoidRobot (Robot):
-
-    def __init__ (self, robotName, rootJointType):
-        Robot.__init__ (self, robotName, rootJointType)
+    ## Constructor
+    # \param compositeName name of the composite robot that will be built later,
+    # \param robotName name of the first robot that is loaded now,
+    # \param rootJointType type of root joint among ("freeflyer", "planar",
+    #        "anchor"),
+    def __init__ (self, compositeName, robotName, rootJointType):
+        Robot.__init__ (self, compositeName, robotName, rootJointType)
 
     def loadModel (self, robotName, rootJointType):
         self.client.manipulation.robot.loadHumanoidModel \
