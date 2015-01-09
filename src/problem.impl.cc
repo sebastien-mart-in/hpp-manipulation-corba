@@ -35,13 +35,13 @@ namespace hpp {
     namespace impl {
 
       core::ComparisonTypePtr_t stringToComparisonType (const std::string& s, const value_type& thr = 0) {
-        if (s.compare ("Equality"))
+        if (s.compare ("Equality") == 0)
           return core::Equality::create ();
-        if (s.compare ("EqualToZero"))
+        if (s.compare ("EqualToZero") == 0)
           return core::EqualToZero::create ();
-        if (s.compare ("SuperiorIneq"))
+        if (s.compare ("SuperiorIneq") == 0)
           return core::SuperiorIneq::create (thr);
-        if (s.compare ("InferiorIneq"))
+        if (s.compare ("InferiorIneq") == 0)
           return core::InferiorIneq::create (thr);
         throw Error ((s + std::string (" is not a ComparisonType")).c_str ());
       }
