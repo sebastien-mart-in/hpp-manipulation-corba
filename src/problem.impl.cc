@@ -139,7 +139,7 @@ namespace hpp {
 	}
       }
 
-      void Problem::createLockedJointConstraint
+      void Problem::createLockedJoint
       (const char* lockedJointName, const char* jointName,
        const hpp::floatSeq& value, const char* comparisonType)
 	throw (hpp::Error)
@@ -152,8 +152,7 @@ namespace hpp {
 
           core::ComparisonTypePtr_t compType = stringToComparisonType (comparisonType);
           LockedJointPtr_t lockedJoint (LockedJoint::create (joint, config, compType));
-          problemSolver_->addLockedJointConstraint (lockedJointName,
-						    lockedJoint);
+          problemSolver_->addLockedJoint (lockedJointName, lockedJoint);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}

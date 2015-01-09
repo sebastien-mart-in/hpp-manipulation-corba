@@ -260,9 +260,9 @@ class ProblemSolver (object):
     # \param jointName name of the joint
     # \param value value of the joint configuration
     # \param compType Comparison type: "Equality" or "EqualToZero"
-    def createLockedJointConstraint (self, lockedDofName, jointName, value,
+    def createLockedJoint (self, lockedDofName, jointName, value,
             compType = "EqualToZero"):
-        return self.client.manipulation.problem.createLockedJointConstraint \
+        return self.client.manipulation.problem.createLockedJoint \
             (lockedDofName, jointName, value, compType)
 
     ## Lock degree of freedom of a FreeFlyer joint
@@ -277,11 +277,11 @@ class ProblemSolver (object):
         lockedJoints = list ()
         namet = lockJointBname + '_xyz'
         namer = lockJointBname + '_SO3'
-        self.createLockedJointConstraint (namet, freeflyerBname + '_xyz',
-                                           values[:3], compType)
+        self.createLockedJoint (namet, freeflyerBname + '_xyz',
+                                values[:3], compType)
         lockedJoints.append (namet)
-        self.createLockedJointConstraint (namer, freeflyerBname + '_SO3',
-                                           values[3:], compType)
+        self.createLockedJoint (namer, freeflyerBname + '_SO3',
+                                values[3:], compType)
         lockedJoints.append (namer)
         return lockedJoints
 
@@ -297,10 +297,10 @@ class ProblemSolver (object):
         lockedJoints = list ()
         namet = lockJointBname + '_xy'
         namer = lockJointBname + '_rz'
-        self.createLockedJointConstraint (namet, planarBname + '_xy',
+        self.createLockedJoint (namet, planarBname + '_xy',
                                            values[:2], compType)
         lockedJoints.append (namet)
-        self.createLockedJointConstraint (namer, planarBname + '_rz',
+        self.createLockedJoint (namer, planarBname + '_rz',
                                            values[2:], compType)
         lockedJoints.append (namer)
         return lockedJoints

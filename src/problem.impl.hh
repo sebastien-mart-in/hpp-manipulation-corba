@@ -49,8 +49,8 @@ namespace hpp {
                                      const char* handleName)
 	  throw (hpp::Error);
 
-	virtual void createLockedJointConstraint (const char* lockedJointName,
-						  const char* jointName,
+        virtual void createLockedJoint (const char* lockedJointName,
+                                        const char* jointName,
                                         const hpp::floatSeq& value,
                                         const char* comparisonType)
 	  throw (hpp::Error);
