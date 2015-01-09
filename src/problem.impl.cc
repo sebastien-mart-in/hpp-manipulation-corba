@@ -16,6 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <hpp/util/debug.hh>
+#include <hpp/core/comparison-type.hh>
 #include <hpp/core/locked-joint.hh>
 #include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
@@ -32,6 +33,19 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+
+      core::ComparisonTypePtr_t stringToComparisonType (const std::string& s, const value_type& thr = 0) {
+        if (s.compare ("Equality"))
+          return core::Equality::create ();
+        if (s.compare ("EqualToZero"))
+          return core::EqualToZero::create ();
+        if (s.compare ("SuperiorIneq"))
+          return core::SuperiorIneq::create (thr);
+        if (s.compare ("InferiorIneq"))
+          return core::InferiorIneq::create (thr);
+        throw Error ((s + std::string (" is not a ComparisonType")).c_str ());
+      }
+
       static ConfigurationPtr_t floatSeqToConfig
       (hpp::manipulation::ProblemSolverPtr_t problemSolver,
        const hpp::floatSeq& dofArray)
@@ -127,7 +141,7 @@ namespace hpp {
 
       void Problem::createLockedJointConstraint
       (const char* lockedJointName, const char* jointName,
-       const hpp::floatSeq& value)
+       const hpp::floatSeq& value, const char* comparisonType)
 	throw (hpp::Error)
       {
 	try {
@@ -136,8 +150,8 @@ namespace hpp {
 	  JointPtr_t joint = robot->getJointByName (jointName);
 	  vector_t config = floatSeqToVector (value);
 
-	  LockedJointPtr_t lockedJoint (LockedJoint::create
-					(lockedJointName, joint, config));
+          core::ComparisonTypePtr_t compType = stringToComparisonType (comparisonType);
+          LockedJointPtr_t lockedJoint (LockedJoint::create (joint, config, compType));
           problemSolver_->addLockedJointConstraint (lockedJointName,
 						    lockedJoint);
 	} catch (const std::exception& exc) {

@@ -57,9 +57,11 @@ module hpp {
         /// \param lockedJointName key of the constraint in the map
         /// \param jointName name of the joint
         /// \param value value of the joint configuration,
+        /// \param comparisonType "Equality" or "EqualToZero"
         void createLockedJointConstraint (in string lockedJointName,
 					  in string jointName,
-					  in floatSeq value)
+                                in floatSeq value,
+                                in string comparisonType)
           raises (Error);
 
         Names_t getEnvironmentContactNames ()

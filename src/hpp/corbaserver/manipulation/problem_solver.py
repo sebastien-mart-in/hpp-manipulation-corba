@@ -259,9 +259,11 @@ class ProblemSolver (object):
     # \param lockedDofName key of the constraint in the map
     # \param jointName name of the joint
     # \param value value of the joint configuration
-    def createLockedJointConstraint (self, lockedDofName, jointName, value):
+    # \param compType Comparison type: "Equality" or "EqualToZero"
+    def createLockedJointConstraint (self, lockedDofName, jointName, value,
+            compType = "EqualToZero"):
         return self.client.manipulation.problem.createLockedJointConstraint \
-            (lockedDofName, jointName, value)
+            (lockedDofName, jointName, value, compType)
 
     ## Lock degree of freedom of a FreeFlyer joint
     # \param freeflyerBname base name of the joint
@@ -269,16 +271,17 @@ class ProblemSolver (object):
     # \param lockJointBname base name of the LockedJoint constraints
     #        (It will be completed by '_xyz' and '_SO3'),
     # \param values config of the locked joints (7 float)
+    # \param compType Comparison type: "Equality" or "EqualToZero"
     def lockFreeFlyerJoint (self, freeflyerBname, lockJointBname,
-                            values = (0,0,0,1,0,0,0)):
+                            values = (0,0,0,1,0,0,0), compType = "EqualToZero"):
         lockedJoints = list ()
         namet = lockJointBname + '_xyz'
         namer = lockJointBname + '_SO3'
         self.createLockedJointConstraint (namet, freeflyerBname + '_xyz',
-                                          values[:3])
+                                           values[:3], compType)
         lockedJoints.append (namet)
         self.createLockedJointConstraint (namer, freeflyerBname + '_SO3',
-                                          values[3:])
+                                           values[3:], compType)
         lockedJoints.append (namer)
         return lockedJoints
 
@@ -288,16 +291,17 @@ class ProblemSolver (object):
     # \param lockJointBname base name of the LockedJoint constraints
     #        (It will be completed by '_xy' and '_rz'),
     # \param values config of the locked joints (4 float)
+    # \param compType Comparison type: "Equality" or "EqualToZero"
     def lockPlanarJoint (self, planarBname, lockJointBname,
-                         values = (0,0,1,0)):
+                         values = (0,0,1,0), compType = "EqualToZero"):
         lockedJoints = list ()
         namet = lockJointBname + '_xy'
         namer = lockJointBname + '_rz'
         self.createLockedJointConstraint (namet, planarBname + '_xy',
-                                          values[:2])
+                                           values[:2], compType)
         lockedJoints.append (namet)
         self.createLockedJointConstraint (namer, planarBname + '_rz',
-                                          values[2:])
+                                           values[2:], compType)
         lockedJoints.append (namer)
         return lockedJoints
 
