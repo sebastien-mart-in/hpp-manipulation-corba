@@ -204,12 +204,14 @@ namespace hpp {
           for (CORBA::ULong i=0; i<numericalConstraintNames.length (); ++i) {
             std::string name (numericalConstraintNames [i]);
             edge->insertConfigConstraint (
-                problemSolver_->numericalConstraint(name),
-                problemSolver_->comparisonType (name));
+                  NumericalConstraint::create (
+                    problemSolver_->numericalConstraint(name),
+                    problemSolver_->comparisonType (name)
+                    ));
           }
           for (CORBA::ULong i=0; i<lockedDofNames.length (); ++i) {
             std::string name (lockedDofNames [i]);
-            edge->insertConfigConstraint (problemSolver_->lockedDofConstraint (name));
+            edge->insertConfigConstraint (problemSolver_->lockedJoint (name));
           }
           RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver_->roadmap());
           if (!roadmap)
@@ -254,8 +256,10 @@ namespace hpp {
               if (!problemSolver_->numericalConstraint (name))
                 throw Error ("The numerical function does not exist.");
               component->addNumericalConstraint (
-                  problemSolver_->numericalConstraint(name),
-                  problemSolver_->comparisonType (name));
+                  NumericalConstraint::create (
+                    problemSolver_->numericalConstraint(name),
+                    problemSolver_->comparisonType (name)
+                    ));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -281,8 +285,10 @@ namespace hpp {
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               n->addNumericalConstraintForPath (
-                  problemSolver_->numericalConstraint(name),
-                  problemSolver_->comparisonType (name));
+                  NumericalConstraint::create (
+                    problemSolver_->numericalConstraint(name),
+                    problemSolver_->comparisonType (name)
+                    ));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -303,7 +309,7 @@ namespace hpp {
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               component->addLockedJointConstraint
-		(problemSolver_->lockedDofConstraint(name));
+		(problemSolver_->lockedJoint (name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
