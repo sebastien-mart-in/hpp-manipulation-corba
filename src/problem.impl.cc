@@ -224,9 +224,15 @@ namespace hpp {
           StaticStabilityGravityPtr_t c = StaticStabilityGravity::create (robot, joint);
 
           TriangleList l = object->contactTriangles (objectTriangleName);
+          if (l.empty ())
+            throw Error ((std::string ("The object has no triangle named ")
+                        + objectTriangleName + std::string(".")).c_str ());
           for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
             c->addObjectTriangle (*it);
           l = problemSolver_->contactTriangles (envContactName);
+          if (l.empty ())
+            throw Error ((std::string ("The environment has no triangle named ")
+                        + envContactName + std::string(".")).c_str ());
           for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
             c->addFloorTriangle (*it);
 
