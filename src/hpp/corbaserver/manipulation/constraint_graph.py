@@ -30,8 +30,8 @@ from subprocess import Popen
 
 class ConstraintGraph (object):
     cmdDot = {
-            'pdf': ['dot', '-Tpdf'],
-            'svg': ['dot', '-Tsvg']
+            'pdf': ['dot', '-Gsize=7.5,10', '-Tpdf'],
+            'svg': ['dot', '-Gsize=7.5,10', '-Tsvg']
             }
     cmdViewer = {
             'pdf': ['evince'],
