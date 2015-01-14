@@ -29,8 +29,14 @@
 from subprocess import Popen
 
 class ConstraintGraph (object):
-    dotCmd = ['dot', '-Tpdf']
-    pdfviewCmd = ['evince']
+    cmdDot = {
+            'pdf': ['dot', '-Tpdf'],
+            'svg': ['dot', '-Tsvg']
+            }
+    cmdViewer = {
+            'pdf': ['evince'],
+            'svg': ['firefox']
+            }
 
     def __init__ (self, robot, graphName):
         self.client = robot.client.manipulation
@@ -52,17 +58,19 @@ class ConstraintGraph (object):
     ## \param openPDF set to False if you just want to generate the PDF.
     ## \note DOT and PDF files will be overwritten and are not automatically
     ## deleted so you can keep them.
-    def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph.pdf', openPDF = True):
+    def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph', format = 'pdf', open = True):
         self.graph.display (dotOut)
-        dotCmd = self.dotCmd[:]
-        dotCmd.append ('-o' + pdfOut)
+        if not self.cmdDot.has_key (format):
+            raise TypeError ("This format is not supported. See member cmdDot for supported format.")
+        dotCmd = self.cmdDot [format]
+        dotCmd.append ('-o' + pdfOut + '.' + format)
         dotCmd.append (dotOut)
         dot = Popen (dotCmd)
         dot.wait ()
-        if openPDF:
-            pdfviewCmd = self.pdfviewCmd[:]
-            pdfviewCmd.append (pdfOut)
-            Popen (pdfviewCmd)
+        if open and self.cmdViewer.has_key (format):
+            viewCmd = self.cmdViewer [format]
+            viewCmd.append (pdfOut + '.' + format)
+            Popen (viewCmd)
 
     ### Create one or several node
     ## \param node name (resp. list of names) of the node(s) to be created.
