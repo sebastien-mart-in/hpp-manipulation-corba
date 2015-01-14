@@ -35,6 +35,8 @@ namespace hpp {
     namespace impl {
 
       core::ComparisonTypePtr_t stringToComparisonType (const std::string& s, const value_type& thr = 0) {
+        // TODO: Comparison type DoubleInequality is omitted because the
+        // constructor requires a width parameter.
         if (s.compare ("Equality") == 0)
           return core::Equality::create ();
         if (s.compare ("EqualToZero") == 0)
