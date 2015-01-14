@@ -124,6 +124,29 @@ class Robot (object):
                  srdfSuffix)
         self.rootJointType[objectName] = rootJointType
 
+    ## Load environment model and store in local map.
+    #  Contact surfaces are build from the corresping srdf file.
+    #  See hpp-manipulation-urdf for more details about contact surface
+    #  specifications.
+    #
+    #  \param envName key of the object in ProblemSolver object map
+    #         (see hpp::manipulation::ProblemSolver::addRobot)
+    #  \param packageName Name of the ROS package containing the model,
+    #  \param modelName Name of the package containing the model
+    #  \param urdfSuffix suffix for urdf file,
+    #  \param srdfSuffix suffix for srdf file.
+    #
+    #  The ros url are built as follows:
+    #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
+    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
+    def loadEnvironmentModel (self, packageName, modelName,
+                         urdfSuffix, srdfSuffix, envName):
+        if self.load:
+            self.client.manipulation.robot.loadEnvironmentModel \
+                (packageName, modelName, urdfSuffix,
+                 srdfSuffix, envName)
+        self.rootJointType[envName] = "Anchor"
+
     ## Build a composite robot from a set of robots and objects
     #
     #  \param robotNames list of names of the robots and objects.
