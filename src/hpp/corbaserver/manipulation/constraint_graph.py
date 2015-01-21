@@ -178,3 +178,31 @@ class ConstraintGraph (object):
         elif graph:
             self.graph.setNumericalConstraints (self.graphId, nc, [])
             self.graph.setLockedDofConstraints (self.graphId, lockDof)
+
+    ## Set the numerical constraints of a LevelSetEdge that create the foliation.
+    #  \param edge name of a LevelSetEdge of the graph.
+    #  \param grasp, pregrasp name, or list of names, of grasp or pregrasp.
+    #  \param numConstraints is an array of names of numerical constraints in the ProblemSolver map.
+    #  \param lockDof is an array of names of LockedDof constraints in the ProblemSolver map.
+    #  \param passiveJoints array of names of vector of passive dofs in the ProblemSolver map.
+    #  \note If passiveDofsNames is a shorter list than numConstraints, passiveDofsNames is extended with an empty string,
+    #        which corresponds to an empty vector of passive dofs.
+    def setLevelSetConstraints (self, edge, grasp = None, \
+            pregrasp = None, lockDof = [], numConstraints = [], passiveJoints = []):
+        nc = numConstraints [:]
+        pdofs = ["" for i in range (len(numConstraints))]
+        pdofs [:len(passiveJoints)] = passiveJoints [:]
+        if grasp is not None:
+            if type(grasp) is str:
+                grasp = [grasp]
+            for g in grasp:
+                nc.extend (self.grasps [g][0])
+                pdofs.extend (self.grasps [g][1])
+        if pregrasp is not None:
+            if type(pregrasp) is str:
+                pregrasp = [pregrasp]
+            for g in pregrasp:
+                nc.extend (self.pregrasps [g][0])
+                pdofs.extend (self.pregrasps [g][1])
+
+        self.graph.setLevelSetConstraints (self.edges [edge], nc, [], lockDof)
