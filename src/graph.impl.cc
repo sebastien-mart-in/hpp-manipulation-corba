@@ -32,6 +32,16 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      std::vector <std::string> expandPassiveDofsNameVector (
+          const hpp::Names_t& names, const size_t& s)
+      {
+        assert (s >= names.length ());
+        std::vector <std::string> ret (s, std::string ());
+        for (CORBA::ULong i=0; i<names.length (); ++i)
+          ret [i] = std::string (names[i]);
+        return ret;
+      }
+
       Graph::Graph () :
         problemSolver_ (0x0), graph_ ()
       {}
@@ -189,6 +199,7 @@ namespace hpp {
 
       void Graph::setLevelSetConstraints (const Long edgeId,
           const hpp::Names_t& numericalConstraintNames,
+          const hpp::Names_t& passiveDofsNames,
           const hpp::Names_t& lockedDofNames)
         throw (hpp::Error)
       {
@@ -201,13 +212,18 @@ namespace hpp {
         if (!edge)
           throw Error ("The edge could not be found.");
         try {
+          std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+            (passiveDofsNames, numericalConstraintNames.length ());
           for (CORBA::ULong i=0; i<numericalConstraintNames.length (); ++i) {
-            std::string name (numericalConstraintNames [i]);
+            std::string name (numericalConstraintNames [i]),
+              pdofName (passiveDofsNames[i]);
             edge->insertConfigConstraint (
                   NumericalConstraint::create (
                     problemSolver_->numericalConstraint(name),
                     problemSolver_->comparisonType (name)
-                    ));
+                    ),
+                  problemSolver_->passiveDofs (pdofNames [i])
+                  );
           }
           for (CORBA::ULong i=0; i<lockedDofNames.length (); ++i) {
             std::string name (lockedDofNames [i]);
@@ -242,7 +258,8 @@ namespace hpp {
       }
 
       void Graph::setNumericalConstraints (const Long graphComponentId,
-          const hpp::Names_t& constraintNames)
+          const hpp::Names_t& constraintNames,
+          const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
       {
         graph::GraphComponentPtr_t component = graph::GraphComponent::get(graphComponentId).lock();
@@ -251,6 +268,8 @@ namespace hpp {
 
         if (constraintNames.length () > 0) {
           try {
+            std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+              (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               if (!problemSolver_->numericalConstraint (name))
@@ -259,7 +278,9 @@ namespace hpp {
                   NumericalConstraint::create (
                     problemSolver_->numericalConstraint(name),
                     problemSolver_->comparisonType (name)
-                    ));
+                    ),
+                  problemSolver_->passiveDofs (pdofNames [i])
+                  );
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -268,7 +289,8 @@ namespace hpp {
       }
 
       void Graph::setNumericalConstraintsForPath (const Long nodeId,
-          const hpp::Names_t& constraintNames)
+          const hpp::Names_t& constraintNames,
+          const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
       {
         graph::NodePtr_t n;
@@ -282,13 +304,17 @@ namespace hpp {
 
         if (constraintNames.length () > 0) {
           try {
+            std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+              (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               n->addNumericalConstraintForPath (
                   NumericalConstraint::create (
                     problemSolver_->numericalConstraint(name),
                     problemSolver_->comparisonType (name)
-                    ));
+                    ),
+                  problemSolver_->passiveDofs (pdofNames [i])
+                  );
             }
           } catch (std::exception& err) {
             throw Error (err.what());

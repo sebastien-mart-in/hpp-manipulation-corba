@@ -78,19 +78,28 @@ module hpp {
         /// \param graphComponentId ID of the component.
         /// \param numericalConstraintNames is an array of names of numerical constraints in the ProblemSolver map.
         /// \param lockedDofNames is an array of names of LockedDof constraints in the ProblemSolver map.
-        void setLevelSetConstraints (in long edgeId, in Names_t numericalConstraintNames, in Names_t lockedDofNames)
+        /// \param passiveDofsNames array of names of vector of passive dofs in the ProblemSolver map.
+        /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
+        ///       which corresponds to an empty vector of passive dofs.
+        void setLevelSetConstraints (in long edgeId, in Names_t numericalConstraintNames, in Names_t passiveDofsNames, in Names_t lockedDofNames)
           raises (Error);
 
         /// Set the numerical constraints of a component.
         /// \param graphComponentId ID of the component.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
-        void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames)
+        /// \param passiveDofsNames array of names of vector of passive dofs in the ProblemSolver map.
+        /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
+        ///       which corresponds to an empty vector of passive dofs.
+        void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames, in Names_t passiveDofsNames)
           raises (Error);
 
         /// Set the numerical constraints for path of a node.
         /// \param nodeId ID of the node.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
-        void setNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames)
+        /// \param passiveDofsNames array of names of vector of passive dofs in the ProblemSolver map.
+        /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
+        ///       which corresponds to an empty vector of passive dofs.
+        void setNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames, in Names_t passiveDofsNames)
           raises (Error);
 
         /// Set the LockedDof constraints of a component.

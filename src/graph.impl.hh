@@ -79,15 +79,18 @@ namespace hpp {
 
           virtual void setLevelSetConstraints (const Long edgeId,
               const hpp::Names_t& numericalConstraintNames,
+              const hpp::Names_t& passiveDofsNames,
               const hpp::Names_t& lockedDofNames)
             throw (hpp::Error);
 
           virtual void setNumericalConstraints (const Long graphComponentId,
-                                       const hpp::Names_t& constraintNames)
+                                       const hpp::Names_t& constraintNames,
+                                       const hpp::Names_t& passiveDofsNames)
             throw (hpp::Error);
 
           virtual void setNumericalConstraintsForPath (const Long nodeId,
-              const hpp::Names_t& constraintNames)
+              const hpp::Names_t& constraintNames,
+              const hpp::Names_t& passiveDofsNames)
             throw (hpp::Error);
 
           virtual void setLockedDofConstraints (const Long graphComponentId,

@@ -222,6 +222,13 @@ class ProblemSolver (object):
         return self.client.basic.problem.createPositionConstraint \
             (constraintName, joint1Name, joint2Name, point1, point2, mask)
 
+    ## Create a vector of passive dofs.
+    #
+    #  \param name name of the vector in the ProblemSolver map.
+    #  \param dofNames list of names of DOF that may
+    def addPassiveDofs (self, name, dofNames):
+        return self.client.basic.problem.addPassiveDofs (name, dofNames)
+
     ## Reset Constraints
     #
     #  Reset all constraints, including numerical constraints and locked

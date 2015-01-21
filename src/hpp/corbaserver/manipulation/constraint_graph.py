@@ -134,27 +134,15 @@ class ConstraintGraph (object):
     ## \param gripper, handle names of the gripper and handle,
     ## \param passiveJoints a list of joints that should not be modified by the constraint.
     ## \note The passive joints are only used for path constraints and are for optimization only.
-    def createGrasp (self, name, gripper, handle, passiveJoints = None):
+    def createGrasp (self, name, gripper, handle, passiveJoints = ""):
         self.client.problem.createGrasp (name, gripper, handle)
-        self.grasps [(name, False)] = [name]
-        if passiveJoints is not None:
-            self.client.problem.createGrasp (name + "_passive", gripper, handle)
-            self.clientBasic.problem.setPassiveDofs (name + "_passive", passiveJoints)
-            self.grasps [(name, True)] = [name + "_passive"]
-        else:
-            self.grasps [(name, True)] = [name]
+        self.grasps [name] = ((name,), (passiveJoints,))
 
     ### Create pre-grasp constraints between a gripper and a handle
     ## See createGrasp.
-    def createPreGrasp (self, name, gripper, handle, passiveJoints = None):
+    def createPreGrasp (self, name, gripper, handle, passiveJoints = ""):
         self.client.problem.createPreGrasp (name, gripper, handle)
-        self.pregrasps [(name, False)] = [name, name + "/0_f_0.05"]
-        if passiveJoints is not None:
-            self.client.problem.createPreGrasp (name + "_passive", gripper, handle)
-            self.clientBasic.problem.setPassiveDofs (name + "_passive", passiveJoints)
-            self.pregrasps [(name, True)] = [name + "_passive", name + "_passive/0_f_0.05"]
-        else:
-            self.pregrasps [(name, True)] = [name, name + "/0_f_0.05"]
+        self.pregrasps [name] = ((name, name + "/0_f_0.05"), (passiveJoints, passiveJoints))
 
     ### Set the constraints of an edge or a node.
     ## This method sets the constraints of an element of the graph and handles the
@@ -163,29 +151,30 @@ class ConstraintGraph (object):
     ## \param node, edge name of a component of the graph,
     ## \param grasp, pregrasp name, or list of names, of grasp or pregrasp.
     ## \note Exaclty one of the parameter graph, node and edge must be set.
-    def setConstraints (self, graph = False, node = None, edge = None, grasp = None, pregrasp = None, lockDof = [], numConstraints = []):
+    def setConstraints (self, graph = False, node = None, edge = None, grasp = None, pregrasp = None, lockDof = [], numConstraints = [], passiveJoints = []):
         nc = numConstraints [:]
-        nc_p = numConstraints [:]
+        pdofs = ["" for i in range (len(numConstraints))]
+        pdofs [:len(passiveJoints)] = passiveJoints [:]
         if grasp is not None:
             if type(grasp) is str:
                 grasp = [grasp]
             for g in grasp:
-                nc.extend (self.grasps[(g, False)])
-                nc_p.extend (self.grasps[(g, True)])
+                nc.extend (self.grasps [g][0])
+                pdofs.extend (self.grasps [g][1])
         if pregrasp is not None:
             if type(pregrasp) is str:
                 pregrasp = [pregrasp]
             for g in pregrasp:
-                nc.extend (self.pregrasps[(g, False)])
-                nc_p.extend (self.pregrasps[(g, True)])
+                nc.extend (self.pregrasps [g][0])
+                pdofs.extend (self.pregrasps [g][1])
 
         if node is not None:
-            self.graph.setNumericalConstraints (self.nodes [node], nc)
-            self.graph.setNumericalConstraintsForPath (self.nodes [node], nc_p)
+            self.graph.setNumericalConstraints (self.nodes [node], nc, [])
+            self.graph.setNumericalConstraintsForPath (self.nodes [node], nc, pdofs)
             self.graph.setLockedDofConstraints (self.nodes [node], lockDof)
         elif edge is not None:
-            self.graph.setNumericalConstraints (self.edges [edge], nc)
+            self.graph.setNumericalConstraints (self.edges [edge], nc, [])
             self.graph.setLockedDofConstraints (self.edges [edge], lockDof)
         elif graph:
-            self.graph.setNumericalConstraints (self.graphId, nc)
+            self.graph.setNumericalConstraints (self.graphId, nc, [])
             self.graph.setLockedDofConstraints (self.graphId, lockDof)
