@@ -216,7 +216,7 @@ namespace hpp {
             (passiveDofsNames, numericalConstraintNames.length ());
           for (CORBA::ULong i=0; i<numericalConstraintNames.length (); ++i) {
             std::string name (numericalConstraintNames [i]),
-              pdofName (passiveDofsNames[i]);
+              pdofName (pdofNames[i]);
             edge->insertConfigConstraint (
                   NumericalConstraint::create (
                     problemSolver_->numericalConstraint(name),
