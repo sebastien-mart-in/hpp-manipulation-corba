@@ -160,14 +160,32 @@ class ProblemSolver (object):
     #   robot passed at construction of this object.
     #   \param constraintName name of the resulting constraint,
     #   \param q0 configuration that satisfies the constraints
-    def createStaticStabilityConstraints (self, constraintName, q0):
+    def createStaticStabilityConstraints (self, constraintName, q0, comName = ""):
         self.client.wholebodyStep.problem.addStaticStabilityConstraints \
-            (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle)
+            (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle, comName)
         self.balanceConstraints_ = [constraintName + "/relative-com",
                                     constraintName + "/relative-orientation",
                                     constraintName + "/relative-position",
                                     constraintName + "/orientation-left-foot",
                                     constraintName + "/position-left-foot"]
+
+    ##  Create stability constraints
+    #
+    #   Call corba request
+    #   hpp::corbaserver::wholebody_step::Problem::addStabilityConstraints
+    #
+    #   The ankles are defined by members leftAnkle and rightAnkle of variable
+    #   robot passed at construction of this object.
+    #   \param constraintName name of the resulting constraint,
+    #   \param q0 configuration that satisfies the constraints
+    def createStabilityConstraints (self, constraintName, q0, comName = ""):
+        self.client.wholebodyStep.problem.addStabilityConstraints \
+            (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle, comName)
+        self.balanceConstraints_ = [constraintName + "/com-between-feet",
+                                    constraintName + "/orientation-right",
+                                    constraintName + "/orientation-left",
+                                    constraintName + "/position-right",
+                                    constraintName + "/position-left"]
 
     ##  Create complement of static stability constraints
     #
@@ -221,6 +239,44 @@ class ProblemSolver (object):
                                   joint2Name, point1, point2, mask):
         return self.client.basic.problem.createPositionConstraint \
             (constraintName, joint1Name, joint2Name, point1, point2, mask)
+
+    ## Create RelativeCom constraint between two joints
+    #
+    #  \param constraintName name of the constraint created,
+    #  \param comName name of CenterOfMassComputation
+    #  \param jointName name of joint
+    #  \param point point in local frame of joint.
+    #  \param mask Select axis to be constrained.
+    #  If jointName is "", the robot root joint is used.
+    #  Constraints are stored in ProblemSolver object
+    def createRelativeComConstraint (self, constraintName, comName, jointLName, point, mask):
+        return self.client.basic.problem.createRelativeComConstraint \
+            (constraintName, comName, jointLName, point, mask)
+
+    ## Create ComBeetweenFeet constraint between two joints
+    #
+    #  \param constraintName name of the constraint created,
+    #  \param comName name of CenterOfMassComputation
+    #  \param jointLName name of first joint
+    #  \param jointRName name of second joint
+    #  \param pointL point in local frame of jointL.
+    #  \param pointR point in local frame of jointR.
+    #  \param jointRefName name of second joint
+    #  \param mask Select axis to be constrained.
+    #  If jointRef is "", the robot root joint is used.
+    #  Constraints are stored in ProblemSolver object
+    def createComBeetweenFeet (self, constraintName, comName, jointLName, jointRName,
+        pointL, pointR, jointRefName, mask):
+        return self.client.basic.problem.createComBeetweenFeet \
+            (constraintName, comName, jointLName, jointRName, pointL, pointR, jointRefName, mask)
+
+    ## Add an object to compute a partial COM of the robot.
+    # \param name of the partial com
+    # \param jointNames list of joint name of each tree ROOT to consider.
+    # \note Joints are added recursively, it is not possible so far to add a
+    # joint without addind all its children.
+    def addPartialCom (self, comName, jointNames):
+        return self.client.basic.robot.addPartialCom (comName, jointNames);
 
     ## Create a vector of passive dofs.
     #
