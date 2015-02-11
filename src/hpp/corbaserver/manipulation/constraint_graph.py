@@ -49,6 +49,7 @@ class ConstraintGraph (object):
         self.edges = dict ()
         self.graphId = self.graph.createGraph (graphName)
         self.subGraphId = self.graph.createSubGraph (graphName + "_sg")
+        self.textToTex = dict ()
 
     ### Display the current graph.
     ## The graph is printed in DOT format. Command dot must be
@@ -80,7 +81,7 @@ class ConstraintGraph (object):
         if type (node) is str:
             node = [node]
         for n in node:
-            self.nodes [n] = self.graph.createNode (self.subGraphId, n)
+            self.nodes [n] = self.graph.createNode (self.subGraphId, self._(n))
 
     ### Create an edge
     ## \param nodeFrom, nodeTo the extremities of the edge,
@@ -97,7 +98,7 @@ class ConstraintGraph (object):
         if isInNodeFrom is None:
             isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
         self.edges [name] =\
-            self.graph.createEdge (self.nodes[nodeFrom], self.nodes[nodeTo], name, weight, isInNodeFrom)
+            self.graph.createEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, isInNodeFrom)
 
     ### Create a WaypointEdge.
     ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note,
@@ -113,7 +114,7 @@ class ConstraintGraph (object):
     def createWaypointEdge (self, nodeFrom, nodeTo, name, nb = 1, weight = 1, isInNodeFrom = None):
         if isInNodeFrom is None:
             isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
-        elmts = self.graph.createWaypointEdge (self.nodes[nodeFrom], self.nodes[nodeTo], name, nb, weight, isInNodeFrom)
+        elmts = self.graph.createWaypointEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), nb, weight, isInNodeFrom)
         for e in elmts.edges:
             self.edges [e.name] = e.id
         for n in elmts.nodes:
@@ -127,7 +128,7 @@ class ConstraintGraph (object):
         if isInNodeFrom is None:
             isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
         self.edges [name] =\
-            self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], name, weight, isInNodeFrom)
+            self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, isInNodeFrom)
 
     ### Create grasp constraints between a gripper and a handle
     ## \param name basename of the constraints,
@@ -135,14 +136,14 @@ class ConstraintGraph (object):
     ## \param passiveJoints a list of joints that should not be modified by the constraint.
     ## \note The passive joints are only used for path constraints and are for optimization only.
     def createGrasp (self, name, gripper, handle, passiveJoints = ""):
-        self.client.problem.createGrasp (name, gripper, handle)
-        self.grasps [name] = ((name,), (passiveJoints,))
+        self.client.problem.createGrasp (self._(name), gripper, handle)
+        self.grasps [name] = ((self._(name),), (passiveJoints,))
 
     ### Create pre-grasp constraints between a gripper and a handle
     ## See createGrasp.
     def createPreGrasp (self, name, gripper, handle, passiveJoints = ""):
-        self.client.problem.createPreGrasp (name, gripper, handle)
-        self.pregrasps [name] = ((name, name + "/0_f_0.05"), (passiveJoints, passiveJoints))
+        self.client.problem.createPreGrasp (self._(name), gripper, handle)
+        self.pregrasps [name] = ((self._(name), self._(name )+ "/0_f_0.05"), (passiveJoints, passiveJoints))
 
     ### Set the constraints of an edge or a node.
     ## This method sets the constraints of an element of the graph and handles the
@@ -206,3 +207,23 @@ class ConstraintGraph (object):
                 pdofs.extend (self.pregrasps [g][1])
 
         self.graph.setLevelSetConstraints (self.edges [edge], nc, [], lockDof)
+
+    ## Add entry to the local dictionnary
+    # \param text plain text
+    # \param tex its latex translation
+    # \sa ConstraintGraph.setTextToTeXTranslation
+    def addTextToTeXTranslation (self, text, tex):
+        self.textToTex[text] = tex
+    
+    ## Set the local dictionnary
+    # \param textToTex a dictionnary of (plain text, TeX replacment)
+    # If the name of a node or an edges is a key of the dictionnary,
+    # it is replaced by the corresponding value.
+    def setTextToTeXTranslation (self, textToTex):
+        if type (textToTex) is not dict:
+            raise TypeError ("Argument textToTex must be a dictionnary.")
+        self.textToTex = textToTex
+
+    ## get the textToTex translation
+    def _ (self, text):
+        return self.textToTex.get (text, text)
