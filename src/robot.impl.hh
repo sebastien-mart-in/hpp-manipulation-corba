@@ -29,84 +29,59 @@ namespace hpp {
 
       class Robot : public virtual POA_hpp::corbaserver::manipulation::Robot
       {
-      public:
-	Robot ();
-	void setProblemSolver (const ProblemSolverPtr_t& problemSolver)
-	{
-	  problemSolver_ = problemSolver;
-	}
+        public:
+          Robot ();
 
-	virtual void loadRobotModel (const char* robotName,
-				     const char* rootJointType,
-				     const char* packageName,
-				     const char* modelName,
-				     const char* urdfSuffix,
-				     const char* srdfSuffix)
-	  throw (hpp::Error);
+          void setProblemSolver (const ProblemSolverPtr_t& problemSolver)
+          {
+            problemSolver_ = problemSolver;
+          }
 
-	virtual void loadHumanoidModel (const char* robotName,
-					const char* rootJointType,
-					const char* packageName,
-					const char* modelName,
-					const char* urdfSuffix,
-					const char* srdfSuffix)
-	  throw (hpp::Error);
+          virtual void insertRobotModel (const char* robotName,
+              const char* rootJointType, const char* packageName,
+              const char* modelName, const char* urdfSuffix,
+              const char* srdfSuffix)
+            throw (hpp::Error);
 
-	virtual void loadObjectModel (const char* objectName,
-				      const char* rootJointType,
-				      const char* packageName,
-				      const char* modelName,
-				      const char* urdfSuffix,
-				      const char* srdfSuffix)
-	  throw (hpp::Error);
+          virtual void insertObjectModel (const char* objectName,
+              const char* rootJointType, const char* packageName,
+              const char* modelName, const char* urdfSuffix,
+              const char* srdfSuffix)
+            throw (hpp::Error);
 
-        virtual void loadEnvironmentModel (const char* package,
-                                           const char* envModelName,
-                                           const char* urdfSuffix,
-                                           const char* srdfSuffix,
-                                           const char* prefix)
-          throw (hpp::Error);
+          virtual void insertHumanoidModel (const char* robotName,
+              const char* rootJointType, const char* packageName,
+              const char* modelName, const char* urdfSuffix,
+              const char* srdfSuffix)
+            throw (hpp::Error);
 
-	virtual void buildCompositeRobot (const char* robotName,
-					  const hpp::Names_t& robotNames)
-	  throw (hpp::Error);
+          virtual void loadEnvironmentModel (const char* package,
+              const char* envModelName, const char* urdfSuffix,
+              const char* srdfSuffix, const char* prefix)
+            throw (hpp::Error);
 
-        virtual Transform__slice* getRootJointPosition (const char* robotName)
-          throw (hpp::Error);
+          virtual Transform__slice* getRootJointPosition (const char* robotName)
+            throw (hpp::Error);
 
-        virtual void setRootJointPosition (const char* robotName,
-                                           const ::hpp::Transform_ position)
-          throw (hpp::Error);
+          virtual void setRootJointPosition (const char* robotName,
+              const ::hpp::Transform_ position)
+            throw (hpp::Error);
 
-	virtual void addHandle (const char* objectName, const char* linkName,
-				const char* handleName,
-				const ::hpp::Transform_ localPosition)
-	  throw (hpp::Error);
+          virtual void addHandle (const char* linkName, const char* handleName,
+              const ::hpp::Transform_ localPosition)
+            throw (hpp::Error);
 
-        virtual void addGripper(const char* robotName,
-                                const char* linkName,
-			        const char* gripperName,
-			        const ::hpp::Transform_ handlePositioninJoint,
-                                const hpp::Names_t& bodyInCollisionNames)
-          throw (hpp::Error);
+          virtual void addGripper(const char* linkName, const char* gripperName,
+              const ::hpp::Transform_ handlePositioninJoint,
+              const hpp::Names_t& bodyInCollisionNames)
+            throw (hpp::Error);
 
-	virtual void addAxialHandle (const char* objectName,
-				     const char* linkName,
-				     const char* handleName,
-				     const ::hpp::Transform_ localPosition)
-	  throw (hpp::Error);
+          virtual void addAxialHandle (const char* linkName,
+              const char* handleName, const ::hpp::Transform_ localPosition)
+            throw (hpp::Error);
 
-        Names_t* getDeviceNames () 
-          throw (hpp::Error);
-
-        Names_t* getDeviceJointNames (const char* inDeviceName)
-          throw (hpp::Error);
-
-        char* getRootBody(const char* inRootJointType, 
-                          const char* inDeviceName)
-          throw (hpp::Error);
-private:
-	ProblemSolverPtr_t problemSolver_;
+        private:
+          ProblemSolverPtr_t problemSolver_;
       }; // class Robot
     } // namespace impl
   } // namespace manipulation

@@ -49,11 +49,8 @@ namespace hpp {
       Long Graph::createGraph(const char* graphName)
         throw (hpp::Error)
       {
-        RobotPtr_t robot = problemSolver_->robot ();
-        if (!robot) {
-          throw Error ("You should build a composite robot"
-              " before creating a graph.");
-        }
+        DevicePtr_t robot = problemSolver_->robot ();
+        if (!robot) throw Error ("Build the robot first.");
         graph_ = graph::Graph::create(robot);
         graph_->name(graphName);
         graph_->maxIterations (problemSolver_->maxIterations ());
@@ -227,7 +224,8 @@ namespace hpp {
           }
           for (CORBA::ULong i=0; i<lockedDofNames.length (); ++i) {
             std::string name (lockedDofNames [i]);
-            edge->insertConfigConstraint (problemSolver_->lockedJoint (name));
+            edge->insertConfigConstraint
+              (problemSolver_->get <LockedJointPtr_t> (name));
           }
           RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver_->roadmap());
           if (!roadmap)
@@ -335,7 +333,7 @@ namespace hpp {
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               component->addLockedJointConstraint
-		(problemSolver_->lockedJoint (name));
+		(problemSolver_->get <LockedJointPtr_t> (name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());

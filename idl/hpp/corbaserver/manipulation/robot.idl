@@ -26,7 +26,7 @@ module hpp
   module manipulation {
   interface Robot
   {
-    ///  Load robot model and store in local map
+    ///  Insert robot model as a child of the root joint of the Device
     ///
     /// \param robotName key of the robot in ProblemSolver object map
     ///        (see hpp::manipulation::ProblemSolver::addRobot)
@@ -40,12 +40,12 @@ module hpp
     /// "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
     /// "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
     ///
-    void loadRobotModel (in string robotName, in string rootJointType,
-			 in string packageName, in string modelName,
-			 in string urdfSuffix, in string srdfSuffix)
+    void insertRobotModel (in string robotName, in string rootJointType,
+        in string packageName, in string modelName, in string urdfSuffix,
+        in string srdfSuffix)
       raises (Error);
 
-    ///  Load humanoid robot model and store in local map
+    ///  Insert humanoid robot model as a child of the root joint of the Device
     ///
     /// \param robotName key of the robot in ProblemSolver object map
     ///        (see hpp::manipulation::ProblemSolver::addRobot)
@@ -59,9 +59,9 @@ module hpp
     /// "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
     /// "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
     ///
-    void loadHumanoidModel (in string robotName, in string rootJointType,
-			    in string packageName, in string modelName,
-			    in string urdfSuffix, in string srdfSuffix)
+    void insertHumanoidModel (in string robotName, in string rootJointType,
+        in string packageName, in string modelName, in string urdfSuffix,
+        in string srdfSuffix)
       raises (Error);
 
     ///  Load object model and store in local map
@@ -78,21 +78,13 @@ module hpp
     /// "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
     /// "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
     ///
-    void loadObjectModel (in string objectName, in string rootJointType,
-			  in string packageName, in string modelName,
-			  in string urdfSuffix, in string srdfSuffix)
+    void insertObjectModel (in string objectName, in string rootJointType,
+        in string packageName, in string modelName, in string urdfSuffix,
+        in string srdfSuffix)
       raises (Error);
 
     void loadEnvironmentModel (in string packageName, in string envModelName,
-			 in string urdfSuffix, in string srdfSuffix,
-			 in string prefix)
-      raises (Error);
-
-    /// Build a composite robot from a set of robots and objects
-    ///
-    /// \param robotName Name of the composite robot,
-    /// \param robotNames list of names of the robots and objects.
-    void buildCompositeRobot (in string robotName, in Names_t robotNames)
+        in string urdfSuffix, in string srdfSuffix, in string prefix)
       raises (Error);
 
     /// Get the position of root joint of a robot in world frame
@@ -109,45 +101,32 @@ module hpp
 
     /// Add Gripper to a robot
     ///
-    /// \param robotName name of the robot owning the gripper,
     /// \param linkName name of the link (hpp::model::Body) holding the gripper,
     /// \param gripperName name of the gripper,
     /// \param handlePositioninJoint position of the handle in the joint frame.
-    void addGripper (in string robotName, in string linkName,
-		     in string gripperName, 
-                     in Transform_ handlePositioninJoint,
-                     in Names_t bodyInCollisionNames)
+    void addGripper (in string linkName, in string gripperName, 
+        in Transform_ handlePositioninJoint, in Names_t bodyInCollisionNames)
       raises (Error);
 
     /// Add Handle to an object
     ///
-    /// \param objectName name of the object holding the handle,
     /// \param linkName name of the link (hpp::model::Body) holding the handle,
     /// \param handleName name of the handle,
     /// \param localPosition position of the handle in the joint frame.
-    void addHandle (in string objectName, in string linkName,
-		    in string handleName, in Transform_ localPosition)
+    void addHandle (in string linkName, in string handleName,
+        in Transform_ localPosition)
       raises (Error);
 
     /// Add axial handle to an object
     ///
-    /// \param objectName name of the object holding the handle,
     /// \param linkName name of the link (hpp::model::Body) holding the handle,
     /// \param handleName name of the handle,
     /// \param localPosition position of the handle in the joint frame,
     ///        rotation around x-axis is not constrained.
-    void addAxialHandle (in string objectName, in string linkName,
-			 in string handleName, in Transform_ localPosition)
+    void addAxialHandle (in string linkName, in string handleName,
+        in Transform_ localPosition)
       raises (Error);
 
-    Names_t getDeviceNames ()
-      raises (Error);
-
-    Names_t getDeviceJointNames (in string inDeviceName)
-      raises (Error);
-    
-    string getRootBody(in string inRootJointType, in string inDeviceName)
-      raises (Error);
   }; // interface Robot
   }; // module manipulation
   }; // module corbaserver

@@ -40,45 +40,36 @@ namespace hpp {
 	}
 
         virtual void createGrasp (const char* graspName,
-				  const char* gripperName,
-				  const char* handleName)
+            const char* gripperName, const char* handleName)
 	  throw (hpp::Error);
 
         virtual void createPreGrasp (const char* graspName,
-                                     const char* gripperName,
-                                     const char* handleName)
+            const char* gripperName, const char* handleName)
 	  throw (hpp::Error);
 
         virtual void createLockedJoint (const char* lockedJointName,
-                                        const char* jointName,
-                                        const hpp::floatSeq& value,
-                                        const char* comparisonType)
+            const char* jointName, const hpp::floatSeq& value,
+            const char* comparisonType)
 	  throw (hpp::Error);
 
         virtual Names_t* getEnvironmentContactNames ()
           throw (hpp::Error);
 
-        virtual Names_t* getObjectContactNames (const char* objectName)
+        virtual Names_t* getRobotContactNames ()
           throw (hpp::Error);
 
-	virtual void createPlacementConstraint (const char* placName,
-                              const char* objectName,
-                              const char* objectJointName,
-                              const char* objectTriangleName,
-                              const char* envContactName)
+        virtual void createPlacementConstraint (const char* placName,
+            const char* jointName, const char* triangleName,
+            const char* envContactName)
 	  throw (hpp::Error);
 
-        virtual bool applyConstraints (hpp::ID id,
-            const hpp::floatSeq& input,
-            hpp::floatSeq_out output,
-            double& residualError)
+        virtual bool applyConstraints (hpp::ID id, const hpp::floatSeq& input,
+            hpp::floatSeq_out output, double& residualError)
           throw (hpp::Error);
 
         virtual bool applyConstraintsWithOffset (hpp::ID IDedge,
-            const hpp::floatSeq& qnear,
-            const hpp::floatSeq& input,
-            hpp::floatSeq_out output,
-            double& residualError)
+            const hpp::floatSeq& qnear, const hpp::floatSeq& input,
+            hpp::floatSeq_out output, double& residualError)
           throw (hpp::Error);
 
       private:

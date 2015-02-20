@@ -22,8 +22,7 @@
 #include <hpp/core/config-projector.hh>
 #include <hpp/model/gripper.hh>
 #include <hpp/constraints/static-stability.hh>
-#include <hpp/manipulation/robot.hh>
-#include <hpp/manipulation/object.hh>
+#include <hpp/manipulation/device.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>
@@ -33,19 +32,27 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      namespace {
+        core::ComparisonTypePtr_t stringToComparisonType (const std::string& s, const value_type& thr = 0) {
+          // TODO: Comparison type DoubleInequality is omitted because the
+          // constructor requires a width parameter.
+          if (s.compare ("Equality") == 0)
+            return core::Equality::create ();
+          if (s.compare ("EqualToZero") == 0)
+            return core::EqualToZero::create ();
+          if (s.compare ("SuperiorIneq") == 0)
+            return core::SuperiorIneq::create (thr);
+          if (s.compare ("InferiorIneq") == 0)
+            return core::InferiorIneq::create (thr);
+          throw Error ((s + std::string (" is not a ComparisonType")).c_str ());
+        }
 
-      core::ComparisonTypePtr_t stringToComparisonType (const std::string& s, const value_type& thr = 0) {
-        // TODO: Comparison type DoubleInequality is omitted because the
-        // constructor requires a width parameter.
-        if (s.compare ("Equality") == 0)
-          return core::Equality::create ();
-        if (s.compare ("EqualToZero") == 0)
-          return core::EqualToZero::create ();
-        if (s.compare ("SuperiorIneq") == 0)
-          return core::SuperiorIneq::create (thr);
-        if (s.compare ("InferiorIneq") == 0)
-          return core::InferiorIneq::create (thr);
-        throw Error ((s + std::string (" is not a ComparisonType")).c_str ());
+        DevicePtr_t getRobotOrThrow (ProblemSolverPtr_t p)
+        {
+          DevicePtr_t robot = p->robot ();
+          if (!robot) throw Error ("Robot not found.");
+          return robot;
+        }
       }
 
       static ConfigurationPtr_t floatSeqToConfig
@@ -93,14 +100,10 @@ namespace hpp {
 				 const char* handleName)
 	throw (hpp::Error)
       {
-	RobotPtr_t robot = problemSolver_->robot ();
-	if (!robot) {
-	  throw Error ("You should build a composite robot before trying to"
-		       " define constraints.");
-	}
+	DevicePtr_t robot = getRobotOrThrow (problemSolver_);
 	try {
-	  const GripperPtr_t gripper = robot->gripper (gripperName);
-	  const HandlePtr_t& handle = robot->handle (handleName);
+          const GripperPtr_t& gripper = robot->get <GripperPtr_t> (gripperName);
+          const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createGrasp (gripper);
 	  DifferentiableFunctionPtr_t complement =
@@ -118,15 +121,11 @@ namespace hpp {
                                     const char* handleName)
 	throw (hpp::Error)
       {
-	RobotPtr_t robot = problemSolver_->robot ();
-	if (!robot) {
-	  throw Error ("You should build a composite robot before trying to"
-		       " define constraints.");
-	}
+        DevicePtr_t robot = getRobotOrThrow (problemSolver_);
 	try {
           using hpp::core::DoubleInequality;
-	  const GripperPtr_t gripper = robot->gripper (gripperName);
-	  const HandlePtr_t& handle = robot->handle (handleName);
+          const GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
+          const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
           std::string name (graspName);
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createPreGrasp (gripper);
@@ -148,13 +147,15 @@ namespace hpp {
       {
 	try {
 	  // Get robot in hppPlanner object.
-	  RobotPtr_t robot = problemSolver_->robot ();
+          DevicePtr_t robot = getRobotOrThrow (problemSolver_);
 	  JointPtr_t joint = robot->getJointByName (jointName);
 	  vector_t config = floatSeqToVector (value);
 
-          core::ComparisonTypePtr_t compType = stringToComparisonType (comparisonType);
-          LockedJointPtr_t lockedJoint (LockedJoint::create (joint, config, compType));
-          problemSolver_->addLockedJoint (lockedJointName, lockedJoint);
+          core::ComparisonTypePtr_t compType =
+            stringToComparisonType (comparisonType);
+          LockedJointPtr_t lockedJoint (
+              LockedJoint::create (joint, config, compType));
+          problemSolver_->add <LockedJointPtr_t> (lockedJointName, lockedJoint);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
@@ -164,7 +165,8 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  const TriangleMap& m = problemSolver_->contactTriangles ();
+	  typedef Container <TriangleList>::ElementMap_t TriangleMap;
+	  const TriangleMap& m = problemSolver_->getAll <TriangleList> ();
 
 	  char** nameList = Names_t::allocbuf(m.size ());
 	  Names_t *jointNames = new Names_t (m.size(), m.size(), nameList);
@@ -182,14 +184,13 @@ namespace hpp {
         }
       }
 
-      Names_t* Problem::getObjectContactNames (const char* objectName)
+      Names_t* Problem::getRobotContactNames ()
         throw (hpp::Error)
       {
         try {
-	  ObjectPtr_t o = problemSolver_->object (std::string (objectName));
-          if (!o)
-            throw Error ("The object does not exists.");
-	  const TriangleMap& m = o->contactTriangles ();
+	  typedef Container <TriangleList>::ElementMap_t TriangleMap;
+          DevicePtr_t r = getRobotOrThrow (problemSolver_);
+	  const TriangleMap& m = r->getAll <TriangleList> ();
 
 	  char** nameList = Names_t::allocbuf(m.size ());
 	  Names_t *jointNames = new Names_t (m.size(), m.size(), nameList);
@@ -208,33 +209,25 @@ namespace hpp {
       }
 
       void Problem::createPlacementConstraint (const char* placName,
-          const char* objectName,
-          const char* objectJointName,
-          const char* objectTriangleName,
+          const char* jointName, const char* triangleName,
           const char* envContactName)
         throw (hpp::Error)
       {
 	try {
 	  // Get robot in hppPlanner object.
-	  RobotPtr_t robot = problemSolver_->robot ();
-	  JointPtr_t joint = robot->getJointByName (objectJointName);
-
-	  ObjectPtr_t object = problemSolver_->object (objectName);
+          DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+	  JointPtr_t joint = robot->getJointByName (jointName);
 
           using constraints::StaticStabilityGravity;
           using constraints::StaticStabilityGravityPtr_t;
           StaticStabilityGravityPtr_t c = StaticStabilityGravity::create (robot, joint);
 
-          TriangleList l = object->contactTriangles (objectTriangleName);
-          if (l.empty ())
-            throw Error ((std::string ("The object has no triangle named ")
-                        + objectTriangleName + std::string(".")).c_str ());
+          TriangleList l = robot->get <TriangleList> (triangleName);
+          if (l.empty ()) throw Error ("Robot triangles not found.");
           for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
             c->addObjectTriangle (*it);
-          l = problemSolver_->contactTriangles (envContactName);
-          if (l.empty ())
-            throw Error ((std::string ("The environment has no triangle named ")
-                        + envContactName + std::string(".")).c_str ());
+          l = problemSolver_->get <TriangleList> (envContactName);
+          if (l.empty ()) throw Error ("Environment triangles not found.");
           for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
             c->addFloorTriangle (*it);
 
@@ -259,8 +252,7 @@ namespace hpp {
           if (edge) {
             constraint =
 	      problemSolver_->constraintGraph ()->configConstraint (edge);
-            RobotPtr_t robot = problemSolver_->robot ();
-            if (!robot) throw Error ("You must have a robot to do that.");
+            DevicePtr_t robot = getRobotOrThrow (problemSolver_);
 	    if (core::ConfigProjectorPtr_t cp =
 		constraint->configProjector ()) {
 	      cp->rightHandSideFromConfig (robot->currentConfiguration());

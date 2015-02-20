@@ -38,7 +38,6 @@ class CorbaClient:
 #  chains rooted at an anchor joint.
 class Robot (object):
     ## Constructor
-    # \param compositeName name of the composite robot that will be built later,
     # \param robotName name of the first robot that is loaded now,
     # \param rootJointType type of root joint among ("freeflyer", "planar",
     #        "anchor"),
@@ -56,11 +55,10 @@ class Robot (object):
 
     ## Virtual function to load the robot model
     def loadModel (self, robotName, rootJointType):
-        self.loadRobotModel \
-                (robotName, rootJointType, self.packageName, self.urdfName,
-                        self.urdfSuffix, self.srdfSuffix)
+        self.insertRobotModel (robotName, rootJointType, self.packageName,
+                self.urdfName, self.urdfSuffix, self.srdfSuffix)
 
-    ## Load robot model and store in local map
+    ## Load robot model and insert it in the device
     #
     #  \param robotName key of the robot in hpp::manipulation::ProblemSolver object
     #         map (see hpp::manipulation::ProblemSolver::addRobot)
@@ -73,15 +71,16 @@ class Robot (object):
     #  The ros url are built as follows:
     #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
     #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-    def loadRobotModel (self, robotName, rootJointType, packageName, modelName,
-                        urdfSuffix, srdfSuffix):
+    def insertRobotModel (self, robotName, rootJointType, packageName,
+            modelName, urdfSuffix, srdfSuffix):
         if self.load:
-            self.client.manipulation.robot.loadRobotModel (robotName, rootJointType,
-                                                           packageName, modelName,
-                                                           urdfSuffix, srdfSuffix)
+            self.client.manipulation.robot.insertRobotModel (robotName,
+                    rootJointType, packageName, modelName, urdfSuffix,
+                    srdfSuffix)
         self.rootJointType[robotName] = rootJointType
+        self.rebuildRanks ()
 
-    ## Load humanoid robot model and store in local map
+    ## Load humanoid robot model and insert it in the device
     #
     #  \param robotName key of the robot in ProblemSolver object map
     #         (see hpp::manipulation::ProblemSolver::addRobot)
@@ -97,12 +96,13 @@ class Robot (object):
     def loadHumanoidModel (self, robotName, rootJointType, packageName,
                            modelName, urdfSuffix, srdfSuffix):
         if self.load:
-            self.client.manipulation.robot.loadHumanoidModel \
+            self.client.manipulation.robot.insertHumanoidModel \
                 (robotName, rootJointType, packageName, modelName,
                  urdfSuffix, srdfSuffix)
         self.rootJointType[robotName] = rootJointType
+        self.rebuildRanks ()
 
-    ## Load object model and store in local map
+    ## Load object model and insert it in the device
     #
     #  \param robotName key of the object in ProblemSolver object map
     #         (see hpp::manipulation::ProblemSolver::addRobot)
@@ -115,14 +115,14 @@ class Robot (object):
     #  The ros url are built as follows:
     #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
     #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-    def loadObjectModel (self, objectName, rootJointType,
-                         packageName, modelName,
-                         urdfSuffix, srdfSuffix):
+    def insertObjectModel (self, objectName, rootJointType,
+            packageName, modelName, urdfSuffix, srdfSuffix):
         if self.load:
-            self.client.manipulation.robot.loadObjectModel \
-                (objectName, rootJointType, packageName, modelName, urdfSuffix,
-                 srdfSuffix)
+            self.client.manipulation.robot.insertObjectModel (objectName,
+                    rootJointType, packageName, modelName, urdfSuffix,
+                    srdfSuffix)
         self.rootJointType[objectName] = rootJointType
+        self.rebuildRanks ()
 
     ## Load environment model and store in local map.
     #  Contact surfaces are build from the corresping srdf file.
@@ -142,18 +142,12 @@ class Robot (object):
     def loadEnvironmentModel (self, packageName, modelName,
                          urdfSuffix, srdfSuffix, envName):
         if self.load:
-            self.client.manipulation.robot.loadEnvironmentModel \
-                (packageName, modelName, urdfSuffix,
-                 srdfSuffix, envName)
+            self.client.manipulation.robot.loadEnvironmentModel (packageName,
+                    modelName, urdfSuffix, srdfSuffix, envName)
         self.rootJointType[envName] = "Anchor"
 
-    ## Build a composite robot from a set of robots and objects
-    #
-    #  \param robotNames list of names of the robots and objects.
-    def buildCompositeRobot (self, robotNames):
-        if self.load:
-            self.client.manipulation.robot.buildCompositeRobot (self.name,
-                                                                robotNames)
+    ## Rebuild inner variables rankInConfiguration and rankInVelocity
+    def rebuildRanks (self):
         self.jointNames = self.client.basic.robot.getJointNames ()
         self.__setattr__ (self.displayName + 'JointNames',
                           map (lambda n : n [len(self.displayName)+1:],
@@ -197,6 +191,10 @@ class Robot (object):
     ## Get joint position.
     def getJointPosition (self, jointName):
         return self.client.basic.robot.getJointPosition (jointName)
+
+    ## Set static position of joint in its parent frame
+    def setJointPosition (self, jointName, position):
+        return self.client.basic.robot.setJointPosition (jointName, position)
 
     ## Get joint number degrees of freedom.
     def getJointNumberDof (self, jointName):

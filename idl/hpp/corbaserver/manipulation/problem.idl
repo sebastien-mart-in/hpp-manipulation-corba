@@ -67,12 +67,12 @@ module hpp {
         Names_t getEnvironmentContactNames ()
           raises (Error);
 
-        Names_t getObjectContactNames (in string objectName)
+        Names_t getRobotContactNames ()
           raises (Error);
 
-        void createPlacementConstraint (in string placementName, in string objectName,
-                                        in string objectJointName, in string objectTriangleName,
-                                        in string envContactName)
+        void createPlacementConstraint (in string placementName,
+            in string jointName, in string triangleName,
+            in string envContactName)
           raises (Error);
 
         /// Apply constaints to a configuration

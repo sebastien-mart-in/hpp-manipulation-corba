@@ -38,7 +38,8 @@ int main (int argc, char* argv [])
   ProblemSolverPtr_t problemSolver = new ProblemSolver;
   /// Add new path planner and path validation classes and make them the default values.
   problemSolver->addPathPlannerType ("M-RRT", ManipulationPlanner::create);
-  problemSolver->addPathValidationType ("Graph-discretized", GraphPathValidation::create <DiscretizedCollisionChecking>);
+  problemSolver->addPathValidationType ("Graph-discretized",
+      GraphPathValidation::create <DiscretizedCollisionChecking>);
   problemSolver->pathPlannerType ("M-RRT");
   problemSolver->pathValidationType ("Graph-discretized", 0.05);
 
