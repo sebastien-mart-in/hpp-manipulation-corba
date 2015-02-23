@@ -37,6 +37,9 @@ namespace hpp {
             problemSolver_ = problemSolver;
           }
 
+          virtual void create (const char* robotName)
+            throw (hpp::Error);
+
           virtual void insertRobotModel (const char* robotName,
               const char* rootJointType, const char* packageName,
               const char* modelName, const char* urdfSuffix,

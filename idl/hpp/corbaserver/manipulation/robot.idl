@@ -26,6 +26,13 @@ module hpp
   module manipulation {
   interface Robot
   {
+    /// Create a manipulation::Device
+    /// The device automatically has an anchor joint called "base_joint" as 
+    /// root joint.
+    /// \param robotName the name of the robot.
+    void create (in string robotName)
+      raises (Error);
+
     ///  Insert robot model as a child of the root joint of the Device
     ///
     /// \param robotName key of the robot in ProblemSolver object map

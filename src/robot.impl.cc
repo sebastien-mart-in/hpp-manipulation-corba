@@ -32,16 +32,22 @@ namespace hpp {
   namespace manipulation {
     namespace impl {
       namespace {
-        manipulation::DevicePtr_t getOrCreateRobot (ProblemSolver* p)
-        {
-          manipulation::DevicePtr_t r = p->robot ();
-          if (r) return r;
-          r = manipulation::Device::create ("Robot");
+        manipulation::DevicePtr_t createRobot (const std::string& name) {
+          manipulation::DevicePtr_t r = manipulation::Device::create (name);
           fcl::Transform3f t; t.setIdentity ();
           model::ObjectFactory of;
           JointPtr_t rj = of.createJointAnchor (t);
           rj->name ("base_joint");
           r->rootJoint (rj);
+          return r;
+        }
+
+        manipulation::DevicePtr_t getOrCreateRobot (ProblemSolver* p,
+            const std::string& name = "Robot")
+        {
+          manipulation::DevicePtr_t r = p->robot ();
+          if (r) return r;
+          r = createRobot (name);
           p->robot (r);
           return r;
         }
@@ -66,6 +72,16 @@ namespace hpp {
       Robot::Robot () : problemSolver_ (0x0)
       {}
 
+      void Robot::create (const char* name)
+	throw (Error)
+      {
+	try {
+          problemSolver_->robot (createRobot (std::string (name)));
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       void Robot::insertRobotModel (const char* robotName,
           const char* rootJointType, const char* packageName,
           const char* modelName, const char* urdfSuffix,
@@ -74,10 +90,12 @@ namespace hpp {
       {
 	try {
           manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver_);
+          robot->prepareInsertRobot ();
 	  manipulation::srdf::loadRobotModel (robot, robot->rootJoint (),
               std::string (robotName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
+          robot->didInsertRobot ();
           problemSolver_->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -92,10 +110,12 @@ namespace hpp {
       {
 	try {
           manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver_);
+          robot->prepareInsertRobot ();
           manipulation::srdf::loadObjectModel (robot, robot->rootJoint (),
               std::string (objectName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
+          robot->didInsertRobot ();
           problemSolver_->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -110,10 +130,12 @@ namespace hpp {
       {
 	try {
           manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver_);
+          robot->prepareInsertRobot ();
 	  manipulation::srdf::loadHumanoidModel (robot, robot->rootJoint (),
               std::string (robotName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
+          robot->didInsertRobot ();
           problemSolver_->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
