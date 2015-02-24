@@ -55,7 +55,7 @@ class Robot (object):
 
     ## Virtual function to load the robot model
     def loadModel (self, robotName, rootJointType):
-        self.client.manipulation.create (self.name)
+        self.client.manipulation.robot.create (self.name)
         self.insertRobotModel (robotName, rootJointType, self.packageName,
                 self.urdfName, self.urdfSuffix, self.srdfSuffix)
 
@@ -359,6 +359,7 @@ class HumanoidRobot (Robot):
         Robot.__init__ (self, compositeName, robotName, rootJointType)
 
     def loadModel (self, robotName, rootJointType):
+        self.client.manipulation.robot.create (self.name)
         self.client.manipulation.robot.loadHumanoidModel \
             (robotName, rootJointType, self.packageName, self.urdfName,
              self.urdfSuffix, self.srdfSuffix)
