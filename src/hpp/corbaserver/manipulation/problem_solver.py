@@ -17,7 +17,7 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-import hpp.corbaserver.wholebody_step.problem_idl
+import hpp.corbaserver.wholebody_step
 
 ## Definition of a manipulation planning problem
 #
@@ -28,8 +28,8 @@ import hpp.corbaserver.wholebody_step.problem_idl
 #  goal of this class is to hide them and to expose those that can be
 #  considered as public.
 class ProblemSolver (object):
-    SLIDING = hpp.corbaserver.wholebody_step.problem_idl.SLIDING
-    ALIGNED_COM = hpp.corbaserver.wholebody_step.problem_idl.ALIGNED_COM
+    SLIDING = hpp.corbaserver.wholebody_step.Problem.SLIDING
+    ALIGNED_COM = hpp.corbaserver.wholebody_step.Problem.ALIGNED_COM
 
     def __init__ (self, robot):
         self.client = robot.client
@@ -166,20 +166,22 @@ class ProblemSolver (object):
     #   \param constraintName name of the resulting constraint,
     #   \param q0 configuration that satisfies the constraints,
     #   \param comName name of a partial COM,
-    #   \param type Type of static stability constraints.
+    #   \param type Type of static stability constraints (Default value: ProblemSolver.SLIDING)
     #
     #   \sa hpp::corbaserver::wholebody_step::Problem::StaticStabilityType
     def createStaticStabilityConstraints (self, constraintName, q0, comName = "",
-            type = ProblemSolver.SLIDING):
+            type = None):
+        if type is None:
+            type = self.SLIDING
         self.client.wholebodyStep.problem.addStaticStabilityConstraints \
             (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle, comName, type)
-        if type == ProblemSolver.SLIDING:
+        if type == self.SLIDING:
             self.balanceConstraints_ = [constraintName + "/relative-com",
                                         constraintName + "/relative-orientation",
                                         constraintName + "/relative-position",
                                         constraintName + "/orientation-left-foot",
                                         constraintName + "/position-left-foot"]
-        elif type == ProblemSolver.ALIGNED_COM:
+        elif type == self.ALIGNED_COM:
             self.balanceConstraints_ = [constraintName + "/com-between-feet",
                                         constraintName + "/orientation-right",
                                         constraintName + "/orientation-left",
