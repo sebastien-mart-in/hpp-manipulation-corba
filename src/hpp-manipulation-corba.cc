@@ -44,10 +44,10 @@ int main (int argc, char* argv [])
   problemSolver->pathValidationType ("Graph-discretized", 0.05);
 
   CorbaServer corbaServer (problemSolver, argc,
-			   const_cast<const char**> (argv), false);
-  WholebodyServer wbsServer (argc, argv, false);
+			   const_cast<const char**> (argv), true);
+  WholebodyServer wbsServer (argc, argv, true);
   wbsServer.setProblemSolver (problemSolver);
-  ManipulationServer manipServer (argc, argv, false);
+  ManipulationServer manipServer (argc, argv, true);
   manipServer.setProblemSolver (problemSolver);
 
   corbaServer.startCorbaServer ();
