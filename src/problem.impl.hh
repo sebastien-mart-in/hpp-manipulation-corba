@@ -48,8 +48,7 @@ namespace hpp {
 	  throw (hpp::Error);
 
         virtual void createLockedJoint (const char* lockedJointName,
-            const char* jointName, const hpp::floatSeq& value,
-            const char* comparisonType)
+            const char* jointName, const hpp::floatSeq& value)
 	  throw (hpp::Error);
 
         virtual Names_t* getEnvironmentContactNames ()

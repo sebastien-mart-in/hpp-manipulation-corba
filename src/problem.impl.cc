@@ -142,7 +142,7 @@ namespace hpp {
 
       void Problem::createLockedJoint
       (const char* lockedJointName, const char* jointName,
-       const hpp::floatSeq& value, const char* comparisonType)
+       const hpp::floatSeq& value)
 	throw (hpp::Error)
       {
 	try {
@@ -151,10 +151,7 @@ namespace hpp {
 	  JointPtr_t joint = robot->getJointByName (jointName);
 	  vector_t config = floatSeqToVector (value);
 
-          core::ComparisonTypePtr_t compType =
-            stringToComparisonType (comparisonType);
-          LockedJointPtr_t lockedJoint (
-              LockedJoint::create (joint, config, compType));
+          LockedJointPtr_t lockedJoint (LockedJoint::create (joint, config));
           problemSolver_->add <LockedJointPtr_t> (lockedJointName, lockedJoint);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());

@@ -325,10 +325,9 @@ class ProblemSolver (object):
     # \param jointName name of the joint
     # \param value value of the joint configuration
     # \param compType Comparison type: "Equality" or "EqualToZero"
-    def createLockedJoint (self, lockedDofName, jointName, value,
-            compType = "EqualToZero"):
+    def createLockedJoint (self, lockedDofName, jointName, value):
         return self.client.manipulation.problem.createLockedJoint \
-            (lockedDofName, jointName, value, compType)
+            (lockedDofName, jointName, value)
 
     ## Lock degree of freedom of a FreeFlyer joint
     # \param freeflyerBname base name of the joint
@@ -338,15 +337,13 @@ class ProblemSolver (object):
     # \param values config of the locked joints (7 float)
     # \param compType Comparison type: "Equality" or "EqualToZero"
     def lockFreeFlyerJoint (self, freeflyerBname, lockJointBname,
-                            values = (0,0,0,1,0,0,0), compType = "EqualToZero"):
+                            values = (0,0,0,1,0,0,0)):
         lockedJoints = list ()
         namet = lockJointBname + '_xyz'
         namer = lockJointBname + '_SO3'
-        self.createLockedJoint (namet, freeflyerBname + '_xyz',
-                                values[:3], compType)
+        self.createLockedJoint (namet, freeflyerBname + '_xyz', values[:3])
         lockedJoints.append (namet)
-        self.createLockedJoint (namer, freeflyerBname + '_SO3',
-                                values[3:], compType)
+        self.createLockedJoint (namer, freeflyerBname + '_SO3', values[3:])
         lockedJoints.append (namer)
         return lockedJoints
 
@@ -357,16 +354,13 @@ class ProblemSolver (object):
     #        (It will be completed by '_xy' and '_rz'),
     # \param values config of the locked joints (4 float)
     # \param compType Comparison type: "Equality" or "EqualToZero"
-    def lockPlanarJoint (self, planarBname, lockJointBname,
-                         values = (0,0,1,0), compType = "EqualToZero"):
+    def lockPlanarJoint (self, planarBname, lockJointBname, values = (0,0,1,0)):
         lockedJoints = list ()
         namet = lockJointBname + '_xy'
         namer = lockJointBname + '_rz'
-        self.createLockedJoint (namet, planarBname + '_xy',
-                                           values[:2], compType)
+        self.createLockedJoint (namet, planarBname + '_xy', values[:2])
         lockedJoints.append (namet)
-        self.createLockedJoint (namer, planarBname + '_rz',
-                                           values[2:], compType)
+        self.createLockedJoint (namer, planarBname + '_rz', values[2:])
         lockedJoints.append (namer)
         return lockedJoints
 
