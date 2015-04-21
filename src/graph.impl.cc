@@ -51,8 +51,7 @@ namespace hpp {
       {
         DevicePtr_t robot = problemSolver_->robot ();
         if (!robot) throw Error ("Build the robot first.");
-        graph_ = graph::Graph::create(robot);
-        graph_->name(graphName);
+        graph_ = graph::Graph::create(graphName, robot);
         graph_->maxIterations (problemSolver_->maxIterations ());
         graph_->errorThreshold (problemSolver_->errorThreshold ());
         problemSolver_->constraintGraph (graph_);
@@ -66,8 +65,7 @@ namespace hpp {
         if (!graph_)
           throw Error ("You should create the graph"
               " before creating subgraph.");
-        graph::NodeSelectorPtr_t ns = graph_->createNodeSelector();
-        ns->name(subgraphName);
+        graph::NodeSelectorPtr_t ns = graph_->createNodeSelector(subgraphName);
         return ns->id ();
       }
 
@@ -85,8 +83,7 @@ namespace hpp {
           throw Error ("You should create a subgraph "
               " before creating nodes.");
 
-        graph::NodePtr_t node = ns->createNode ();
-        node->name (nodeName);
+        graph::NodePtr_t node = ns->createNode (nodeName);
         return node->id ();
       }
 
@@ -103,8 +100,7 @@ namespace hpp {
         if (!from || !to)
           throw Error ("The nodes could not be found.");
 
-        graph::EdgePtr_t edge = from->linkTo (to, w, isInNodeFrom);
-        edge->name (edgeName);
+        graph::EdgePtr_t edge = from->linkTo (edgeName, to, w, isInNodeFrom);
         return edge->id ();
       }
 
@@ -122,10 +118,10 @@ namespace hpp {
         if (!from || !to)
           throw Error ("The nodes could not be found.");
 
-        graph::EdgePtr_t edge_pc = from->linkTo (to, w, isInNodeFrom, graph::WaypointEdge::create);
-        graph::WaypointEdgePtr_t edge = HPP_DYNAMIC_PTR_CAST (graph::WaypointEdge, edge_pc);
         std::ostringstream ss; ss << edgeBaseName << "_e" << nb;
-        edge->name (ss.str ());
+        graph::EdgePtr_t edge_pc = from->linkTo (ss.str (), to, w, isInNodeFrom,
+						 graph::WaypointEdge::create);
+        graph::WaypointEdgePtr_t edge = HPP_DYNAMIC_PTR_CAST (graph::WaypointEdge, edge_pc);
         edge->createWaypoint (nb - 1, edgeBaseName);
         std::list <graph::EdgePtr_t> edges;
         graph::WaypointEdgePtr_t cur = edge;
@@ -189,8 +185,8 @@ namespace hpp {
         if (!from || !to)
           throw Error ("The nodes could not be found.");
 
-        graph::EdgePtr_t edge = from->linkTo (to, w, isInNodeFrom, graph::LevelSetEdge::create);
-        edge->name (edgeName);
+        graph::EdgePtr_t edge = from->linkTo (edgeName, to, w, isInNodeFrom,
+					      graph::LevelSetEdge::create);
         return edge->id ();
       }
 
