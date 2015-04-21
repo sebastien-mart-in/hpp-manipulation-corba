@@ -383,6 +383,37 @@ namespace hpp {
         }
       }
 
+      CORBA::Boolean Graph::getConfigErrorForNode
+      (const hpp::floatSeq& dofArray, ID nodeId, hpp::floatSeq_out error)
+	throw (hpp::Error)
+      {
+	try {
+	  vector_t err;
+	  graph::GraphComponentPtr_t gc (graph::GraphComponent::get (nodeId));
+	  graph::NodePtr_t node (HPP_DYNAMIC_PTR_CAST (graph::Node, gc));
+	  if (!node) {
+	    std::ostringstream oss;
+	    oss << "Graph component " << nodeId << " is not a node.";
+	    throw std::logic_error (oss.str ().c_str ());
+	  }
+          Configuration_t config; config.resize (dofArray.length());
+          for (std::size_t iDof = 0; iDof < (std::size_t)config.size();
+	       ++iDof) {
+            config [iDof] = dofArray[iDof];
+          }
+	  bool res = graph_->getConfigErrorForNode (config, node, err);
+	  floatSeq* e = new floatSeq ();
+	  e->length (err.size ());
+	  for (std::size_t i=0; i < (std::size_t) err.size (); ++i) {
+	    (*e) [i] = err [i];
+	  }
+	  error = e;
+	  return res;
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       void Graph::display (const char* filename)
         throw (hpp::Error)
       {

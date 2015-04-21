@@ -119,6 +119,18 @@ module hpp {
         void getNode (in floatSeq dofArray, out ID nodeId)
           raises (Error);
 
+	/// Get error of a config with respect to a node constraint
+	///
+	/// \param config Configuration,
+	/// \param nodeId id of the node.
+	/// \retval error the error of the node constraint for the
+	///        configuration
+	/// \return whether the configuration belongs to the node.
+	/// Call method core::ConstraintSet::isSatisfied for the node
+	/// constraints.
+	boolean getConfigErrorForNode (in floatSeq config, in ID IDnode,
+				       out floatSeq errorVector) raises (Error);
+
         void display (in string filename)
           raises (Error);
       }; // interface Graph
