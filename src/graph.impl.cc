@@ -20,6 +20,9 @@
 #include <hpp/util/debug.hh>
 #include <hpp/util/pointer.hh>
 
+#include <hpp/core/steering-method-straight.hh>
+#include <hpp/core/weighed-distance.hh>
+
 #include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/roadmap.hh>
 #include <hpp/manipulation/graph/node-selector.hh>
@@ -32,6 +35,11 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      using core::SteeringMethodPtr_t;
+      using core::SteeringMethodStraight;
+      using core::WeighedDistance;
+      using core::WeighedDistancePtr_t;
+
       std::vector <std::string> expandPassiveDofsNameVector (
           const hpp::Names_t& names, const size_t& s)
       {
@@ -51,7 +59,18 @@ namespace hpp {
       {
         DevicePtr_t robot = problemSolver_->robot ();
         if (!robot) throw Error ("Build the robot first.");
-        graph_ = graph::Graph::create(graphName, robot);
+	// Create default steering method to store in edges, until we define a
+	// factory for steering methods.
+	WeighedDistancePtr_t distance
+	  (HPP_DYNAMIC_PTR_CAST (WeighedDistance,
+				 problemSolver_->problem ()->distance ()));
+	SteeringMethodPtr_t sm;
+	if  (distance) {
+	  sm = SteeringMethodStraight::create (robot, distance);
+	} else {
+	  sm = SteeringMethodStraight::create (robot);
+	}
+        graph_ = graph::Graph::create(graphName, robot, sm);
         graph_->maxIterations (problemSolver_->maxIterations ());
         graph_->errorThreshold (problemSolver_->errorThreshold ());
         problemSolver_->constraintGraph (graph_);
