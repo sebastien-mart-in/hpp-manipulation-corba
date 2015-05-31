@@ -270,52 +270,41 @@ class ConstraintGraph (object):
 
     ## Set the numerical constraints of a LevelSetEdge that create the foliation.
     #  \param edge name of a LevelSetEdge of the graph.
-    #  \param grasp, pregrasp name, or list of names, of grasp or pregrasp.
-    #  \param numConstraints is an array of names of numerical constraints in the ProblemSolver map.
-    #  \param lockDof is an array of names of LockedDof constraints in the ProblemSolver map.
-    #  \param passiveJoints array of names of vector of passive dofs in the ProblemSolver map.
+    #  \param condGrasp, condPregrasp name, or list of names, of grasp or pregrasp that define the foliated manifold
+    #  \param condNC, condLJ numerical constraints and locked joints that define the foliated manifold
+    #  \param paramGrasp, paramPregrasp name, or list of names, of grasp or pregrasp that parametrize the foliation
+    #  \param paramNC, paramPassiveJoints, paramLJ numerical constraints and locked joints that parametrize the foliation
     #  \note If passiveDofsNames is a shorter list than numConstraints, passiveDofsNames is extended with an empty string,
     #        which corresponds to an empty vector of passive dofs.
-    def setLevelSetConstraints (self, edge, grasps = None, pregrasps = None,
-                                lockDof = [], numConstraints = [],
-                                passiveJoints = [], grasp = None,
-                                pregrasp = None):
-        if grasp is not None:
-            from warnings import warn
-            warn ("grasp argument is deprecated: use grasps and provide a " +
-                  "list of grasp names")
-            if type (grasp) is str:
-                grasps = [grasp,]
-            else:
-                grasps = grasp
+    def setLevelSetFoliation (self, edge,
+            condGrasps = None, condPregrasps = None, condNC = [], condLJ = [],
+            paramGrasps = None, paramPregrasps = None, paramNC = [], paramPassiveJoints = [], paramLJ = []):
 
-        if pregrasp is not None:
-            from warnings import warn
-            warn ("pregrasp argument is deprecated: use pregrasps and provide" +
-                  " a list of pregrasp names")
-            if type (pregrasp) is str:
-                pregrasps = [pregrasp,]
-            else:
-                pregrasps = pregrasp
-        nc = numConstraints [:]
-        pdofs = ["" for i in range (len(numConstraints))]
-        pdofs [:len(passiveJoints)] = passiveJoints [:]
-        if grasp is not None:
-            if type(grasp) is str:
-                grasp = [grasp]
-            for g in grasp:
+        cond_nc = condNC [:]
+        if condGrasps is not None:
+            for g in condGrasps:
                 for pair in self.grasps [g]:
-                    nc.append (pair.constraint)
-                    pdofs.append (pair.passiveJoints)
-        if pregrasp is not None:
-            if type(pregrasp) is str:
-                pregrasp = [pregrasp]
-            for g in pregrasp:
+                    cond_nc.append (pair.constraint)
+        if condPregrasps is not None:
+            for g in condPregrasps:
                 for pair in self.pregrasps [g]:
-                    nc.extend (pair.constraint)
+                    cond_nc.append (pair.constraint)
+
+        param_nc = paramNC [:]
+        pdofs = ["" for i in range (len(paramNC))]
+        pdofs [:len(paramPassiveJoints)] = paramPassiveJoints [:]
+        if paramGrasps is not None:
+            for g in paramGrasps:
+                for pair in self.grasps [g]:
+                    param_nc.append (pair.constraint)
+                    pdofs.append (pair.passiveJoints)
+        if paramPregrasps is not None:
+            for g in paramPregrasps:
+                for pair in self.pregrasps [g]:
+                    param_nc.extend (pair.constraint)
                     pdofs.extend (pair.passiveJoints)
 
-        self.graph.setLevelSetConstraints (self.edges [edge], nc, [], lockDof)
+        self.graph.setLevelSetFoliation (self.edges [edge], cond_nc, condLJ, param_nc, pdofs, paramLJ)
 
     ## Add entry to the local dictionnary
     # \param text plain text
