@@ -103,7 +103,17 @@ namespace hpp {
 	DevicePtr_t robot = getRobotOrThrow (problemSolver_);
 	try {
           const GripperPtr_t& gripper = robot->get <GripperPtr_t> (gripperName);
+	  if (!gripper) {
+	    std::string msg (std::string ("No gripper with name ") +
+			     std::string (gripperName) + std::string ("."));
+	    throw std::runtime_error (msg.c_str ());
+	  }
           const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
+	  if (!handle) {
+	    std::string msg (std::string ("No handle with name ") +
+			     std::string (handleName) + std::string ("."));
+	    throw std::runtime_error (msg.c_str ());
+	  }
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createGrasp (gripper);
 	  DifferentiableFunctionPtr_t complement =
