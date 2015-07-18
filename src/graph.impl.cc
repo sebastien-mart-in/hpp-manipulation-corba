@@ -429,6 +429,38 @@ namespace hpp {
 	}
       }
 
+      void Graph::displayNodeConstraints
+      (hpp::ID nodeId, CORBA::String_out constraints) throw (Error)
+      {
+	graph::GraphComponentPtr_t gc (graph::GraphComponent::get (nodeId));
+	graph::NodePtr_t node (HPP_DYNAMIC_PTR_CAST (graph::Node, gc));
+	if (!node) {
+	  std::ostringstream oss;
+	  oss << "Graph component " << nodeId << " is not a node.";
+	  throw std::logic_error (oss.str ().c_str ());
+	}
+	ConstraintSetPtr_t cs (graph_->configConstraint (node));
+	std::ostringstream oss;
+	oss << (*cs);
+	constraints = oss.str ().c_str ();
+      }
+
+      void Graph::displayEdgeConstraints
+      (hpp::ID edgeId, CORBA::String_out constraints) throw (Error)
+      {
+	graph::GraphComponentPtr_t gc (graph::GraphComponent::get (edgeId));
+	graph::EdgePtr_t edge (HPP_DYNAMIC_PTR_CAST (graph::Edge, gc));
+	if (!edge) {
+	  std::ostringstream oss;
+	  oss << "Graph component " << edgeId << " is not an edge.";
+	  throw std::logic_error (oss.str ().c_str ());
+	}
+	ConstraintSetPtr_t cs (graph_->configConstraint (edge));
+	std::ostringstream oss;
+	oss << (*cs);
+	constraints = oss.str ().c_str ();
+      }
+
       void Graph::display (const char* filename)
         throw (hpp::Error)
       {
