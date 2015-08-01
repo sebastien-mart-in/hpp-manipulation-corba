@@ -39,6 +39,7 @@ namespace hpp {
       using core::SteeringMethodStraight;
       using core::WeighedDistance;
       using core::WeighedDistancePtr_t;
+      using CORBA::ULong;
 
       std::vector <std::string> expandPassiveDofsNameVector (
           const hpp::Names_t& names, const size_t& s)
@@ -75,7 +76,7 @@ namespace hpp {
         graph_->errorThreshold (problemSolver_->errorThreshold ());
         problemSolver_->constraintGraph (graph_);
         problemSolver_->problem()->constraintGraph (graph_);
-        return graph_->id ();
+        return (Long) graph_->id ();
       }
 
       Long Graph::createSubGraph(const char* subgraphName)
@@ -85,7 +86,7 @@ namespace hpp {
           throw Error ("You should create the graph"
               " before creating subgraph.");
         graph::NodeSelectorPtr_t ns = graph_->createNodeSelector(subgraphName);
-        return ns->id ();
+        return (Long) ns->id ();
       }
 
       Long Graph::createNode(const Long subgraphId, const char* nodeName)
@@ -103,7 +104,7 @@ namespace hpp {
               " before creating nodes.");
 
         graph::NodePtr_t node = ns->createNode (nodeName);
-        return node->id ();
+        return (Long) node->id ();
       }
 
       Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
@@ -120,7 +121,7 @@ namespace hpp {
           throw Error ("The nodes could not be found.");
 
         graph::EdgePtr_t edge = from->linkTo (edgeName, to, w, isInNodeFrom);
-        return edge->id ();
+        return (Long) edge->id ();
       }
 
       void Graph::createWaypointEdge(const Long nodeFromId, const Long nodeToId,
@@ -152,22 +153,22 @@ namespace hpp {
 
         GraphComps_t n, e;
         GraphComp gc;
-        e.length (edges.size () + 1);
-        n.length (edges.size ());
+        e.length ((ULong) edges.size () + 1);
+        n.length ((ULong) edges.size ());
         size_t r = 0;
         for (std::list <graph::EdgePtr_t>::const_iterator it = edges.begin ();
             it != edges.end (); it++) {
           gc.name = (*it)->name ().c_str ();
-          gc.id = (*it)->id ();
-          e[r] = gc;
+          gc.id = (Long) (*it)->id ();
+          e[(ULong) r] = gc;
           gc.name = (*it)->to ()->name ().c_str ();
-          gc.id = (*it)->to ()->id ();
-          n[r] = gc;
+          gc.id = (Long) (*it)->to ()->id ();
+          n[(ULong) r] = gc;
           r++;
         }
         gc.name = edge->name ().c_str ();
-        gc.id = edge->id ();
-        e[r] = gc;
+        gc.id = (Long) edge->id ();
+        e[(ULong) r] = gc;
         out_elmts = new GraphElements;
         out_elmts->nodes = n;
         out_elmts->edges = e;
@@ -187,8 +188,8 @@ namespace hpp {
         graph::EdgePtr_t waypoint = edge->waypoint <graph::Edge> ();
         waypoint->name (edge->name () + "_waypoint");
         waypoint->to ()->name (edge->name () + "_waypoint_node");
-        nodeId = waypoint->to ()->id ();
-        return waypoint->id ();
+        nodeId = (Long) waypoint->to ()->id ();
+        return (Long) waypoint->id ();
       }
 
       Long Graph::createLevelSetEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
@@ -206,7 +207,7 @@ namespace hpp {
 
         graph::EdgePtr_t edge = from->linkTo (edgeName, to, w, isInNodeFrom,
 					      graph::LevelSetEdge::create);
-        return edge->id ();
+        return (Long) edge->id ();
       }
 
       void Graph::setLevelSetConstraints (const Long edgeId,
@@ -392,7 +393,7 @@ namespace hpp {
             config [iDof] = dofArray[iDof];
           }
           graph::NodePtr_t node = graph_->getNode (config);
-          output = node->id();
+          output = (Long) node->id();
         } catch (std::exception& e) {
           throw Error (e.what());
         }
@@ -414,13 +415,13 @@ namespace hpp {
           Configuration_t config; config.resize (dofArray.length());
           for (std::size_t iDof = 0; iDof < (std::size_t)config.size();
 	       ++iDof) {
-            config [iDof] = dofArray[iDof];
+            config [iDof] = dofArray[(ULong) iDof];
           }
 	  bool res = graph_->getConfigErrorForNode (config, node, err);
 	  floatSeq* e = new floatSeq ();
-	  e->length (err.size ());
+	  e->length ((ULong) err.size ());
 	  for (std::size_t i=0; i < (std::size_t) err.size (); ++i) {
-	    (*e) [i] = err [i];
+	    (*e) [(ULong) i] = err [i];
 	  }
 	  error = e;
 	  return res;
