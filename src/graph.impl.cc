@@ -189,14 +189,15 @@ namespace hpp {
           // Set the graph values
           graph_out = new GraphComp ();
           graph_out->name = graph_->name ().c_str();
-          graph_out->id = graph_->id ();
+          graph_out->id = (Long) graph_->id ();
 
-          for (int i = 0; i < graph::GraphComponent::components().size (); ++i) {
+          for (std::size_t i = 0;
+	       i < graph::GraphComponent::components().size (); ++i) {
             if (i == graph_->id ()) continue;
             graph::GraphComponentPtr_t gcomponent = graph::GraphComponent::get(i).lock();
             if (!gcomponent) continue;
             current.name = gcomponent->name ().c_str ();
-            current.id   = gcomponent->id ();
+            current.id   = (Long) gcomponent->id ();
             n = HPP_DYNAMIC_PTR_CAST(graph::Node, gcomponent);
             e = HPP_DYNAMIC_PTR_CAST(graph::Edge, gcomponent);
             if (n) {
@@ -208,11 +209,11 @@ namespace hpp {
               graph::WaypointEdgePtr_t we = HPP_DYNAMIC_PTR_CAST (
                   graph::WaypointEdge, e);
               if (we) {
-                current.start = we->waypoint<graph::Edge>()->to ()->id ();
-                current.end = e->to ()->id ();
+                current.start = (Long)we->waypoint<graph::Edge>()->to ()->id ();
+                current.end = (Long) e->to ()->id ();
               } else {
-                current.start = e->from ()->id ();
-                current.end = e->to ()->id ();
+                current.start = (Long) e->from ()->id ();
+                current.end = (Long) e->to ()->id ();
               }
               comp_e[len_edges] = current;
               len_edges++;
@@ -244,9 +245,9 @@ namespace hpp {
           ConfigProjectorPtr_t proj =
             graph_->configConstraint (node)->configProjector ();
           if (proj) {
-            config.success = proj->statistics().nbSuccess();
-            config.error = proj->statistics().nbFailure();
-            config.nbObs = proj->statistics().numberOfObservations();
+            config.success = (Long) proj->statistics().nbSuccess();
+            config.error = (Long) proj->statistics().nbFailure();
+            config.nbObs = (Long) proj->statistics().numberOfObservations();
           }
           path.success = 0;
           path.error = 0;
@@ -256,15 +257,15 @@ namespace hpp {
           ConfigProjectorPtr_t proj =
             graph_->configConstraint (edge)->configProjector ();
           if (proj) {
-            config.success = proj->statistics().nbSuccess();
-            config.error = proj->statistics().nbFailure();
-            config.nbObs = proj->statistics().numberOfObservations();
+            config.success = (Long) proj->statistics().nbSuccess();
+            config.error = (Long) proj->statistics().nbFailure();
+            config.nbObs = (Long) proj->statistics().numberOfObservations();
           }
           proj = graph_->pathConstraint (edge)->configProjector ();
           if (proj) {
-            path.success = proj->statistics().nbSuccess();
-            path.error = proj->statistics().nbFailure();
-            path.nbObs = proj->statistics().numberOfObservations();
+            path.success = (Long) proj->statistics().nbSuccess();
+            path.error = (Long) proj->statistics().nbFailure();
+            path.nbObs = (Long) proj->statistics().numberOfObservations();
           }
           return true;
         } else {
