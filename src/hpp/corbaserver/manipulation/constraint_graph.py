@@ -17,6 +17,23 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
+from subprocess import Popen
+
+## Association of a numerical constraint with the associated passive joints
+#
+#  Passive joints are information provided to the constraint solver to get
+#  better performance and behavior in the resolution.
+class ConstraintAndPassiveJoints (object):
+    def __init__ (self, constraint, passiveJoints):
+        self.constraint_ = constraint
+        self.passiveJoints_ = passiveJoints
+    @property
+    def constraint (self):
+        return self.constraint_
+    @property
+    def passiveJoints (self):
+        return self.passiveJoints_
+
 ### Definition of a constraint graph.
 ##
 ##  This class wraps the Corba client to the server implemented by
@@ -25,9 +42,6 @@
 ##  Some method implemented by the server can be considered as private. The
 ##  goal of this class is to hide them and to expose those that can be
 ##  considered as public.
-
-from subprocess import Popen
-
 class ConstraintGraph (object):
     cmdDot = {
             'pdf': ['dot', '-Gsize=7.5,10', '-Tpdf'],
@@ -130,48 +144,122 @@ class ConstraintGraph (object):
         self.edges [name] =\
             self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, isInNodeFrom)
 
-    ### Create grasp constraints between a gripper and a handle
-    ## \param name basename of the constraints,
-    ## \param gripper, handle names of the gripper and handle,
-    ## \param passiveJoints a list of joints that should not be modified by the constraint.
-    ## \note The passive joints are only used for path constraints and are for optimization only.
+    ## Create grasp constraints between robot gripper and object handle
+    #
+    #  Creates two contraints between a handle and a gripper.
+    #  \li The first constraint named "${name}" is defined by
+    #  the type of handle. For instance, an axial handle defines
+    #  a five degree of freedom constraint with free rotation
+    #  around the x-axis.
+    #  \li the second constraint named "${name}/complement" is
+    #  the complement to the full transformation constraint. For the axial
+    #  handle, it corresponds to the rotation around x.
+    #
+    #  \param name prefix of the constraint names for storing in
+    #         ProblemSolver map,
+    #  \param gripper name of the gripper used when it has been created
+    #  \param handle name of the handle in the form "object/handle"
+    #  where object is the name of the object owning the handle and handle
+    #  is the name of the handle in this object.
+    #  \param passiveJoints name of the set of passive joints associated to
+    #         the grasp constraints as register in ProblemSolver
+    #         \sa manipulation.problem_solver.ProblemSolver::addPassiveDofs.
+    #
+    #  \sa method hpp::corbaserver::manipulation::Problem::createGrasp.
+    #
+    #  \note Passive joints are only used for path constraints and are for
+    #        computational optimization only.
     def createGrasp (self, name, gripper, handle, passiveJoints = ""):
         self.client.problem.createGrasp (self._(name), gripper, handle)
-        self.grasps [name] = ((self._(name),), (passiveJoints,))
+        self.grasps [name] = (ConstraintAndPassiveJoints (self._(name),
+                                                          passiveJoints),)
 
-    ### Create pre-grasp constraints between a gripper and a handle
-    ## See createGrasp.
+    ## Create pre-grasp constraints between robot gripper and object handle
+    #
+    #  Creates two contraints between a handle and a gripper.
+    #  \li The first constraint named "${name}" is the same as the grasp
+    #  defined in createGrasp, except that the translation along x is not
+    #  constrained. For instance, an axial handle defines
+    #  a four degree of freedom constraint with free rotation and translation
+    #  around/along the x-axis,
+    #  \li the second constraint named "${name}/0_f_0.05" is a double
+    #  inequality on the relative x-position of the handle and of the gripper.
+    #  the bounds of the inequality are for now [-0.027,0.073].
+    #
+    #  \param name prefix of the constraint names for storing in
+    #         ProblemSolver map,
+    #  \param gripper name of the gripper used when it has been created
+    #  \param handle name of the handle in the form "object/handle"
+    #  where object is the name of the object owning the handle and handle
+    #  is the name of the handle in this object,
+    #  \param passiveJoints name of the set of passive joints associated to
+    #         the pre-grasp constraints as register in ProblemSolver.
+    #         \sa manipulation.problem_solver.ProblemSolver::addPassiveDofs.
+    #
+    #  \sa hpp::corbaserver::manipulation::Problem::createPreGrasp
+    #
+    #  \note Passive joints are only used for path constraints and are for
+    #        computational optimization only.
     def createPreGrasp (self, name, gripper, handle, passiveJoints = ""):
         self.client.problem.createPreGrasp (self._(name), gripper, handle)
-        self.pregrasps [name] = ((self._(name), self._(name )+ "/0_f_0.05"), (passiveJoints, passiveJoints))
+        self.pregrasps [name] = \
+            (ConstraintAndPassiveJoints (self._(name), passiveJoints),
+             ConstraintAndPassiveJoints (self._(name )+"/0_f_0.05",
+                                         passiveJoints))
 
-    ### Set the constraints of an edge or a node.
-    ## This method sets the constraints of an element of the graph and handles the
-    ## special cases of grasps constraints.
+    ## Set the constraints of an edge, a node or the whole graph
+    #
+    # This method sets the constraints of an element of the graph and handles
+    # the special cases of grasp and pregrasp constraints.
+    #
     ## \param graph set to true if you are defining constraints for every nodes,
-    ## \param node, edge name of a component of the graph,
-    ## \param grasp, pregrasp name, or list of names, of grasp or pregrasp.
+    ## \param node edge name of a component of the graph,
+    ## \param grasps list of names of grasp. Each grasp 
+    ## \param pregrasps list of names of pregrasps
     ## \note Exaclty one of the parameter graph, node and edge must be set.
-    def setConstraints (self, graph = False, node = None, edge = None, grasp = None, pregrasp = None, lockDof = [], numConstraints = [], passiveJoints = []):
+    def setConstraints (self, graph = False, node = None, edge = None, 
+                        grasps = None, pregrasps = None, lockDof = [],
+                        numConstraints = [], passiveJoints = [],
+                        grasp = None, pregrasp = None):
+        if grasp is not None:
+            from warnings import warn
+            warn ("grasp argument is deprecated: use grasps and provide a " +
+                  "list of grasp names")
+            if type (grasp) is str:
+                grasps = [grasp,]
+            else:
+                grasps = grasp
+
+        if pregrasp is not None:
+            from warnings import warn
+            warn ("pregrasp argument is deprecated: use pregrasps and provide" +
+                  " a list of pregrasp names")
+            if type (pregrasp) is str:
+                pregrasps = [pregrasp,]
+            else:
+                pregrasps = pregrasp
+
         nc = numConstraints [:]
         pdofs = ["" for i in range (len(numConstraints))]
         pdofs [:len(passiveJoints)] = passiveJoints [:]
-        if grasp is not None:
-            if type(grasp) is str:
-                grasp = [grasp]
-            for g in grasp:
-                nc.extend (self.grasps [g][0])
-                pdofs.extend (self.grasps [g][1])
-        if pregrasp is not None:
-            if type(pregrasp) is str:
-                pregrasp = [pregrasp]
-            for g in pregrasp:
-                nc.extend (self.pregrasps [g][0])
-                pdofs.extend (self.pregrasps [g][1])
+        if grasps is not None:
+            for g in grasps:
+                for pair in self.grasps [g]:
+                    if edge is not None:
+                        nc.append (pair.constraint + "/complement")
+                    else:
+                        nc.append (pair.constraint)
+                    pdofs.append (pair.passiveJoints)
+        if pregrasps is not None:
+            for g in pregrasps:
+                for pair in self.pregrasps [g]:
+                    nc.append (pair.constraint)
+                    pdofs.append (pair.passiveJoints)
 
         if node is not None:
             self.graph.setNumericalConstraints (self.nodes [node], nc, [])
-            self.graph.setNumericalConstraintsForPath (self.nodes [node], nc, pdofs)
+            self.graph.setNumericalConstraintsForPath (self.nodes [node], nc,
+                                                       pdofs)
             self.graph.setLockedDofConstraints (self.nodes [node], lockDof)
         elif edge is not None:
             self.graph.setNumericalConstraints (self.edges [edge], nc, [])
@@ -188,8 +276,27 @@ class ConstraintGraph (object):
     #  \param passiveJoints array of names of vector of passive dofs in the ProblemSolver map.
     #  \note If passiveDofsNames is a shorter list than numConstraints, passiveDofsNames is extended with an empty string,
     #        which corresponds to an empty vector of passive dofs.
-    def setLevelSetConstraints (self, edge, grasp = None, \
-            pregrasp = None, lockDof = [], numConstraints = [], passiveJoints = []):
+    def setLevelSetConstraints (self, edge, grasps = None, pregrasps = None,
+                                lockDof = [], numConstraints = [],
+                                passiveJoints = [], grasp = None,
+                                pregrasp = None):
+        if grasp is not None:
+            from warnings import warn
+            warn ("grasp argument is deprecated: use grasps and provide a " +
+                  "list of grasp names")
+            if type (grasp) is str:
+                grasps = [grasp,]
+            else:
+                grasps = grasp
+
+        if pregrasp is not None:
+            from warnings import warn
+            warn ("pregrasp argument is deprecated: use pregrasps and provide" +
+                  " a list of pregrasp names")
+            if type (pregrasp) is str:
+                pregrasps = [pregrasp,]
+            else:
+                pregrasps = pregrasp
         nc = numConstraints [:]
         pdofs = ["" for i in range (len(numConstraints))]
         pdofs [:len(passiveJoints)] = passiveJoints [:]
@@ -197,14 +304,16 @@ class ConstraintGraph (object):
             if type(grasp) is str:
                 grasp = [grasp]
             for g in grasp:
-                nc.extend (self.grasps [g][0])
-                pdofs.extend (self.grasps [g][1])
+                for pair in self.grasps [g]:
+                    nc.append (pair.constraint)
+                    pdofs.append (pair.passiveJoints)
         if pregrasp is not None:
             if type(pregrasp) is str:
                 pregrasp = [pregrasp]
             for g in pregrasp:
-                nc.extend (self.pregrasps [g][0])
-                pdofs.extend (self.pregrasps [g][1])
+                for pair in self.pregrasps [g]:
+                    nc.extend (pair.constraint)
+                    pdofs.extend (pair.passiveJoints)
 
         self.graph.setLevelSetConstraints (self.edges [edge], nc, [], lockDof)
 

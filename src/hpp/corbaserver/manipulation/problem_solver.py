@@ -128,34 +128,6 @@ class ProblemSolver (object):
     ## \name Constraints
     #  \{
 
-    ##  Create a grasp constraint for the composite robot
-    #
-    #   constraint is stored in C++ hpp::core::ProblemSolver local map
-    #   of numerical constraints.
-    #   \sa hpp::core::ProblemSolver::addNumericalConstraint
-    #
-    #   \param graspName key in the map of numerical constraints,
-    #   \param jointName name of the joint that grasps "robot/joint",
-    #   \param handleName name of the handle grasped "object/handle",
-    #   \param handlePositioninJoint position of the handle in the joint frame.
-    def createGrasp (self, graspName, gripperName, handleName) :
-        return self.client.manipulation.problem.createGrasp \
-            (graspName, gripperName, handleName)
-
-    ##  Create a pre-grasp constraint for the composite robot
-    #
-    #   constraint is stored in C++ hpp::core::ProblemSolver local map
-    #   of numerical constraints.
-    #   \sa hpp::core::ProblemSolver::addNumericalConstraint
-    #
-    #   \param preGraspName key in the map of numerical constraints,
-    #   \param jointName name of the joint that grasps "robot/joint",
-    #   \param handleName name of the handle grasped "object/handle",
-    #   \param handlePositioninJoint position of the handle in the joint frame.
-    def createPreGrasp (self, preGraspName, gripperName, handleName) :
-        return self.client.manipulation.problem.createPreGrasp \
-            (preGraspName, gripperName, handleName)
-
     ##  Create static stability constraints
     #
     #   Call corba request

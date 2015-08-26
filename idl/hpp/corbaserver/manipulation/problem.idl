@@ -28,29 +28,51 @@ module hpp {
       interface Problem
       {
 
-        /// Create grasp constraint between robot gripper and object handle
+        /// Create grasp constraints between robot gripper and object handle
 	///
-	/// \param graspName name of the constraint for storing in ProblemSolver
-	///        map,
+	/// Creates two contraints between a handle and a gripper.
+	/// \li The first constraint named "${graspName}" is defined by
+	/// the type of handle. For instance, an axial handle defines
+	/// a five degree of freedom constraint with free rotation
+	/// around the x-axis.
+	/// \li the second constraint named "${graspName}/complement" is
+	/// the complement to the fully constraint
+	/// transformation. For the axial handle, it corresponds to
+	/// the rotation around x.
+	///
+	/// \param graspName prefix of the constraint names for storing in
+	///        ProblemSolver map,
 	/// \param gripperName name of the gripper used when it has been created
 	/// \param handleName name of the handle in the form "object/handle"
 	/// where object is the name of the object owning the handle and handle
 	/// is the name of the handle in this object.
+	/// \sa hpp::manipulation::Handle::createGrasp
 	void createGrasp (in string graspName, in string gripperName,
 			  in string handleName)
 	  raises (Error);
 
-        /// Create pre-grasp constraint between robot gripper and object handle
+	///Create pre-grasp constraints between robot gripper and object handle
 	///
-	/// \param graspName name of the constraint for storing in ProblemSolver
-	///        map,
-	/// \param gripperName name of the gripper used when it has been created
-	/// \param handleName name of the handle in the form "object/handle"
+	/// Creates two contraints between a handle and a gripper.
+	/// \li The first constraint named "${name}" is the same as
+	/// the grasp defined in createGrasp, except that the
+	/// translation along x is not constrained. For instance, an
+	/// axial handle defines a four degree of freedom constraint
+	/// with free rotation and translation around/along the
+	/// x-axis,
+	/// \li the second constraint named "${name}/0_f_0.05" is a
+	/// double inequality on the relative x-position of the handle
+	/// and of the gripper.  the bounds of the inequality are for
+	/// now [-0.027,0.073].
+	///
+	/// \param name prefix of the constraint names for storing in
+	///        ProblemSolver map,
+	/// \param gripper name of the gripper used when it has been created
+	/// \param handle name of the handle in the form "object/handle"
 	/// where object is the name of the object owning the handle and handle
-	/// is the name of the handle in this object.
-	void createPreGrasp (in string graspName, in string gripperName,
-			  in string handleName)
-	  raises (Error);
+	/// is the name of the handle in this object,
+	void createPreGrasp (in string name, in string gripper,
+			     in string handle) raises (Error);
 
         /// Insert a new LockedJoint constraint with given value in the
         ///        hpp::manipulation::ProblemSolver map
