@@ -182,9 +182,9 @@ class ConstraintGraph (object):
     #  constrained. For instance, an axial handle defines
     #  a four degree of freedom constraint with free rotation and translation
     #  around/along the x-axis,
-    #  \li the second constraint named "${name}/0_f_0.05" is a double
+    #  \li the second constraint named "${name}/double_ineq" is a double
     #  inequality on the relative x-position of the handle and of the gripper.
-    #  the bounds of the inequality are for now [-0.027,0.073].
+    #  the bounds of the inequality are for now [-.001 c, 2.001 c].
     #
     #  \param name prefix of the constraint names for storing in
     #         ProblemSolver map,
@@ -204,7 +204,7 @@ class ConstraintGraph (object):
         self.client.problem.createPreGrasp (self._(name), gripper, handle)
         self.pregrasps [name] = \
             (ConstraintAndPassiveJoints (self._(name), passiveJoints),
-             ConstraintAndPassiveJoints (self._(name )+"/0_f_0.05",
+             ConstraintAndPassiveJoints (self._(name )+"/double_ineq",
                                          passiveJoints))
 
     ## Set the constraints of an edge, a node or the whole graph

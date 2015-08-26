@@ -60,10 +60,10 @@ module hpp {
 	/// axial handle defines a four degree of freedom constraint
 	/// with free rotation and translation around/along the
 	/// x-axis,
-	/// \li the second constraint named "${name}/0_f_0.05" is a
+	/// \li the second constraint named "${name}/double_ineq" is a
 	/// double inequality on the relative x-position of the handle
 	/// and of the gripper.  the bounds of the inequality are for
-	/// now [-0.027,0.073].
+	/// now [-.001 c, 2.001 c].
 	///
 	/// \param name prefix of the constraint names for storing in
 	///        ProblemSolver map,
