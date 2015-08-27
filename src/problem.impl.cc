@@ -138,12 +138,12 @@ namespace hpp {
           const GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
           const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
           std::string name (graspName);
+          value_type c = handle->clearance () + gripper->clearance ();
+          value_type width = 2*c * 1.01;
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createPreGrasp (gripper);
 	  DifferentiableFunctionPtr_t ineq_positive =
-	    handle->createPreGraspComplement (gripper);
-          value_type c = handle->clearance () + gripper->clearance ();
-          value_type width = 2*c + 0.001;
+	    handle->createPreGraspComplement (gripper, c / 2);
 	  problemSolver_->addNumericalConstraint (name, constraint);
 	  problemSolver_->addNumericalConstraint
             (name + "/double_ineq", ineq_positive);
