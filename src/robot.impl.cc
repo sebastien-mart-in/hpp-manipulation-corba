@@ -297,6 +297,51 @@ namespace hpp {
 	  throw Error (exc.what ());
 	}
       }
+
+      char* Robot::getGripperPositionInJoint (const char* gripperName,
+          ::hpp::Transform__out position)
+        throw (hpp::Error)
+      {
+	try {
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
+          if (!gripper)
+            throw Error ("This gripper does not exists.");
+          const fcl::Transform3f& t = gripper->objectPositionInJoint ();
+          for (std::size_t i = 0; i < 3; ++i)
+            position[  i] = t.getTranslation  ()[i];
+          for (std::size_t i = 0; i < 4; ++i)
+            position[3+i] = t.getQuatRotation ()[i];
+          char* name = new char[gripper->joint ()->name ().length()+1];
+          strcpy (name, gripper->joint ()->name ().c_str ());
+          return name;
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      char* Robot::getHandlePositionInJoint (const char* handleName,
+          ::hpp::Transform__out position)
+        throw (hpp::Error)
+      {
+	try {
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          HandlePtr_t handle = robot->get <HandlePtr_t> (handleName);
+          if (!handle)
+            throw Error ("This handle does not exists.");
+          const fcl::Transform3f& t = handle->localPosition ();
+          for (std::size_t i = 0; i < 3; ++i)
+            position[  i] = t.getTranslation  ()[i];
+          for (std::size_t i = 0; i < 4; ++i)
+            position[3+i] = t.getQuatRotation ()[i];
+          char* name = new char[handle->joint ()->name ().length()+1];
+          strcpy (name, handle->joint ()->name ().c_str ());
+          return name;
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+        }
+      }
+
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

@@ -134,6 +134,18 @@ module hpp
         in Transform_ localPosition)
       raises (Error);
 
+    /// Return the joint name in which a gripper is and the position relatively
+    /// to the joint
+    string getGripperPositionInJoint (in string gripperName,
+        out Transform_ position)
+      raises (hpp::Error);
+
+    /// Return the joint name in which a handle is and the position relatively
+    /// to the joint
+    string getHandlePositionInJoint (in string handleName,
+        out Transform_ position)
+      raises (hpp::Error);
+
   }; // interface Robot
   }; // module manipulation
   }; // module corbaserver
