@@ -118,7 +118,7 @@ module hpp {
             out double residualError)
           raises (Error);
 
-        /// Apply constaints to a configuration
+        /// Apply constaints to a configuration using Edge::applyConstraints
         ///
         /// \param IDedge ID of an edge
         /// \param qnear configuration to initiliaze the projector,

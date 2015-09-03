@@ -317,9 +317,9 @@ namespace hpp {
         throw (hpp::Error)
       {
         /// First get the constraint.
-        ConstraintSetPtr_t constraint;
+        graph::EdgePtr_t edge;
         try {
-          graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
                   graph::GraphComponent::get((size_t)IDedge).lock ());
           if (!edge) {
             std::stringstream ss;
@@ -327,20 +327,18 @@ namespace hpp {
             std::string errmsg = ss.str();
             throw Error (errmsg.c_str());
           }
-          constraint =
-	    problemSolver_->constraintGraph ()->configConstraint (edge);
-          ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
-	  if (core::ConfigProjectorPtr_t cp = constraint->configProjector ()) {
-	    cp->rightHandSideFromConfig (*qoffset);
-	  }
         } catch (std::exception& e ) {
           throw Error (e.what());
         }
 
 	bool success = false;
 	ConfigurationPtr_t config = floatSeqToConfig (problemSolver_, input);
-	try {
-	  success = constraint->apply (*config);
+        ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
+        try {
+	  success = edge->applyConstraints (*qoffset, *config);
+
+          ConstraintSetPtr_t constraint =
+            problemSolver_->constraintGraph ()->configConstraint (edge);
 	  if (hpp::core::ConfigProjectorPtr_t configProjector =
 	      constraint ->configProjector ()) {
 	    residualError = configProjector->residualError ();
