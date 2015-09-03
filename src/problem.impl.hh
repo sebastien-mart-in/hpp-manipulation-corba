@@ -71,6 +71,13 @@ namespace hpp {
             hpp::floatSeq_out output, double& residualError)
           throw (hpp::Error);
 
+        virtual bool buildAndProjectPath (hpp::ID IDedge,
+            const hpp::floatSeq& qb,
+            const hpp::floatSeq& qe,
+            CORBA::Long& indexNotProj,
+            CORBA::Long& indexProj)
+          throw (hpp::Error);
+
       private:
 	ProblemSolverPtr_t problemSolver_;
       }; // class Problem

@@ -20,9 +20,12 @@
 #include <hpp/core/locked-joint.hh>
 #include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
+#include <hpp/core/path-projector.hh>
+#include <hpp/core/path-vector.hh>
 #include <hpp/model/gripper.hh>
 #include <hpp/constraints/static-stability.hh>
 #include <hpp/manipulation/device.hh>
+#include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>
@@ -353,6 +356,68 @@ namespace hpp {
 	  (*q_ptr) [(ULong) i] = (*config) [i];
 	}
 	output = q_ptr;
+	return success;
+      }
+
+      bool Problem::buildAndProjectPath (hpp::ID IDedge,
+          const hpp::floatSeq& qb,
+          const hpp::floatSeq& qe,
+          CORBA::Long& indexNotProj,
+          CORBA::Long& indexProj)
+        throw (hpp::Error)
+      {
+        /// First get the constraint.
+        graph::EdgePtr_t edge;
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+                  graph::GraphComponent::get((size_t)IDedge).lock ());
+          if (!edge) {
+            std::stringstream ss;
+            ss << "ID " << IDedge << " is not an edge";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
+          }
+        } catch (std::exception& e ) {
+          throw Error (e.what());
+        }
+
+	bool success = false;
+	ConfigurationPtr_t q1 = floatSeqToConfig (problemSolver_, qb);
+        ConfigurationPtr_t q2 = floatSeqToConfig (problemSolver_, qe);
+        core::PathVectorPtr_t pv;
+        indexNotProj = -1;
+        indexProj = -1;
+        try {
+          core::PathPtr_t path;
+	  success = edge->build (path, *q1, *q2, *problemSolver_->problem()->steeringMethod ()->distance());
+          if (!success) return false;
+          pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, path);
+          indexNotProj = problemSolver_->paths ().size ();
+          if (!pv) {
+            pv = core::PathVector::create (path->outputSize (),
+                path->outputDerivativeSize ());
+            pv->appendPath (path);
+          }
+          problemSolver_->addPath (pv);
+
+          core::PathPtr_t projPath;
+          success = problemSolver_->problem()->pathProjector ()->apply (path, projPath);
+
+          if (!success) {
+            if (!projPath || projPath->length () == 0)
+              return false;
+          }
+          pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, projPath);
+          indexProj = problemSolver_->paths ().size ();
+          if (!pv) {
+            pv = core::PathVector::create (projPath->outputSize (),
+                projPath->outputDerivativeSize ());
+            pv->appendPath (projPath);
+          }
+          problemSolver_->addPath (pv);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
 	return success;
       }
     } // namespace impl

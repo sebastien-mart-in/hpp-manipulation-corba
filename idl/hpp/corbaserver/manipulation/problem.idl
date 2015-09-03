@@ -129,6 +129,22 @@ module hpp {
             out double residualError)
           raises (Error);
 
+        /// Build a path from qb to qe using the Edge::build.
+        /// \param IDedge id of the edge to use.
+        /// \param qb configuration at the beginning of the path
+        /// \param qe configuration at the end of the path
+        /// \retval return true if the path is built and fully projected.
+        /// \retval indexNotProj -1 is the path could not be built. The index
+        ///                      of the built path (before projection) in the 
+        ///                      in the ProblemSolver path vector.
+        /// \retval indexProj -1 is the path could not be fully projected. The
+        ///                   index of the built path (before projection) in the 
+        ///                   in the ProblemSolver path vector.
+        /// No path validation is made. The paths can be retrieved using
+        /// corbaserver::Problem::configAtParam
+        boolean buildAndProjectPath (in ID IDedge, in floatSeq qb, in floatSeq qe, out long indexNotProj,
+            out long indexProj)
+          raises (Error);
       }; // interface Problem
     }; // module manipulation
   }; // module corbaserver
