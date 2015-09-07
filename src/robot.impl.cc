@@ -163,11 +163,23 @@ namespace hpp {
 	    problemSolver_->addObstacle (obj, true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
           }
-          typedef Container <TriangleList>::ElementMap_t TriangleMap;
-          const TriangleMap& m = object->getAll <TriangleList> ();
+          typedef Container <JointAndTriangles_t>::ElementMap_t TriangleMap;
+          const TriangleMap& m = object->getAll <JointAndTriangles_t> ();
           for (TriangleMap::const_iterator it = m.begin ();
-              it != m.end (); it++)
-            problemSolver_->add (p + it->first, it->second);
+              it != m.end (); it++) {
+            JointAndTriangles_t triangles;
+            for (JointAndTriangles_t::const_iterator itT = it->second.begin ();
+                itT != it->second.end(); ++itT) {
+              const fcl::Transform3f& M = itT->first->currentTransformation ();
+              triangles.push_back (JointAndTriangle_t (NULL,
+                    JointAndTriangle_t::second_type (
+                      M.transform (itT->second.a),
+                      M.transform (itT->second.b),
+                      M.transform (itT->second.c))
+                  ));
+            }
+            problemSolver_->add (p + it->first, triangles);
+          }
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}

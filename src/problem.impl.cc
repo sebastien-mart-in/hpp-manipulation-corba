@@ -180,8 +180,8 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  typedef Container <TriangleList>::ElementMap_t TriangleMap;
-	  const TriangleMap& m = problemSolver_->getAll <TriangleList> ();
+	  typedef Container <JointAndTriangles_t>::ElementMap_t TriangleMap;
+	  const TriangleMap& m = problemSolver_->getAll <JointAndTriangles_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
@@ -204,9 +204,9 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  typedef Container <TriangleList>::ElementMap_t TriangleMap;
+	  typedef Container <JointAndTriangles_t>::ElementMap_t TriangleMap;
           DevicePtr_t r = getRobotOrThrow (problemSolver_);
-	  const TriangleMap& m = r->getAll <TriangleList> ();
+	  const TriangleMap& m = r->getAll <JointAndTriangles_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
@@ -239,14 +239,16 @@ namespace hpp {
           using constraints::StaticStabilityGravityPtr_t;
           StaticStabilityGravityPtr_t c = StaticStabilityGravity::create (robot, joint);
 
-          TriangleList l = robot->get <TriangleList> (triangleName);
+          JointAndTriangles_t l = robot->get <JointAndTriangles_t> (triangleName);
           if (l.empty ()) throw Error ("Robot triangles not found.");
-          for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
-            c->addObjectTriangle (*it);
-          l = problemSolver_->get <TriangleList> (envContactName);
+          for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
+            c->addObjectTriangle (it->second);
+          }
+          l = problemSolver_->get <JointAndTriangles_t> (envContactName);
           if (l.empty ()) throw Error ("Environment triangles not found.");
-          for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
-            c->addFloorTriangle (*it);
+          for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
+            c->addFloorTriangle (it->second);
+          }
 
           problemSolver_->addNumericalConstraint (placName, c);
 	} catch (const std::exception& exc) {
