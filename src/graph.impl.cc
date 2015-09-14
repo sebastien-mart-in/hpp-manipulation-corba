@@ -202,6 +202,7 @@ namespace hpp {
       void Graph::getGraph (GraphComp_out graph_out, GraphElements_out elmts)
         throw (hpp::Error)
       {
+        if (!graph_) throw Error ("There is no graph");
         GraphComps_t comp_n, comp_e;
         GraphComp comp_g, current;
 
