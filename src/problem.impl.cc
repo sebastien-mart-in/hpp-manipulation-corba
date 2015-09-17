@@ -18,7 +18,6 @@
 #include <hpp/util/debug.hh>
 #include <hpp/core/comparison-type.hh>
 #include <hpp/core/locked-joint.hh>
-#include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
 #include <hpp/core/path-projector.hh>
 #include <hpp/core/path-vector.hh>
@@ -26,6 +25,7 @@
 #include <hpp/constraints/static-stability.hh>
 #include <hpp/manipulation/device.hh>
 #include <hpp/manipulation/problem.hh>
+#include <hpp/manipulation/constraint-set.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>

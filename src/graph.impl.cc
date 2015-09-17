@@ -30,6 +30,7 @@
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/graph.hh>
 #include <hpp/manipulation/graph/edge.hh>
+#include <hpp/manipulation/constraint-set.hh>
 
 #include "graph.impl.hh"
 
