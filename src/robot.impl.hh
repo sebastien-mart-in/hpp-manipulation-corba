@@ -83,6 +83,14 @@ namespace hpp {
               const char* handleName, const ::hpp::Transform_ localPosition)
             throw (hpp::Error);
 
+          virtual char* getGripperPositionInJoint (const char* gripperName,
+              ::hpp::Transform__out position)
+            throw (hpp::Error);
+
+          virtual char* getHandlePositionInJoint (const char* handleName,
+              ::hpp::Transform__out position)
+            throw (hpp::Error);
+
         private:
           ProblemSolverPtr_t problemSolver_;
       }; // class Robot

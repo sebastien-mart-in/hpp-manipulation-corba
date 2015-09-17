@@ -20,9 +20,12 @@
 #include <hpp/core/locked-joint.hh>
 #include <hpp/core/constraint-set.hh>
 #include <hpp/core/config-projector.hh>
+#include <hpp/core/path-projector.hh>
+#include <hpp/core/path-vector.hh>
 #include <hpp/model/gripper.hh>
 #include <hpp/constraints/static-stability.hh>
 #include <hpp/manipulation/device.hh>
+#include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>
@@ -138,12 +141,12 @@ namespace hpp {
           const GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
           const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
           std::string name (graspName);
+          value_type c = handle->clearance () + gripper->clearance ();
+          value_type width = 2*c * 1.01;
 	  DifferentiableFunctionPtr_t constraint =
 	    handle->createPreGrasp (gripper);
 	  DifferentiableFunctionPtr_t ineq_positive =
-	    handle->createPreGraspComplement (gripper);
-          value_type c = handle->clearance () + gripper->clearance ();
-          value_type width = 2*c + 0.001;
+	    handle->createPreGraspComplement (gripper, c / 2);
 	  problemSolver_->addNumericalConstraint (name, constraint);
 	  problemSolver_->addNumericalConstraint
             (name + "/double_ineq", ineq_positive);
@@ -177,8 +180,8 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  typedef Container <TriangleList>::ElementMap_t TriangleMap;
-	  const TriangleMap& m = problemSolver_->getAll <TriangleList> ();
+	  typedef Container <JointAndTriangles_t>::ElementMap_t TriangleMap;
+	  const TriangleMap& m = problemSolver_->getAll <JointAndTriangles_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
@@ -201,9 +204,9 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  typedef Container <TriangleList>::ElementMap_t TriangleMap;
+	  typedef Container <JointAndTriangles_t>::ElementMap_t TriangleMap;
           DevicePtr_t r = getRobotOrThrow (problemSolver_);
-	  const TriangleMap& m = r->getAll <TriangleList> ();
+	  const TriangleMap& m = r->getAll <JointAndTriangles_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
@@ -236,14 +239,16 @@ namespace hpp {
           using constraints::StaticStabilityGravityPtr_t;
           StaticStabilityGravityPtr_t c = StaticStabilityGravity::create (robot, joint);
 
-          TriangleList l = robot->get <TriangleList> (triangleName);
+          JointAndTriangles_t l = robot->get <JointAndTriangles_t> (triangleName);
           if (l.empty ()) throw Error ("Robot triangles not found.");
-          for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
-            c->addObjectTriangle (*it);
-          l = problemSolver_->get <TriangleList> (envContactName);
+          for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
+            c->addObjectTriangle (it->second);
+          }
+          l = problemSolver_->get <JointAndTriangles_t> (envContactName);
           if (l.empty ()) throw Error ("Environment triangles not found.");
-          for (TriangleList::const_iterator it = l.begin (); it != l.end(); it++)
-            c->addFloorTriangle (*it);
+          for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
+            c->addFloorTriangle (it->second);
+          }
 
           problemSolver_->addNumericalConstraint (placName, c);
 	} catch (const std::exception& exc) {
@@ -314,9 +319,9 @@ namespace hpp {
         throw (hpp::Error)
       {
         /// First get the constraint.
-        ConstraintSetPtr_t constraint;
+        graph::EdgePtr_t edge;
         try {
-          graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
                   graph::GraphComponent::get((size_t)IDedge).lock ());
           if (!edge) {
             std::stringstream ss;
@@ -324,20 +329,18 @@ namespace hpp {
             std::string errmsg = ss.str();
             throw Error (errmsg.c_str());
           }
-          constraint =
-	    problemSolver_->constraintGraph ()->configConstraint (edge);
-          ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
-	  if (core::ConfigProjectorPtr_t cp = constraint->configProjector ()) {
-	    cp->rightHandSideFromConfig (*qoffset);
-	  }
         } catch (std::exception& e ) {
           throw Error (e.what());
         }
 
 	bool success = false;
 	ConfigurationPtr_t config = floatSeqToConfig (problemSolver_, input);
-	try {
-	  success = constraint->apply (*config);
+        ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
+        try {
+	  success = edge->applyConstraints (*qoffset, *config);
+
+          ConstraintSetPtr_t constraint =
+            problemSolver_->constraintGraph ()->configConstraint (edge);
 	  if (hpp::core::ConfigProjectorPtr_t configProjector =
 	      constraint ->configProjector ()) {
 	    residualError = configProjector->residualError ();
@@ -353,6 +356,68 @@ namespace hpp {
 	  (*q_ptr) [(ULong) i] = (*config) [i];
 	}
 	output = q_ptr;
+	return success;
+      }
+
+      bool Problem::buildAndProjectPath (hpp::ID IDedge,
+          const hpp::floatSeq& qb,
+          const hpp::floatSeq& qe,
+          CORBA::Long& indexNotProj,
+          CORBA::Long& indexProj)
+        throw (hpp::Error)
+      {
+        /// First get the constraint.
+        graph::EdgePtr_t edge;
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
+                  graph::GraphComponent::get((size_t)IDedge).lock ());
+          if (!edge) {
+            std::stringstream ss;
+            ss << "ID " << IDedge << " is not an edge";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
+          }
+        } catch (std::exception& e ) {
+          throw Error (e.what());
+        }
+
+	bool success = false;
+	ConfigurationPtr_t q1 = floatSeqToConfig (problemSolver_, qb);
+        ConfigurationPtr_t q2 = floatSeqToConfig (problemSolver_, qe);
+        core::PathVectorPtr_t pv;
+        indexNotProj = -1;
+        indexProj = -1;
+        try {
+          core::PathPtr_t path;
+	  success = edge->build (path, *q1, *q2, *problemSolver_->problem()->steeringMethod ()->distance());
+          if (!success) return false;
+          pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, path);
+          indexNotProj = problemSolver_->paths ().size ();
+          if (!pv) {
+            pv = core::PathVector::create (path->outputSize (),
+                path->outputDerivativeSize ());
+            pv->appendPath (path);
+          }
+          problemSolver_->addPath (pv);
+
+          core::PathPtr_t projPath;
+          success = problemSolver_->problem()->pathProjector ()->apply (path, projPath);
+
+          if (!success) {
+            if (!projPath || projPath->length () == 0)
+              return false;
+          }
+          pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, projPath);
+          indexProj = problemSolver_->paths ().size ();
+          if (!pv) {
+            pv = core::PathVector::create (projPath->outputSize (),
+                projPath->outputDerivativeSize ());
+            pv->appendPath (projPath);
+          }
+          problemSolver_->addPath (pv);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
 	return success;
       }
     } // namespace impl
