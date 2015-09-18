@@ -244,8 +244,13 @@ namespace hpp {
           for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
             c->addObjectTriangle (it->second);
           }
-          l = problemSolver_->get <JointAndTriangles_t> (envContactName);
-          if (l.empty ()) throw Error ("Environment triangles not found.");
+	  // Search first robot triangles
+	  l = robot->get <JointAndTriangles_t> (envContactName);
+	  if (l.empty ()) {
+	    // and then environment triangles.
+	    l = problemSolver_->get <JointAndTriangles_t> (envContactName);
+	    if (l.empty ()) throw Error ("Environment triangles not found.");
+	  }
           for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
             c->addFloorTriangle (it->second);
           }
