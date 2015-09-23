@@ -78,14 +78,6 @@ namespace hpp
       /// \brief Shutdown CORBA server
       Client::~Client()
       {
-        if (!CORBA::is_nil(orb_)) {
-          try {
-            orb_->destroy();
-            std::cout << "Ending CORBA..." << std::endl;
-          } catch(const CORBA::Exception& e) {
-            std::cout << "orb->destroy failed" << std::endl;
-          }
-        }
       }
     } // end of namespace manipulation.
   } // end of namespace corbaServer.
