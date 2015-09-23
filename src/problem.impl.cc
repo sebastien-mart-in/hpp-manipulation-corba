@@ -237,12 +237,13 @@ namespace hpp {
 
           using constraints::StaticStabilityGravity;
           using constraints::StaticStabilityGravityPtr_t;
-          StaticStabilityGravityPtr_t c = StaticStabilityGravity::create (robot, joint);
+          StaticStabilityGravityPtr_t c = StaticStabilityGravity::create
+	    (robot);
 
           JointAndTriangles_t l = robot->get <JointAndTriangles_t> (triangleName);
           if (l.empty ()) throw Error ("Robot triangles not found.");
           for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
-            c->addObjectTriangle (it->second);
+            c->addObjectTriangle (it->second, it->first);
           }
 	  // Search first robot triangles
 	  l = robot->get <JointAndTriangles_t> (envContactName);
@@ -252,7 +253,7 @@ namespace hpp {
 	    if (l.empty ()) throw Error ("Environment triangles not found.");
 	  }
           for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
-            c->addFloorTriangle (it->second);
+            c->addFloorTriangle (it->second, it->first);
           }
 
           problemSolver_->addNumericalConstraint (placName, c);
