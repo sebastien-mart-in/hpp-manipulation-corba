@@ -18,6 +18,8 @@
 
 #include <iostream>
 
+#include "hpp/corbaserver/orb-singleton.hh"
+
 namespace hpp
 {
   namespace corbaServer
@@ -31,15 +33,15 @@ namespace hpp
       using CORBA::PolicyList;
       using omniORB::fatalException;
 
-      Client::Client(int argc, char *argv[]) :
-        orb_ (CORBA::ORB_init (argc, argv))
+      Client::Client(int argc, char *argv[])
       {
+        OrbSingletonAccessor::get_mutable_instance ().create (argc, argv);
       }
 
       void Client::connect (const char* iiop)
       {
         // Get a reference to the Naming Service
-        CORBA::Object_var rootContextObj = orb_->string_to_object(iiop);
+        CORBA::Object_var rootContextObj = OrbSingletonAccessor::get_mutable_instance ().orb_->string_to_object(iiop);
         CosNaming::NamingContext_var nc =
           CosNaming::NamingContext::_narrow(rootContextObj.in());
 

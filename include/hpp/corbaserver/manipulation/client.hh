@@ -51,8 +51,6 @@ namespace hpp
           hpp::corbaserver::manipulation::Robot_var robot_;
           hpp::corbaserver::manipulation::Problem_var problem_;
           hpp::corbaserver::manipulation::Graph_var graph_;
-
-          CORBA::ORB_var orb_;
       };
     } // end of namespace manipulation.
   } // end of namespace corbaServer.
