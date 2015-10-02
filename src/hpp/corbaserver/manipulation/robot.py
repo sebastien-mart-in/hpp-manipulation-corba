@@ -94,7 +94,7 @@ class Robot (object):
     #  The ros url are built as follows:
     #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
     #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-    def loadHumanoidModel (self, robotName, rootJointType, packageName,
+    def insertHumanoidModel (self, robotName, rootJointType, packageName,
                            modelName, urdfSuffix, srdfSuffix):
         if self.load:
             self.client.manipulation.robot.insertHumanoidModel \
@@ -102,6 +102,11 @@ class Robot (object):
                  urdfSuffix, srdfSuffix)
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
+
+    def loadHumanoidModel (self, robotName, rootJointType, packageName,
+                           modelName, urdfSuffix, srdfSuffix):
+        self.insertHumanoidModel (robotName, rootJointType, packageName,
+                           modelName, urdfSuffix, srdfSuffix)
 
     ## Load object model and insert it in the device
     #
