@@ -22,6 +22,7 @@
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/core/discretized-collision-checking.hh>
 #include <hpp/manipulation/graph-path-validation.hh>
+#include <hpp/wholebody-step/small-steps.hh>
 
 typedef hpp::wholebodyStep::Server WholebodyServer;
 typedef hpp::corbaServer::Server CorbaServer;
@@ -36,6 +37,8 @@ typedef hpp::manipulation::GraphPathValidation GraphPathValidation;
 int main (int argc, char* argv [])
 {
   ProblemSolverPtr_t problemSolver = new ProblemSolver();
+  problemSolver->addPathOptimizerType ("Walkgen",
+      hpp::wholebodyStep::SmallSteps::create);
 
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), true);
