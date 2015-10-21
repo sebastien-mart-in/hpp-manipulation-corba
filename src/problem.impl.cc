@@ -119,10 +119,9 @@ namespace hpp {
 			     std::string (handleName) + std::string ("."));
 	    throw std::runtime_error (msg.c_str ());
 	  }
-	  DifferentiableFunctionPtr_t constraint =
-	    handle->createGrasp (gripper);
-	  DifferentiableFunctionPtr_t complement =
-	    handle->createGraspComplement (gripper);
+	  NumericalConstraintPtr_t constraint (handle->createGrasp (gripper));
+	  NumericalConstraintPtr_t complement
+	    (handle->createGraspComplement (gripper));
 	  problemSolver_->addNumericalConstraint (graspName, constraint);
 	  problemSolver_->addNumericalConstraint (std::string(graspName) + "/complement", complement);
           problemSolver_->addGrasp(constraint, gripper, handle);
@@ -144,15 +143,13 @@ namespace hpp {
           std::string name (graspName);
           value_type c = handle->clearance () + gripper->clearance ();
           value_type width = 2*c * 1.01;
-	  DifferentiableFunctionPtr_t constraint =
+	  NumericalConstraintPtr_t constraint =
 	    handle->createPreGrasp (gripper);
-	  DifferentiableFunctionPtr_t ineq_positive =
-	    handle->createPreGraspComplement (gripper, c / 2);
+	  NumericalConstraintPtr_t ineq_positive =
+	    handle->createPreGraspComplement (gripper, c / 2, width);
 	  problemSolver_->addNumericalConstraint (name, constraint);
 	  problemSolver_->addNumericalConstraint
             (name + "/double_ineq", ineq_positive);
-          problemSolver_->comparisonType
-            (name + "/double_ineq", DoubleInequality::create (width));
           problemSolver_->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());

@@ -355,13 +355,11 @@ namespace hpp {
           for (CORBA::ULong i=0; i<numericalConstraintNames.length (); ++i) {
             std::string name (numericalConstraintNames [i]),
               pdofName (pdofNames[i]);
-            edge->insertConfigConstraint (
-                  NumericalConstraint::create (
-                    problemSolver_->numericalConstraint(name),
-                    problemSolver_->comparisonType (name)
-                    ),
-                  problemSolver_->passiveDofs (pdofNames [i])
-                  );
+            edge->insertConfigConstraint
+	      (HPP_STATIC_PTR_CAST
+	       (NumericalConstraint,
+		problemSolver_->numericalConstraint(name)->copy ()),
+	       problemSolver_->passiveDofs (pdofNames [i]));
           }
           for (CORBA::ULong i=0; i<lockedDofNames.length (); ++i) {
             std::string name (lockedDofNames [i]);
@@ -413,13 +411,11 @@ namespace hpp {
               std::string name (constraintNames [i]);
               if (!problemSolver_->numericalConstraint (name))
                 throw Error ("The numerical function does not exist.");
-              component->addNumericalConstraint (
-                  NumericalConstraint::create (
-                    problemSolver_->numericalConstraint(name),
-                    problemSolver_->comparisonType (name)
-                    ),
-                  problemSolver_->passiveDofs (pdofNames [i])
-                  );
+              component->addNumericalConstraint
+		(HPP_STATIC_PTR_CAST
+		 (NumericalConstraint,
+		  problemSolver_->numericalConstraint(name)->copy ()),
+		 problemSolver_->passiveDofs (pdofNames [i]));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -447,13 +443,11 @@ namespace hpp {
               (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
-              n->addNumericalConstraintForPath (
-                  NumericalConstraint::create (
-                    problemSolver_->numericalConstraint(name),
-                    problemSolver_->comparisonType (name)
-                    ),
-                  problemSolver_->passiveDofs (pdofNames [i])
-                  );
+              n->addNumericalConstraintForPath
+		(HPP_STATIC_PTR_CAST
+		 (NumericalConstraint,
+		  problemSolver_->numericalConstraint(name)->copy ()),
+		 problemSolver_->passiveDofs (pdofNames [i]));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
