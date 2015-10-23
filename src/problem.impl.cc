@@ -22,7 +22,7 @@
 #include <hpp/core/path-projector.hh>
 #include <hpp/core/path-vector.hh>
 #include <hpp/model/gripper.hh>
-#include <hpp/constraints/static-stability.hh>
+#include <hpp/constraints/convex-shape-contact.hh>
 #include <hpp/manipulation/device.hh>
 #include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/constraint-set.hh>
@@ -180,15 +180,15 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  typedef Container <JointAndTriangles_t>::ElementMap_t TriangleMap;
-	  const TriangleMap& m = problemSolver_->getAll <JointAndTriangles_t> ();
+	  typedef Container <JointAndShapes_t>::ElementMap_t ShapeMap;
+	  const ShapeMap& m = problemSolver_->getAll <JointAndShapes_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
 					     nameList);
 
 	  std::size_t rank = 0;
-          for (TriangleMap::const_iterator it = m.begin ();
+          for (ShapeMap::const_iterator it = m.begin ();
               it != m.end (); it++) {
             nameList[rank] = (char*) malloc (sizeof(char)*(it->first.length ()+1));
             strcpy (nameList [rank], it->first.c_str ());
@@ -204,16 +204,16 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  typedef Container <JointAndTriangles_t>::ElementMap_t TriangleMap;
+	  typedef Container <JointAndShapes_t>::ElementMap_t ShapeMap;
           DevicePtr_t r = getRobotOrThrow (problemSolver_);
-	  const TriangleMap& m = r->getAll <JointAndTriangles_t> ();
+	  const ShapeMap& m = r->getAll <JointAndShapes_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
 					     nameList);
 
 	  std::size_t rank = 0;
-          for (TriangleMap::const_iterator it = m.begin ();
+          for (ShapeMap::const_iterator it = m.begin ();
               it != m.end (); it++) {
             nameList[rank] = (char*) malloc (sizeof(char)*(it->first.length ()+1));
             strcpy (nameList [rank], it->first.c_str ());
@@ -226,7 +226,7 @@ namespace hpp {
       }
 
       void Problem::createPlacementConstraint (const char* placName,
-          const char* jointName, const char* triangleName,
+          const char* jointName, const char* shapeName,
           const char* envContactName)
         throw (hpp::Error)
       {
@@ -235,20 +235,19 @@ namespace hpp {
           DevicePtr_t robot = getRobotOrThrow (problemSolver_);
 	  JointPtr_t joint = robot->getJointByName (jointName);
 
-          using constraints::StaticStabilityGravity;
-          using constraints::StaticStabilityGravityPtr_t;
-          StaticStabilityGravityPtr_t c = StaticStabilityGravity::create (robot, joint);
+          using constraints::ConvexShape;
+          using constraints::ConvexShapeContact;
+          using constraints::ConvexShapeContactPtr_t;
+          ConvexShapeContactPtr_t c = ConvexShapeContact::create (placName, robot);
 
-          JointAndTriangles_t l = robot->get <JointAndTriangles_t> (triangleName);
-          if (l.empty ()) throw Error ("Robot triangles not found.");
-          for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
-            c->addObjectTriangle (it->second);
-          }
-          l = problemSolver_->get <JointAndTriangles_t> (envContactName);
-          if (l.empty ()) throw Error ("Environment triangles not found.");
-          for (JointAndTriangles_t::const_iterator it = l.begin (); it != l.end(); it++) {
-            c->addFloorTriangle (it->second);
-          }
+          JointAndShapes_t l = robot->get <JointAndShapes_t> (shapeName);
+          if (l.empty ()) throw Error ("Robot shapes not found.");
+          for (JointAndShapes_t::const_iterator it = l.begin (); it != l.end(); it++)
+            c->addObject (ConvexShape (it->second, it->first));
+          l = problemSolver_->get <JointAndShapes_t> (envContactName);
+          if (l.empty ()) throw Error ("Environment shapes not found.");
+          for (JointAndShapes_t::const_iterator it = l.begin (); it != l.end(); it++)
+            c->addFloor (ConvexShape (it->second, it->first));
 
           problemSolver_->addNumericalConstraint (placName, c);
 	} catch (const std::exception& exc) {

@@ -163,22 +163,20 @@ namespace hpp {
 	    problemSolver_->addObstacle (obj, true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
           }
-          typedef Container <JointAndTriangles_t>::ElementMap_t TriangleMap;
-          const TriangleMap& m = object->getAll <JointAndTriangles_t> ();
-          for (TriangleMap::const_iterator it = m.begin ();
+          typedef Container <JointAndShapes_t>::ElementMap_t ShapeMap;
+          const ShapeMap& m = object->getAll <JointAndShapes_t> ();
+          for (ShapeMap::const_iterator it = m.begin ();
               it != m.end (); it++) {
-            JointAndTriangles_t triangles;
-            for (JointAndTriangles_t::const_iterator itT = it->second.begin ();
+            JointAndShapes_t shapes;
+            for (JointAndShapes_t::const_iterator itT = it->second.begin ();
                 itT != it->second.end(); ++itT) {
               const fcl::Transform3f& M = itT->first->currentTransformation ();
-              triangles.push_back (JointAndTriangle_t (NULL,
-                    JointAndTriangle_t::second_type (
-                      M.transform (itT->second.a),
-                      M.transform (itT->second.b),
-                      M.transform (itT->second.c))
-                  ));
+              Shape_t newShape (itT->second.size());
+              for (std::size_t i = 0; i < newShape.size (); ++i)
+                newShape [i] = M.transform (itT->second[i]);
+              shapes.push_back (JointAndShape_t (NULL, newShape));
             }
-            problemSolver_->add (p + it->first, triangles);
+            problemSolver_->add (p + it->first, shapes);
           }
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
