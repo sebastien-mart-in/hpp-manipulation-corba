@@ -58,8 +58,7 @@ namespace hpp {
           throw (hpp::Error);
 
         virtual void createPlacementConstraint (const char* placName,
-            const char* jointName, const char* triangleName,
-            const char* envContactName)
+            const char* shapeName, const char* envContactName)
 	  throw (hpp::Error);
 
         virtual bool applyConstraints (hpp::ID id, const hpp::floatSeq& input,

@@ -90,21 +90,19 @@ module hpp {
         Names_t getRobotContactNames ()
           raises (Error);
 
-	/// Create a placement constraint between a triangles of robot and env.
+	/// Create a placement constraint between a shapes of robot and env.
 	///
 	/// \param placementName Name of the numerical constraint,
-	/// \param jointName Name of the joint holding the contact surface
-	///        composed of triangles,
-	/// \param triangleName Name of the list of triangles as stored in the
+	/// \param shapeName Name of the list of shapes as stored in the
 	///        Device instance,
-	/// \param envContactName Name of the list of triangles as stored in
+	/// \param envContactName Name of the list of shapes as stored in
 	///        ProblemSolver instance
 	///
 	/// A placement constraint specifies that surfaces delimited by
-	/// one triangle of the robot and one triangle of the environment
+	/// one shape of the robot and one shape of the environment
 	/// should have an intersection of positive area.
         void createPlacementConstraint (in string placementName,
-            in string jointName, in string triangleName,
+            in string jointName, in string shapeName,
             in string envContactName)
           raises (Error);
 

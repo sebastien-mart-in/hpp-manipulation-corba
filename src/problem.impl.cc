@@ -226,8 +226,7 @@ namespace hpp {
       }
 
       void Problem::createPlacementConstraint (const char* placName,
-          const char* jointName, const char* shapeName,
-          const char* envContactName)
+          const char* shapeName, const char* envContactName)
         throw (hpp::Error)
       {
 	try {
