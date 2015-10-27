@@ -233,7 +233,6 @@ namespace hpp {
 	try {
 	  // Get robot in hppPlanner object.
           DevicePtr_t robot = getRobotOrThrow (problemSolver_);
-	  JointPtr_t joint = robot->getJointByName (jointName);
 
           using constraints::ConvexShape;
           using constraints::ConvexShapeContact;
@@ -244,8 +243,15 @@ namespace hpp {
           if (l.empty ()) throw Error ("Robot shapes not found.");
           for (JointAndShapes_t::const_iterator it = l.begin (); it != l.end(); it++)
             c->addObject (ConvexShape (it->second, it->first));
-          l = problemSolver_->get <JointAndShapes_t> (envContactName);
           if (l.empty ()) throw Error ("Environment shapes not found.");
+
+	  // Search first robot triangles
+          l = robot->get <JointAndShapes_t> (envContactName);
+	  if (l.empty ()) {
+	    // and then environment triangles.
+            l = problemSolver_->get <JointAndShapes_t> (envContactName);
+            if (l.empty ()) throw Error ("Environment triangles not found.");
+	  }
           for (JointAndShapes_t::const_iterator it = l.begin (); it != l.end(); it++)
             c->addFloor (ConvexShape (it->second, it->first));
 
