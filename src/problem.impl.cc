@@ -23,6 +23,7 @@
 #include <hpp/core/path-vector.hh>
 #include <hpp/model/gripper.hh>
 #include <hpp/constraints/convex-shape-contact.hh>
+#include <hpp/constraints/qp-static-stability.hh>
 #include <hpp/manipulation/device.hh>
 #include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/constraint-set.hh>
@@ -254,6 +255,51 @@ namespace hpp {
           for (JointAndShapes_t::const_iterator it = l.begin (); it != l.end(); it++)
             c->addFloor (ConvexShape (it->second, it->first));
 
+          problemSolver_->addNumericalConstraint (placName, c);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
+      void Problem::createQPStabilityConstraint (const char* placName,
+          const Names_t& shapesName)
+        throw (hpp::Error)
+      {
+	try {
+	  // Get robot in hppPlanner object.
+          DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+
+          using constraints::ConvexShape;
+          using constraints::QPStaticStability;
+          using constraints::QPStaticStabilityPtr_t;
+          typedef constraints::QPStaticStability::ForceData ForceData;
+          using model::CenterOfMassComputation;
+          using model::CenterOfMassComputationPtr_t;
+
+          std::vector <ForceData> fds;
+
+          for (CORBA::ULong i = 0; i < shapesName.length(); ++i) {
+            JointAndShapes_t l = robot->get <JointAndShapes_t>
+              (std::string (shapesName[i]));
+            if (l.empty ()) throw Error ("Robot shapes not found.");
+            for (JointAndShapes_t::const_iterator it = l.begin ();
+                it != l.end(); it++) {
+              ConvexShape c (ConvexShape (it->second, it->first));
+              ForceData fd;
+              fd.joint = c.joint_;
+              fd.supportJoint = NULL;
+              fd.normal = - c.N_;
+              fd.points = c.Pts_;
+              fds.push_back (fd);
+            }
+          }
+
+          CenterOfMassComputationPtr_t com = CenterOfMassComputation::create
+            (robot);
+          com->add (robot->rootJoint ());
+          com->computeMass ();
+          QPStaticStabilityPtr_t c = QPStaticStability::create (placName, robot,
+              fds, com);
           problemSolver_->addNumericalConstraint (placName, c);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());

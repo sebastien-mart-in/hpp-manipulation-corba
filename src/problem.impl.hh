@@ -61,6 +61,10 @@ namespace hpp {
             const char* shapeName, const char* envContactName)
 	  throw (hpp::Error);
 
+        virtual void createQPStabilityConstraint (const char* placName,
+            const Names_t& shapesName)
+          throw (hpp::Error);
+
         virtual bool applyConstraints (hpp::ID id, const hpp::floatSeq& input,
             hpp::floatSeq_out output, double& residualError)
           throw (hpp::Error);

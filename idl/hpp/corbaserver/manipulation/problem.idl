@@ -102,8 +102,15 @@ module hpp {
 	/// one shape of the robot and one shape of the environment
 	/// should have an intersection of positive area.
         void createPlacementConstraint (in string placementName,
-            in string jointName, in string shapeName,
-            in string envContactName)
+            in string shapeName, in string envContactName)
+          raises (Error);
+
+        /// Create a QPStaticStability constraints
+        /// \param constraintName
+        /// \param shapesName list of the convex shape name of the robot on
+        ///        which forces are applied.
+        void createQPStabilityConstraint (in string constraintName,
+            in Names_t shapesName)
           raises (Error);
 
         /// Apply constaints to a configuration
