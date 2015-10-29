@@ -57,6 +57,54 @@ namespace hpp {
           if (!robot) throw Error ("Robot not found.");
           return robot;
         }
+
+        Names_t* jointAndShapes (const JointAndShapes_t& js,
+            intSeq_out indexes_out, floatSeqSeq_out points) {
+          char** nameList = Names_t::allocbuf((ULong) js.size ());
+          Names_t *jointNames = new Names_t ((ULong) js.size(), (ULong) js.size(),
+              nameList);
+
+          intSeq* indexes = new intSeq ();
+          indexes->length ((ULong) js.size ());
+          indexes_out = indexes;
+
+          CORBA::Long rank = 0;
+          std::size_t nbPts = 0;
+          for (JointAndShapes_t::const_iterator itJs = js.begin ();
+              itJs != js.end (); ++itJs) {
+            if (itJs->first) {
+              nameList[rank] = new char[itJs->first->name().length ()+1];
+              strcpy (nameList[rank], itJs->first->name().c_str ());
+            } else {
+              nameList[rank] = new char[5];
+              strcpy (nameList[rank], "NONE");
+            }
+            nbPts += itJs->second.size ();
+            (*indexes)[rank] = nbPts;
+            ++rank;
+          }
+
+          floatSeqSeq* pts = new hpp::floatSeqSeq ();
+          points = pts;
+          pts->length ((CORBA::ULong) nbPts);
+
+          rank = 0;
+          std::size_t iJs = 0;
+          for (JointAndShapes_t::const_iterator itJs = js.begin ();
+              itJs != js.end (); ++itJs) {
+            for (std::size_t i = 0; i < itJs->second.size (); ++i) {
+              floatSeq p; p.length (3);
+              p[0] = itJs->second[i][0];
+              p[1] = itJs->second[i][1];
+              p[2] = itJs->second[i][2];
+              (*pts)[rank] = p;
+              ++rank;
+            }
+            assert ((*indexes)[iJs] == rank);
+            ++iJs;
+          }
+          return jointNames;
+        }
       }
 
       static ConfigurationPtr_t floatSeqToConfig
@@ -236,6 +284,34 @@ namespace hpp {
             rank++;
           }
 	  return jointNames;
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+        }
+      }
+
+      Names_t* Problem::getEnvironmentContact (const char* name,
+            intSeq_out indexes, floatSeqSeq_out points)
+        throw (hpp::Error)
+      {
+        try {
+	  const JointAndShapes_t& js =
+            problemSolver_->get <JointAndShapes_t> (name);
+
+          return jointAndShapes (js, indexes, points);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+        }
+      }
+
+      Names_t* Problem::getRobotContact (const char* name,
+            intSeq_out indexes, hpp::floatSeqSeq_out points)
+        throw (hpp::Error)
+      {
+        try {
+          DevicePtr_t r = getRobotOrThrow (problemSolver_);
+	  const JointAndShapes_t& js = r->get <JointAndShapes_t> (name);
+
+          return jointAndShapes (js, indexes, points);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
         }

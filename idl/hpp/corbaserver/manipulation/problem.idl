@@ -101,6 +101,15 @@ module hpp {
         Names_t getRobotContactNames ()
           raises (Error);
 
+        Names_t getEnvironmentContact (in string name, out intSeq indexes,
+                                       out floatSeqSeq points)
+          raises (Error);
+
+        Names_t getRobotContact (in string name, out intSeq indexes,
+                                 out floatSeqSeq points)
+          raises (Error);
+
+
 	/// Create a placement constraint between a shapes of robot and env.
 	///
 	/// \param placementName Name of the numerical constraint,

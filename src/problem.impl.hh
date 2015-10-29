@@ -61,6 +61,14 @@ namespace hpp {
         virtual Names_t* getRobotContactNames ()
           throw (hpp::Error);
 
+        virtual Names_t* getEnvironmentContact (const char* name,
+            intSeq_out indexes, floatSeqSeq_out points)
+          throw (hpp::Error);
+
+        virtual Names_t* getRobotContact (const char* name,
+            intSeq_out indexes, floatSeqSeq_out points)
+          throw (hpp::Error);
+
         virtual void createPlacementConstraint (const char* placName,
             const char* shapeName, const char* envContactName)
 	  throw (hpp::Error);
