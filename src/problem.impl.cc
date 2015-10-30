@@ -224,35 +224,13 @@ namespace hpp {
       }
 
       void Problem::createPlacementConstraint (const char* placName,
-          const char* shapeName, const char* envContactName)
+					       const char* surface1,
+					       const char* surface2)
         throw (hpp::Error)
       {
 	try {
-	  // Get robot in hppPlanner object.
-          DevicePtr_t robot = getRobotOrThrow (problemSolver_);
-
-          using constraints::ConvexShape;
-          using constraints::ConvexShapeContact;
-          using constraints::ConvexShapeContactPtr_t;
-          ConvexShapeContactPtr_t c = ConvexShapeContact::create (placName, robot);
-
-          JointAndShapes_t l = robot->get <JointAndShapes_t> (shapeName);
-          if (l.empty ()) throw Error ("Robot shapes not found.");
-          for (JointAndShapes_t::const_iterator it = l.begin (); it != l.end(); it++)
-            c->addObject (ConvexShape (it->second, it->first));
-          if (l.empty ()) throw Error ("Environment shapes not found.");
-
-	  // Search first robot triangles
-          l = robot->get <JointAndShapes_t> (envContactName);
-	  if (l.empty ()) {
-	    // and then environment triangles.
-            l = problemSolver_->get <JointAndShapes_t> (envContactName);
-            if (l.empty ()) throw Error ("Environment triangles not found.");
-	  }
-          for (JointAndShapes_t::const_iterator it = l.begin (); it != l.end(); it++)
-            c->addFloor (ConvexShape (it->second, it->first));
-
-          problemSolver_->addNumericalConstraint (placName, c);
+	  problemSolver_->createPlacementConstraint (placName, surface1,
+						     surface2);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
