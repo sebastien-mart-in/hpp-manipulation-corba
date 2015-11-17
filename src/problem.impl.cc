@@ -346,6 +346,7 @@ namespace hpp {
           using model::CenterOfMassComputationPtr_t;
 
           std::vector <ForceData> fds;
+          std::size_t nbPoints = 0;
 
           for (CORBA::ULong i = 0; i < shapesName.length(); ++i) {
             JointAndShapes_t l = robot->get <JointAndShapes_t>
@@ -359,6 +360,7 @@ namespace hpp {
               fd.supportJoint = NULL;
               fd.normal = - c.N_;
               fd.points = c.Pts_;
+              nbPoints += c.Pts_.size ();
               fds.push_back (fd);
             }
           }
@@ -370,6 +372,15 @@ namespace hpp {
           QPStaticStabilityPtr_t c = QPStaticStability::create (placName, robot,
               fds, com);
           problemSolver_->addNumericalConstraint (placName, c);
+
+          // Create the inequalities
+          std::vector <core::ComparisonType::Type> cts
+            (6, core::ComparisonType::EqualToZero);
+          for (std::size_t i = 0; i < nbPoints; ++i) {
+            cts.push_back (core::ComparisonType::Superior);
+          }
+          core::ComparisonTypePtr_t comp = core::ComparisonTypes::create (cts);
+          problemSolver_->comparisonType (placName, comp);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
