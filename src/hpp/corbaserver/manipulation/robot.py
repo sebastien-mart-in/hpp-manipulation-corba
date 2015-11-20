@@ -360,11 +360,11 @@ class HumanoidRobot (Robot):
     # \param robotName name of the first robot that is loaded now,
     # \param rootJointType type of root joint among ("freeflyer", "planar",
     #        "anchor"),
-    def __init__ (self, compositeName, robotName, rootJointType):
-        Robot.__init__ (self, compositeName, robotName, rootJointType)
+    def __init__ (self, compositeName, robotName, rootJointType, load = True):
+        Robot.__init__ (self, compositeName, robotName, rootJointType, load)
 
     def loadModel (self, robotName, rootJointType):
         self.client.manipulation.robot.create (self.name)
-        self.client.manipulation.robot.loadHumanoidModel \
+        self.insertHumanoidModel \
             (robotName, rootJointType, self.packageName, self.urdfName,
              self.urdfSuffix, self.srdfSuffix)
