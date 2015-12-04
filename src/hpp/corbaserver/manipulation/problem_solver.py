@@ -376,11 +376,15 @@ class ProblemSolver (object):
     def selectPathPlanner (self, pathPlannerType):
         return self.client.basic.problem.selectPathPlanner (pathPlannerType)
 
-    ## Select path optimizer type
-    #  \param Name of the path optimizer type, either "RandomShortcut" or
-    #   any type added by core::ProblemSolver::addPathOptimizerType
-    def selectPathOptimizer (self, pathOptimizerType):
-        return self.client.basic.problem.selectPathOptimizer (pathOptimizerType)
+    ## Add path optimizer type
+    #  \see hpp.corbaserver.problem_solver.ProblemSolver.addPathOptimizer
+    def addPathOptimizer (self, pathOptimizerType):
+        return self.client.basic.problem.addPathOptimizer (pathOptimizerType)
+
+    ## Clear path optimizers
+    #  \see hpp.corbaserver.problem_solver.ProblemSolver.clearPathOptimizers
+    def clearPathOptimizers (self):
+        return self.client.basic.problem.clearPathOptimizers ()
 
     ## Select path validation method
     #  \param Name of the path validation method, either "Discretized"
