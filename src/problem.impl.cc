@@ -174,6 +174,24 @@ namespace hpp {
 	}
       }
 
+      void Problem::createLockedExtraDof
+      (const char* lockedDofName, const CORBA::ULong index,
+       const hpp::floatSeq& value)
+	throw (hpp::Error)
+      {
+	try {
+	  // Get robot in hppPlanner object.
+          DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+	  vector_t config = floatSeqToVector (value);
+
+          LockedJointPtr_t lockedJoint
+            (LockedJoint::create (robot, index, config));
+          problemSolver_->add <LockedJointPtr_t> (lockedDofName, lockedJoint);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
       Names_t* Problem::getEnvironmentContactNames ()
         throw (hpp::Error)
       {
