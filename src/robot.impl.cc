@@ -179,7 +179,7 @@ namespace hpp {
 	    problemSolver_->addObstacle (obj, true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
           }
-          typedef Container <JointAndShapes_t>::ElementMap_t ShapeMap;
+          typedef core::Container <JointAndShapes_t>::ElementMap_t ShapeMap;
           const ShapeMap& m = object->getAll <JointAndShapes_t> ();
           for (ShapeMap::const_iterator it = m.begin ();
               it != m.end (); it++) {
