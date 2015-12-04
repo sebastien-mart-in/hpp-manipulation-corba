@@ -371,16 +371,9 @@ namespace hpp {
           com->computeMass ();
           QPStaticStabilityPtr_t c = QPStaticStability::create (placName, robot,
               fds, com);
-          problemSolver_->addNumericalConstraint (placName, c);
-
-          // Create the inequalities
-          std::vector <core::ComparisonType::Type> cts
-            (6, core::ComparisonType::EqualToZero);
-          for (std::size_t i = 0; i < nbPoints; ++i) {
-            cts.push_back (core::ComparisonType::Superior);
-          }
-          core::ComparisonTypePtr_t comp = core::ComparisonTypes::create (cts);
-          problemSolver_->comparisonType (placName, comp);
+          problemSolver_->addNumericalConstraint (placName,
+              NumericalConstraint::create (c, core::EqualToZero::create())
+              );
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
