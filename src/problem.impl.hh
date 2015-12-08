@@ -39,6 +39,8 @@ namespace hpp {
 	  problemSolver_ = problemSolver;
 	}
 
+        virtual Names_t* getAvailable (const char* what) throw (hpp::Error);
+
         virtual void createGrasp (const char* graspName,
             const char* gripperName, const char* handleName)
 	  throw (hpp::Error);

@@ -15,6 +15,11 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include "problem.impl.hh"
+
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/assign/list_of.hpp>
+
 #include <hpp/util/debug.hh>
 #include <hpp/core/comparison-type.hh>
 #include <hpp/core/locked-joint.hh>
@@ -31,7 +36,6 @@
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/axial-handle.hh>
-#include "problem.impl.hh"
 
 namespace hpp {
   namespace manipulation {
@@ -145,6 +149,38 @@ namespace hpp {
 
       Problem::Problem () : problemSolver_ (0x0)
       {
+      }
+
+      Names_t* Problem::getAvailable (const char* what) throw (hpp::Error)
+      {
+        std::string w (what);
+        boost::algorithm::to_lower(w);
+        typedef std::list <std::string> Ret_t;
+        Ret_t ret;
+
+        if (w == "gripper") {
+          ret = getRobotOrThrow (problemSolver_)->getKeys <model::GripperPtr_t, Ret_t> ();
+        } else if (w == "handle") {
+          ret = getRobotOrThrow (problemSolver_)->getKeys <HandlePtr_t, Ret_t> ();
+        } else if (w == "lockedjoint") {
+          ret = problemSolver_->getKeys <core::LockedJointPtr_t, Ret_t> ();
+        } else if (w == "type") {
+          ret = boost::assign::list_of ("Gripper") ("Handle")
+            ("LockedJoint");
+        } else {
+          throw Error ("Type not understood");
+        }
+
+        char** nameList = Names_t::allocbuf(ret.size());
+        Names_t *names = new Names_t (ret.size(), ret.size(), nameList);
+        std::size_t i = 0;
+        for (Ret_t::const_iterator it = ret.begin (); it != ret.end(); ++it) {
+          nameList [i] =
+            (char*) malloc (sizeof(char)*(it->length ()+1));
+            strcpy (nameList [i], it->c_str ());
+            ++i;
+        }
+        return names;
       }
 
       void Problem::createGrasp (const char* graspName,
