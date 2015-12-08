@@ -43,6 +43,27 @@ namespace hpp {
       using core::WeighedDistancePtr_t;
       using CORBA::ULong;
 
+      namespace {
+        template <typename T> std::string toStr () { return typeid(T).name(); }
+        template <> std::string toStr <graph::NodePtr_t> () { return "Node"; }
+        template <> std::string toStr <graph::EdgePtr_t> () { return "Edge"; }
+        template <> std::string toStr <graph::GraphPtr_t> () { return "Graph"; }
+        template <> std::string toStr <graph::NodeSelectorPtr_t> () { return "SubGraph"; }
+        template <> std::string toStr <graph::LevelSetEdgePtr_t> () { return "LevelSetEdge"; }
+        template <> std::string toStr <graph::WaypointEdgePtr_t> () { return "WaypointEdge"; }
+
+        template <typename T> boost::shared_ptr<T> getComp (ID id) { 
+          boost::shared_ptr <T> comp = HPP_DYNAMIC_PTR_CAST(T,
+              graph::GraphComponent::get(id).lock());
+          if (!comp) {
+            std::stringstream ss;
+            ss << "ID " << id << " is not a " << toStr <T>();
+            throw Error (ss.str().c_str());
+          }
+          return comp;
+        }
+      }
+
       std::vector <std::string> expandPassiveDofsNameVector (
           const hpp::Names_t& names, const size_t& s)
       {
@@ -619,6 +640,17 @@ namespace hpp {
           }
           freq = _freq;
           values = _values;
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      void Graph::setShort (ID edgeId, CORBA::Boolean isShort)
+        throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+        try {
+          edge->setShort (isShort);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
