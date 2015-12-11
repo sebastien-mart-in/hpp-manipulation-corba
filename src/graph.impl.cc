@@ -20,9 +20,6 @@
 #include <hpp/util/debug.hh>
 #include <hpp/util/pointer.hh>
 
-#include <hpp/core/steering-method-straight.hh>
-#include <hpp/core/weighed-distance.hh>
-
 #include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/roadmap.hh>
 #include <hpp/manipulation/graph/node-selector.hh>
@@ -37,10 +34,6 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
-      using core::SteeringMethodPtr_t;
-      using core::SteeringMethodStraight;
-      using core::WeighedDistance;
-      using core::WeighedDistancePtr_t;
       using CORBA::ULong;
 
       namespace {
@@ -85,16 +78,8 @@ namespace hpp {
         if (!robot) throw Error ("Build the robot first.");
 	// Create default steering method to store in edges, until we define a
 	// factory for steering methods.
-	WeighedDistancePtr_t distance
-	  (HPP_DYNAMIC_PTR_CAST (WeighedDistance,
-				 problemSolver_->problem ()->distance ()));
-	SteeringMethodPtr_t sm;
-	if  (distance) {
-	  sm = SteeringMethodStraight::create (robot, distance);
-	} else {
-	  sm = SteeringMethodStraight::create (robot);
-	}
-        graph_ = graph::Graph::create(graphName, robot, sm);
+        graph_ = graph::Graph::create(graphName, robot,
+            problemSolver_->problem());
         graph_->maxIterations (problemSolver_->maxIterations ());
         graph_->errorThreshold (problemSolver_->errorThreshold ());
         problemSolver_->constraintGraph (graph_);
@@ -124,7 +109,7 @@ namespace hpp {
           if (!ns) throw Error ("Not a subgraph");
           graph::Nodes_t nl;
           graph::NodePtr_t node;
-          for (int i = 0; i < nodes.length(); ++i) {
+          for (unsigned int i = 0; i < nodes.length(); ++i) {
             node = HPP_DYNAMIC_PTR_CAST(graph::Node,
                 graph::GraphComponent::get(nodes[i]).lock());
             if (!node) throw Error ("The nodes could not be found.");

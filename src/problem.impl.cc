@@ -21,6 +21,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include <hpp/util/debug.hh>
+#include <hpp/core/distance.hh>
 #include <hpp/core/comparison-type.hh>
 #include <hpp/core/locked-joint.hh>
 #include <hpp/core/config-projector.hh>
@@ -548,7 +549,7 @@ namespace hpp {
         indexProj = -1;
         try {
           core::PathPtr_t path;
-	  success = edge->build (path, *q1, *q2, *problemSolver_->problem()->steeringMethod ()->distance());
+	  success = edge->build (path, *q1, *q2);
           if (!success) return false;
           pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, path);
           indexNotProj = problemSolver_->paths ().size ();
