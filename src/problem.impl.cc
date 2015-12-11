@@ -226,7 +226,7 @@ namespace hpp {
           const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
           std::string name (graspName);
           value_type c = handle->clearance () + gripper->clearance ();
-          value_type width = 2*c * 1.01;
+          value_type width = c * 1.01;
 	  NumericalConstraintPtr_t constraint =
 	    handle->createPreGrasp (gripper);
 	  NumericalConstraintPtr_t ineq_positive =
