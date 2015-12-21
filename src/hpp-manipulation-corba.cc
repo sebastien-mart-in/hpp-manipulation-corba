@@ -50,9 +50,9 @@ int main (int argc, char* argv [])
 
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), true);
-  WholebodyServer wbsServer (argc, argv, true);
+  WholebodyServer wbsServer (argc, const_cast<const char**> (argv), true);
   wbsServer.setProblemSolver (problemSolver);
-  ManipulationServer manipServer (argc, argv, true);
+  ManipulationServer manipServer (argc, const_cast<const char**> (argv), true);
   manipServer.setProblemSolver (problemSolver);
 
   corbaServer.startCorbaServer ();
