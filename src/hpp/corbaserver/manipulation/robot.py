@@ -16,6 +16,7 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
+import warnings
 from hpp import Transform
 from hpp.corbaserver.manipulation import Client as ManipulationClient
 from hpp.corbaserver.wholebody_step import Client as WholebodyStepClient
@@ -296,8 +297,10 @@ class Robot (object):
     #  \param jointName name of the joint owning the body,
     #  \param collision whether collision with object should be computed,
     #  \param distance whether distance to object should be computed.
-    def removeObstacleFromJoint (self, objectName, jointName, collision,
-                                 distance):
+    def removeObstacleFromJoint (self, objectName, jointName, collision = True,
+                                 distance = False):
+        if collision is not True or distance is not False:
+            warnings.warn ("parameters collision and distance are deprecated")
         return self.client.basic.obstacle.removeObstacleFromJoint \
             (objectName, jointName, collision, distance)
 
