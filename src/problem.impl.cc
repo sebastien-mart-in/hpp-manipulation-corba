@@ -497,7 +497,12 @@ namespace hpp {
 	ConfigurationPtr_t config = floatSeqToConfig (problemSolver_, input);
         ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
         try {
-	  success = edge->applyConstraints (*qoffset, *config);
+          value_type dist = 0;
+          core::NodePtr_t nNode = problemSolver_->roadmap()->nearestNode (qoffset, dist);
+          if (dist < 1e-8)
+            success = edge->applyConstraints (nNode, *config);
+          else
+            success = edge->applyConstraints (*qoffset, *config);
 
           ConstraintSetPtr_t constraint =
             problemSolver_->constraintGraph ()->configConstraint (edge);
