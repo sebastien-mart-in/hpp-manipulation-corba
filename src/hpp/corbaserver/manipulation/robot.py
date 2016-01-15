@@ -215,6 +215,13 @@ class Robot (object):
     def setJointBounds (self, jointName, inJointBound):
         return self.client.basic.robot.setJointBounds (jointName, inJointBound)
 
+    ## Set the position of root joint of a robot in world frame
+    ## \param robotName key of the robot in ProblemSolver object map.
+    ## \param position constant position of the root joint in world frame in
+    ##        initial configuration.
+    def setRootJointPosition (self, robotName, position):
+        return self.client.manipulation.robot.setRootJointPosition (robotName, position)
+
     ## Set bounds on the translation part of the freeflyer joint.
     #
     #  Valid only if the robot has a freeflyer joint.
