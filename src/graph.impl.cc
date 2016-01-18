@@ -38,17 +38,23 @@ namespace hpp {
 
       namespace {
         template <typename T> std::string toStr () { return typeid(T).name(); }
-        template <> std::string toStr <graph::NodePtr_t> () { return "Node"; }
-        template <> std::string toStr <graph::EdgePtr_t> () { return "Edge"; }
-        template <> std::string toStr <graph::GraphPtr_t> () { return "Graph"; }
-        template <> std::string toStr <graph::NodeSelectorPtr_t> () { return "SubGraph"; }
-        template <> std::string toStr <graph::LevelSetEdgePtr_t> () { return "LevelSetEdge"; }
-        template <> std::string toStr <graph::WaypointEdgePtr_t> () { return "WaypointEdge"; }
+        template <> std::string toStr <graph::Node> () { return "Node"; }
+        template <> std::string toStr <graph::Edge> () { return "Edge"; }
+        template <> std::string toStr <graph::Graph> () { return "Graph"; }
+        template <> std::string toStr <graph::NodeSelector> () { return "SubGraph"; }
+        template <> std::string toStr <graph::GuidedNodeSelector> () { return "SubGraph"; }
+        template <> std::string toStr <graph::LevelSetEdge> () { return "LevelSetEdge"; }
+        template <> std::string toStr <graph::WaypointEdge> () { return "WaypointEdge"; }
 
-        template <typename T> boost::shared_ptr<T> getComp (ID id) { 
-          boost::shared_ptr <T> comp = HPP_DYNAMIC_PTR_CAST(T,
-              graph::GraphComponent::get(id).lock());
-          if (!comp) {
+        template <typename T> boost::shared_ptr<T> getComp (ID id, bool throwIfWrongType = true) { 
+          boost::shared_ptr <T> comp;
+          try {
+            comp = HPP_DYNAMIC_PTR_CAST(T,
+                graph::GraphComponent::get(id).lock());
+          } catch (std::out_of_range& e) {
+            throw Error (e.what());
+          }
+          if (throwIfWrongType && !comp) {
             std::stringstream ss;
             ss << "ID " << id << " is not a " << toStr <T>();
             throw Error (ss.str().c_str());
@@ -102,19 +108,11 @@ namespace hpp {
       void Graph::setTargetNodeList(const ID subgraph, const hpp::IDseq& nodes)
         throw (hpp::Error)
       {
-        graph::GuidedNodeSelectorPtr_t ns;
+        graph::GuidedNodeSelectorPtr_t ns = getComp <graph::GuidedNodeSelector> (subgraph);
         try {
-          ns = HPP_DYNAMIC_PTR_CAST(graph::GuidedNodeSelector,
-              graph::GraphComponent::get(subgraph).lock());
-          if (!ns) throw Error ("Not a subgraph");
           graph::Nodes_t nl;
-          graph::NodePtr_t node;
-          for (unsigned int i = 0; i < nodes.length(); ++i) {
-            node = HPP_DYNAMIC_PTR_CAST(graph::Node,
-                graph::GraphComponent::get(nodes[i]).lock());
-            if (!node) throw Error ("The nodes could not be found.");
-            nl.push_back (node);
-          }
+          for (unsigned int i = 0; i < nodes.length(); ++i)
+            nl.push_back (getComp <graph::Node> (nodes[i]));
           ns->setNodeList (nl);
         } catch (std::out_of_range& e) {
           throw Error (e.what());
@@ -124,16 +122,7 @@ namespace hpp {
       Long Graph::createNode(const Long subgraphId, const char* nodeName)
         throw (hpp::Error)
       {
-        graph::NodeSelectorPtr_t ns;
-        try {
-          ns = HPP_DYNAMIC_PTR_CAST(graph::NodeSelector,
-              graph::GraphComponent::get(subgraphId).lock());
-        } catch (std::out_of_range& e) {
-          throw Error (e.what());
-        }
-        if (!ns)
-          throw Error ("You should create a subgraph "
-              " before creating nodes.");
+        graph::NodeSelectorPtr_t ns = getComp <graph::NodeSelector> (subgraphId);
 
         graph::NodePtr_t node = ns->createNode (nodeName);
         return (Long) node->id ();
@@ -142,15 +131,8 @@ namespace hpp {
       Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
         throw (hpp::Error)
       {
-        graph::NodePtr_t from, to;
-        try {
-          from = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeFromId).lock());
-          to   = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeToId  ).lock());
-        } catch (std::out_of_range& e) {
-          throw Error (e.what());
-        }
-        if (!from || !to)
-          throw Error ("The nodes could not be found.");
+        graph::NodePtr_t from = getComp <graph::Node> (nodeFromId),
+                         to   = getComp <graph::Node> (nodeToId  );
 
         graph::EdgePtr_t edge = from->linkTo (edgeName, to, w, isInNodeFrom);
         return (Long) edge->id ();
@@ -160,15 +142,8 @@ namespace hpp {
           const char* edgeBaseName, const Long nb, const Long w, const bool isInNodeFrom, GraphElements_out out_elmts)
         throw (hpp::Error)
       {
-        graph::NodePtr_t from, to;
-        try {
-          from = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeFromId).lock());
-          to   = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeToId  ).lock());
-        } catch (std::out_of_range& e) {
-          throw Error (e.what());
-        }
-        if (!from || !to)
-          throw Error ("The nodes could not be found.");
+        graph::NodePtr_t from = getComp <graph::Node> (nodeFromId),
+                         to   = getComp <graph::Node> (nodeToId  );
 
         std::ostringstream ss; ss << edgeBaseName << "_e" << nb;
         graph::EdgePtr_t edge_pc = from->linkTo (ss.str (), to, w, isInNodeFrom,
@@ -266,14 +241,8 @@ namespace hpp {
       {
         if (!graph_)
           throw Error ("You should create the graph");
-        graph::NodePtr_t node;
-        graph::EdgePtr_t edge;
-        try {
-          node = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(elmt).lock());
-          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, graph::GraphComponent::get(elmt).lock());
-        } catch (std::out_of_range& e) {
-          throw Error (e.what());
-        }
+        graph::NodePtr_t node = getComp <graph::Node> (elmt, false);
+        graph::EdgePtr_t edge = getComp <graph::Edge> (elmt, false);
         if (node) {
           ConfigProjectorPtr_t proj =
             graph_->configConstraint (node)->configProjector ();
@@ -310,14 +279,8 @@ namespace hpp {
       Long Graph::getWaypoint (const Long edgeId, hpp::ID_out nodeId)
         throw (hpp::Error)
       {
-        graph::WaypointEdgePtr_t edge;
-        try {
-          edge = HPP_DYNAMIC_PTR_CAST(graph::WaypointEdge, graph::GraphComponent::get(edgeId).lock());
-        } catch (std::out_of_range& e) {
-          throw Error (e.what());
-        }
-        if (!edge)
-          throw Error ("The edge could not be found.");
+        graph::WaypointEdgePtr_t edge = getComp <graph::WaypointEdge> (edgeId);
+
         graph::EdgePtr_t waypoint = edge->waypoint <graph::Edge> ();
         nodeId = (Long) waypoint->to ()->id ();
         return (Long) waypoint->id ();
@@ -326,15 +289,8 @@ namespace hpp {
       Long Graph::createLevelSetEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
         throw (hpp::Error)
       {
-        graph::NodePtr_t from, to;
-        try {
-          from = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeFromId).lock());
-          to   = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeToId  ).lock());
-        } catch (std::out_of_range& e) {
-          throw Error (e.what());
-        }
-        if (!from || !to)
-          throw Error ("The nodes could not be found.");
+        graph::NodePtr_t from = getComp <graph::Node> (nodeFromId),
+                         to   = getComp <graph::Node> (nodeToId  );
 
         graph::EdgePtr_t edge = from->linkTo (edgeName, to, w, isInNodeFrom,
 					      graph::LevelSetEdge::create);
@@ -347,12 +303,8 @@ namespace hpp {
           const hpp::Names_t& paramLJ)
         throw (hpp::Error)
       {
-        graph::LevelSetEdgePtr_t edge;
+        graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge> (edgeId);
         try {
-          edge = HPP_DYNAMIC_PTR_CAST(graph::LevelSetEdge,
-              graph::GraphComponent::get(edgeId).lock());
-          if (!edge) throw Error ("The edge could not be found.");
-
           for (CORBA::ULong i=0; i<condNC.length (); ++i) {
             std::string name (condNC [i]);
             edge->insertConditionConstraint (
@@ -392,14 +344,7 @@ namespace hpp {
       void Graph::isInNodeFrom (const Long edgeId, const bool isInNodeFrom)
         throw (hpp::Error)
       {
-        graph::EdgePtr_t edge;
-        try {
-          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, graph::GraphComponent::get(edgeId).lock());
-        } catch (std::out_of_range& e) {
-          throw Error (e.what());
-        }
-        if (!edge)
-          throw Error ("The edge could not be found.");
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
           edge->isInNodeFrom (isInNodeFrom);
         } catch (std::exception& err) {
@@ -441,14 +386,7 @@ namespace hpp {
           const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
       {
-        graph::NodePtr_t n;
-        try {
-          n = HPP_DYNAMIC_PTR_CAST(graph::Node, graph::GraphComponent::get(nodeId).lock());
-        } catch (std::out_of_range& e) {
-          throw Error (e.what());
-        }
-        if (!n)
-          throw Error ("The nodes could not be found.");
+        graph::NodePtr_t n = getComp <graph::Node> (nodeId);
 
         if (constraintNames.length () > 0) {
           try {
@@ -508,15 +446,9 @@ namespace hpp {
       (const hpp::floatSeq& dofArray, ID nodeId, hpp::floatSeq_out error)
 	throw (hpp::Error)
       {
+	graph::NodePtr_t node = getComp <graph::Node> (nodeId);
 	try {
 	  vector_t err;
-	  graph::GraphComponentPtr_t gc (graph::GraphComponent::get (nodeId));
-	  graph::NodePtr_t node (HPP_DYNAMIC_PTR_CAST (graph::Node, gc));
-	  if (!node) {
-	    std::ostringstream oss;
-	    oss << "Graph component " << nodeId << " is not a node.";
-	    throw std::logic_error (oss.str ().c_str ());
-	  }
           Configuration_t config; config.resize (dofArray.length());
           for (std::size_t iDof = 0; iDof < (std::size_t)config.size();
 	       ++iDof) {
@@ -538,13 +470,7 @@ namespace hpp {
       void Graph::displayNodeConstraints
       (hpp::ID nodeId, CORBA::String_out constraints) throw (Error)
       {
-	graph::GraphComponentPtr_t gc (graph::GraphComponent::get (nodeId));
-	graph::NodePtr_t node (HPP_DYNAMIC_PTR_CAST (graph::Node, gc));
-	if (!node) {
-	  std::ostringstream oss;
-	  oss << "Graph component " << nodeId << " is not a node.";
-	  throw std::logic_error (oss.str ().c_str ());
-	}
+	graph::NodePtr_t node = getComp <graph::Node> (nodeId);
 	ConstraintSetPtr_t cs (graph_->configConstraint (node));
 	std::ostringstream oss;
 	oss << (*cs);
@@ -554,13 +480,7 @@ namespace hpp {
       void Graph::displayEdgeConstraints
       (hpp::ID edgeId, CORBA::String_out constraints) throw (Error)
       {
-	graph::GraphComponentPtr_t gc (graph::GraphComponent::get (edgeId));
-	graph::EdgePtr_t edge (HPP_DYNAMIC_PTR_CAST (graph::Edge, gc));
-	if (!edge) {
-	  std::ostringstream oss;
-	  oss << "Graph component " << edgeId << " is not an edge.";
-	  throw std::logic_error (oss.str ().c_str ());
-	}
+	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	ConstraintSetPtr_t cs (graph_->configConstraint (edge));
 	std::ostringstream oss;
 	oss << (*cs);
@@ -581,11 +501,8 @@ namespace hpp {
           hpp::floatSeqSeq_out values)
         throw (hpp::Error)
       {
-	try {
-          graph::LevelSetEdgePtr_t edge =
-            HPP_DYNAMIC_PTR_CAST(graph::LevelSetEdge,
-                graph::GraphComponent::get (edgeId).lock ());
-          if (!edge) throw Error ("The edge could not be found.");
+        graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge> (edgeId);
+        try {
           graph::LeafHistogramPtr_t hist = edge->histogram ();
 	  floatSeq* _freq = new floatSeq ();
           floatSeqSeq *_values = new floatSeqSeq ();
