@@ -91,6 +91,7 @@ namespace hpp {
                                              const hpp::Names_t& condNC,
                                              const hpp::Names_t& condLJ,
                                              const hpp::Names_t& paramNC,
+                                             const hpp::Names_t& paramPDOF,
                                              const hpp::Names_t& paramLJ)
             throw (hpp::Error);
 

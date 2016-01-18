@@ -270,9 +270,9 @@ class ConstraintGraph (object):
 
     ## Set the numerical constraints of a LevelSetEdge that create the foliation.
     #  \param edge name of a LevelSetEdge of the graph.
-    #  \param condGrasp, condPregrasp name, or list of names, of grasp or pregrasp that define the foliated manifold
+    #  \param condGrasps, condPregrasps name, or list of names, of grasp or pregrasp that define the foliated manifold
     #  \param condNC, condLJ numerical constraints and locked joints that define the foliated manifold
-    #  \param paramGrasp, paramPregrasp name, or list of names, of grasp or pregrasp that parametrize the foliation
+    #  \param paramGrasps, paramPregrasps name, or list of names, of grasp or pregrasp that parametrize the foliation
     #  \param paramNC, paramPassiveJoints, paramLJ numerical constraints and locked joints that parametrize the foliation
     #  \note If passiveDofsNames is a shorter list than numConstraints, passiveDofsNames is extended with an empty string,
     #        which corresponds to an empty vector of passive dofs.

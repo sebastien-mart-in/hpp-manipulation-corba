@@ -356,7 +356,8 @@ namespace hpp {
           for (CORBA::ULong i=0; i<condNC.length (); ++i) {
             std::string name (condNC [i]);
             edge->insertConditionConstraint (
-                problemSolver_->get <NumericalConstraintPtr_t>(name)->copy (),
+                HPP_STATIC_PTR_CAST(NumericalConstraint,
+                problemSolver_->get <NumericalConstraintPtr_t>(name)->copy ())
                 );
           }
           for (CORBA::ULong i=0; i<condLJ.length (); ++i) {
@@ -369,12 +370,13 @@ namespace hpp {
           for (CORBA::ULong i=0; i<paramNC.length (); ++i) {
             std::string name (paramNC [i]);
             edge->insertParamConstraint (
-                problemSolver_->get <NumericalConstraintPtr_t>(name)->copy (),
+                HPP_STATIC_PTR_CAST(NumericalConstraint,
+                problemSolver_->get <NumericalConstraintPtr_t>(name)->copy ()),
                 problemSolver_->passiveDofs (pdofNames [i]));
           }
           for (CORBA::ULong i=0; i<paramLJ.length (); ++i) {
             std::string name (paramLJ [i]);
-            param->add (problemSolver_->get <LockedJointPtr_t> (name));
+            edge->insertParamConstraint (problemSolver_->get <LockedJointPtr_t> (name));
           }
 
           edge->buildHistogram ();

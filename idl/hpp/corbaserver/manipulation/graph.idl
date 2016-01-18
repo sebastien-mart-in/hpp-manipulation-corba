@@ -90,14 +90,13 @@ module hpp {
         long createLevelSetEdge(in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in boolean isInNodeFrom)
           raises (Error);
 
-        /// Set the numerical constraints of a LevelSetEdge that are create the foliation.
-        /// \param graphComponentId ID of the component.
-        /// \param numericalConstraintNames is an array of names of numerical constraints in the ProblemSolver map.
-        /// \param lockedDofNames is an array of names of LockedDof constraints in the ProblemSolver map.
-        /// \param passiveDofsNames array of names of vector of passive dofs in the ProblemSolver map.
+        /// Set the constraints of a LevelSetEdge that create the foliation.
+        /// \param edgeId if of a LevelSetEdge of the graph.
+        /// \param condNC, condLJ numerical constraints and locked joints that define the foliated manifold
+        /// \param paramNC, paramPassiveJoints, paramLJ numerical constraints and locked joints that parametrize the foliation
         /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
         ///       which corresponds to an empty vector of passive dofs.
-        void setLevelSetFoliation (in long edgeId, in Names_t condNC, in Names_t condLJ, in Names_t paramNC, in Names_t paramLJ)
+        void setLevelSetFoliation (in long edgeId, in Names_t condNC, in Names_t condLJ, in Names_t paramNC, in Names_t paramPassiveJoints, in Names_t paramLJ)
           raises (Error);
 
         /// Set the numerical constraints of a component.
