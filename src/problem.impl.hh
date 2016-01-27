@@ -75,6 +75,11 @@ namespace hpp {
             const char* shapeName, const char* envContactName)
 	  throw (hpp::Error);
 
+        virtual void createPrePlacementConstraint (const char* placName,
+            const char* shapeName, const char* envContactName,
+            CORBA::Double width)
+	  throw (hpp::Error);
+
         virtual void createQPStabilityConstraint (const char* placName,
             const Names_t& shapesName)
           throw (hpp::Error);

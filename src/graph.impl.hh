@@ -47,7 +47,8 @@ namespace hpp {
             throw (hpp::Error);
 
           virtual Long createNode (const Long subGraphId,
-                                   const char* nodeName)
+                                   const char* nodeName,
+                                   const bool waypoint)
             throw (hpp::Error);
 
           virtual Long createEdge (const Long nodeFromId,
@@ -57,13 +58,16 @@ namespace hpp {
                                    const bool isInNodeFrom)
             throw (hpp::Error);
 
-          virtual void createWaypointEdge (const Long nodeFromId,
+          virtual Long createWaypointEdge (const Long nodeFromId,
                                            const Long nodeToId,
                                            const char* edgeBaseName,
                                            const Long number,
                                            const Long weight,
-                                           const bool isInNodeFrom,
-                                           GraphElements_out out_elmts)
+                                           const bool isInNodeFrom)
+            throw (hpp::Error);
+
+          virtual void setWaypoint (const ID waypointEdgeId, const Long index,
+              const ID edgeId, const ID nodeId)
             throw (hpp::Error);
 
           virtual void getGraph (GraphComp_out graph, GraphElements_out elmts)
@@ -73,7 +77,8 @@ namespace hpp {
               ConfigProjStat_out path)
             throw (hpp::Error);
 
-          virtual Long getWaypoint (const Long edgeId, hpp::ID_out nodeId)
+          virtual Long getWaypoint (const Long edgeId, const Long index,
+              hpp::ID_out nodeId)
             throw (hpp::Error);
 
           virtual Long createLevelSetEdge(const Long nodeFromId,
@@ -85,6 +90,9 @@ namespace hpp {
 
           virtual void isInNodeFrom (const Long edgeId,
                                      const bool isInNodeFrom)
+            throw (hpp::Error);
+
+          virtual void setContainingNode (const ID edgeId, const ID nodeId)
             throw (hpp::Error);
 
           virtual void setLevelSetFoliation (const Long edgeId,

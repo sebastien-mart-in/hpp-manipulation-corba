@@ -113,7 +113,6 @@ module hpp {
                                  out floatSeqSeq points)
           raises (Error);
 
-
 	/// Create a placement constraint between a shapes of robot and env.
 	///
 	/// \param placementName Name of the numerical constraint,
@@ -127,6 +126,22 @@ module hpp {
 	/// should have an intersection of positive area.
         void createPlacementConstraint (in string placementName,
             in string shapeName, in string envContactName)
+          raises (Error);
+
+	/// Create a pre-placement constraint between a shapes of robot and env.
+	///
+	/// \param placementName Name of the numerical constraint,
+	/// \param shapeName Name of the list of shapes as stored in the
+	///        Device instance,
+	/// \param envContactName Name of the list of shapes as stored in
+	///        ProblemSolver instance
+	/// \param width the approaching distance.
+	///
+	/// A pre-placement constraint specifies that surfaces delimited by
+	/// one shape of the robot and one shape of the environment
+	/// should have an intersection of positive area.
+        void createPrePlacementConstraint (in string placementName,
+            in string shapeName, in string envContactName, in double witdh)
           raises (Error);
 
         /// Create a QPStaticStability constraints

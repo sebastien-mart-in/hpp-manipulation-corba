@@ -89,13 +89,14 @@ class ConstraintGraph (object):
 
     ### Create one or several node
     ## \param node name (resp. list of names) of the node(s) to be created.
+    ## \param waypoint set to True when creating waypoint nodes.
     ## \note The order is important. The first should be the most restrictive one as a configuration
     ## will be in the first node for which the constraint are satisfied.
-    def createNode (self, node):
+    def createNode (self, node, waypoint = False):
         if type (node) is str:
             node = [node]
         for n in node:
-            self.nodes [n] = self.graph.createNode (self.subGraphId, self._(n))
+            self.nodes [n] = self.graph.createNode (self.subGraphId, self._(n), waypoint)
 
     ### Create an edge
     ## \param nodeFrom, nodeTo the extremities of the edge,
@@ -117,23 +118,41 @@ class ConstraintGraph (object):
     ### Create a WaypointEdge.
     ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note,
     ## \param nb number of waypoints,
-    ## \return an object containing two list:
-    ##         \code
-    ##           returnValue.edges
-    ##           returnValue.nodes
-    ##         \endcode
-    ##         Each element of each list contains a name and an id.
-    ##         Nevertheless, the information is stored in the instance of this class.
     ## \note See documentation of class hpp::manipulation::graph::WaypointEdge for more information.
-    def createWaypointEdge (self, nodeFrom, nodeTo, name, nb = 1, weight = 1, isInNodeFrom = None):
+    ##
+    ## \warning Waypoint are now specified by hand to allow finer handling
+    ## of edge types between waypoints. This function has been updated to be
+    ## backward compatible but except for the return value.
+    ## For a finer control of what you are doing, set automaticBuilder to
+    ## False.
+    def createWaypointEdge (self, nodeFrom, nodeTo, name, nb = 1, weight = 1,
+            isInNodeFrom = None, automaticBuilder = True):
         if isInNodeFrom is None:
             isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
-        elmts = self.graph.createWaypointEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), nb, weight, isInNodeFrom)
-        for e in elmts.edges:
-            self.edges [e.name] = e.id
-        for n in elmts.nodes:
-            self.nodes [n.name] = n.id
-        return elmts
+
+        if automaticBuilder:
+            n = name + "_e" + str(nb)
+        else:
+            n = name
+        wid = self.edges[n] = self.graph.createWaypointEdge (
+                self.nodes[nodeFrom], self.nodes[nodeTo], self._(name),
+                nb, weight, isInNodeFrom)
+
+        if not automaticBuilder:
+            return
+
+        waypoints = list ()
+        previous = self.nodes[nodeFrom]
+        for i in range(nb):
+            waypoints.append((name + "_e" + str(i), name + "_n" + str(i)))
+            n = waypoints[-1][1]
+            e = waypoints[-1][0]
+            newN = self.nodes[n] = \
+                    self.graph.createNode (self.subGraphId, self._(n), True)
+            newE = self.edges[e] = \
+                    self.graph.createEdge (previous, newN, self._(e), -1, isInNodeFrom)
+            self.graph.setWaypoint (wid, i, newE, newN);
+            previous = newN
 
     ### Create a LevelSetEdge.
     ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note.
@@ -203,9 +222,7 @@ class ConstraintGraph (object):
     def createPreGrasp (self, name, gripper, handle, passiveJoints = ""):
         self.client.problem.createPreGrasp (self._(name), gripper, handle)
         self.pregrasps [name] = \
-            (ConstraintAndPassiveJoints (self._(name), passiveJoints),
-             ConstraintAndPassiveJoints (self._(name )+"/double_ineq",
-                                         passiveJoints))
+            (ConstraintAndPassiveJoints (self._(name), passiveJoints),)
 
     ## Set the constraints of an edge, a node or the whole graph
     #

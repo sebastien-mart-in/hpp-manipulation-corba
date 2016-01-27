@@ -222,19 +222,13 @@ namespace hpp {
       {
         DevicePtr_t robot = getRobotOrThrow (problemSolver_);
 	try {
-          using hpp::core::DoubleInequality;
           const GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
           const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
           std::string name (graspName);
           value_type c = handle->clearance () + gripper->clearance ();
-          value_type width = c * 1.01;
 	  NumericalConstraintPtr_t constraint =
-	    handle->createPreGrasp (gripper);
-	  NumericalConstraintPtr_t ineq_positive =
-	    handle->createPreGraspComplement (gripper, c / 2, width);
+	    handle->createPreGrasp (gripper, c);
 	  problemSolver_->addNumericalConstraint (name, constraint);
-	  problemSolver_->addNumericalConstraint
-            (name + "/double_ineq", ineq_positive);
           problemSolver_->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -362,6 +356,20 @@ namespace hpp {
 	try {
 	  problemSolver_->createPlacementConstraint (placName, surface1,
 						     surface2, 1e-3);
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
+      void Problem::createPrePlacementConstraint (const char* placName,
+					          const char* surface1,
+					          const char* surface2,
+                                                  CORBA::Double width)
+        throw (hpp::Error)
+      {
+	try {
+	  problemSolver_->createPrePlacementConstraint (placName,
+              surface1, surface2, width, 1e-3);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}

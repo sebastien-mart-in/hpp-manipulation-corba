@@ -40,7 +40,8 @@ module hpp {
         /// Add a node to the graph.
         /// \param subGraphId is the ID of the subgraph to which the node should be added.
         /// \param nodeName the name of the new node.
-        long createNode (in long subGraphId, in string nodeName)
+        /// \param waypoint true when the node is a waypoint
+        long createNode (in long subGraphId, in string nodeName, in boolean waypoint)
           raises (Error);
 
         /// Add an edge between two nodes of the graph.
@@ -53,21 +54,35 @@ module hpp {
         /// Set in which node an edge is.
         /// \param edgeId the ID of the edge,
         /// \param isInNodeFrom whether or not a path corresponding to this edge is in the node from.
+        /// \note A finer control of the containing node can be achieve with
+        ///       setContainingNode
+        /// \deprecated
         void isInNodeFrom (in long edgeId, in boolean isInNodeFrom)
+          raises (Error);
+
+        /// Set in which node an edge is.
+        /// \param edgeId the ID of the edge,
+        /// \param nodeId the ID of the node in which the edge is.
+        void setContainingNode (in ID edgeId, in ID nodeId)
           raises (Error);
 
         /// Add an edge with waypoint between two nodes of the graph.
         /// \param nodeFromId, nodeToId the ID of the ends of the new edge.
         /// \param edgeBaseName basename of the new edge.
         /// \param weight weight of the edge.
-        void createWaypointEdge (in long nodeFromId, in long nodeToId, in string edgeName,
-            in long number, in long weight, in boolean isInNodeFrom, out GraphElements elmts)
+        long createWaypointEdge (in long nodeFromId, in long nodeToId, in string edgeName,
+            in long number, in long weight, in boolean isInNodeFrom)
           raises (Error);
 
         /// Get waypoint IDs of an edge.
         /// \param edgeId the ID of the edge.
+        /// \param index index of the waypoint.
         /// \return the ID of the edge and the node associated with the node.
-        long getWaypoint (in long edgeId, out ID nodeId)
+        long getWaypoint (in long edgeId, in long index, out ID nodeId)
+          raises (Error);
+
+        void setWaypoint (in ID waypointEdgeId, in long index,
+            in ID edgeId, in ID nodeId)
           raises (Error);
 
         /// Get full graph
