@@ -23,16 +23,36 @@ SET(IDL_SOURCES
   robot
 )
 
+
+# search for python
+FINDPYTHON()
+
 OMNIIDL_INCLUDE_DIRECTORIES(
   ${HPP_CORBASERVER_DATAROOTDIR}/idl ${CMAKE_SOURCE_DIR}/idl
   )
 
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/src)
+FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation)
+
 FOREACH(IDL ${IDL_SOURCES})
-  GENERATE_IDL_FILE (hpp/corbaserver/manipulation/${IDL}
-    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
-    )
+  GENERATE_IDL_CPP (hpp/corbaserver/manipulation/${IDL}
+    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation)
+  GENERATE_IDL_PYTHON (hpp/corbaserver/manipulation/${IDL}
+    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation)
+  INSTALL(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}_idl.py
+    DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation)
+  INSTALL(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}.hh
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/corbaserver/manipulation)
 ENDFOREACH()
+
+# Generate and install common_idl.py from hpp.corbaserver
+GENERATE_IDL_PYTHON (hpp/corbaserver/manipulation/common
+  ${HPP_CORBASERVER_DATAROOTDIR}/idl/hpp/corbaserver)
+
+ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS})
+ADD_CUSTOM_TARGET(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
 
 ADD_LIBRARY(${LIBRARY_NAME} SHARED
   ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/gcommon.hh
@@ -51,12 +71,10 @@ ADD_LIBRARY(${LIBRARY_NAME} SHARED
   robot.impl.hh
   server.cc
   client.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/common_idl.py
-  ${CMAKE_CURRENT_BINARY_DIR}/gcommon_idl.py
-  ${CMAKE_CURRENT_BINARY_DIR}/graph_idl.py
-  ${CMAKE_CURRENT_BINARY_DIR}/problem_idl.py
-  ${CMAKE_CURRENT_BINARY_DIR}/robot_idl.py
 )
+
+ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_cpp)
+ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_python)
 
 PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation)
 PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation-urdf)
@@ -64,41 +82,8 @@ PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} omniORB4)
 
 INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION lib)
 
-# search for python
-FINDPYTHON()
-
-# Generate and install python code for each idl file
-FOREACH (IDL ${IDL_SOURCES})
-  ADD_CUSTOM_COMMAND(
-    OUTPUT
-    ${CMAKE_CURRENT_BINARY_DIR}/${IDL}_idl.py
-    COMMAND ${OMNIIDL}
-    ARGS -bpython -Wbpackage="" -I${CMAKE_SOURCE_DIR}/idl
-    -I${HPP_CORBASERVER_DATAROOTDIR}/idl
-    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation/${IDL}.idl
-    MAIN_DEPENDENCY
-    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation/${IDL}.idl
-    )
-  INSTALL(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/${IDL}_idl.py
-    DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
-    )
-  INSTALL(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}.hh
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/corbaserver/manipulation
-    )
-ENDFOREACH()
-# Generate and install common_idl.py from hpp.corbaserver
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/common_idl.py
-  COMMAND ${OMNIIDL}
-  ARGS -bpython -Wbpackage="" -I${HPP_CORBASERVER_DATAROOTDIR}/idl
-  ${HPP_CORBASERVER_DATAROOTDIR}/idl/hpp/corbaserver/common.idl
-  MAIN_DEPENDENCY
-  ${HPP_CORBASERVER_DATAROOTDIR}/idl/hpp/corbaserver/common.idl
-  )
 INSTALL(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/common_idl.py
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/common_idl.py
   DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
   )
 
