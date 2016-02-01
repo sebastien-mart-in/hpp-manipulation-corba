@@ -165,9 +165,13 @@ namespace hpp {
           ret = getRobotOrThrow (problemSolver_)->getKeys <HandlePtr_t, Ret_t> ();
         } else if (w == "lockedjoint") {
           ret = problemSolver_->getKeys <core::LockedJointPtr_t, Ret_t> ();
+        } else if (w == "robotcontact") {
+          ret = getRobotOrThrow (problemSolver_)->getKeys <JointAndShapes_t, Ret_t> ();
+        } else if (w == "envcontact") {
+          ret = problemSolver_->getKeys <JointAndShapes_t, Ret_t> ();
         } else if (w == "type") {
           ret = boost::assign::list_of ("Gripper") ("Handle")
-            ("LockedJoint");
+            ("LockedJoint")("RobotContact")("EnvContact");
         } else {
           throw Error ("Type not understood");
         }
