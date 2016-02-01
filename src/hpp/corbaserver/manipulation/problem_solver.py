@@ -174,6 +174,21 @@ class ProblemSolver (object):
         self.client.wholebodyStep.problem.addComplementStaticStabilityConstraints \
             (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle)
 
+    ## Create placement and pre-placement constraints
+    #
+    # \param width set to None to skip creation of pre-placement constraint
+    #
+    # See hpp::corbaserver::manipulation::Problem::createPlacementConstraint
+    # and hpp::corbaserver::manipulation::Problem::createPrePlacementConstraint
+    def createPlacementConstraints (self, placementName, shapeName, envContactName, width = 0.05):
+        name = placementName
+        self.client.manipulation.problem.createPlacementConstraint (name, shapeName, envContactName)
+        if width is not None:
+            prename = "pre_" + name
+            self.client.manipulation.problem.createPrePlacementConstraint (prename, shapeName, envContactName, width)
+            return name, prename
+        return name
+
     ## Return balance constraints created by method
     #  ProblemSolver.createStaticStabilityConstraints
     def balanceConstraints (self):
