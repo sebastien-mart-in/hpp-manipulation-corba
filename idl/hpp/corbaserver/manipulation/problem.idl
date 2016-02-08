@@ -27,6 +27,13 @@ module hpp {
     module manipulation {
       interface Problem
       {
+        /// Select a problem by its name.
+        /// If no problem with this name exists, a new
+        /// hpp::manipulation::ProblemSolver is created and selected.
+        /// \param name the problem name.
+        /// \return true if a new problem was created.
+        boolean selectProblem (in string name) raises (Error);
+
         /// Return a list of available elements of type type
         /// \param type enter "type" to know what types I know of.
         ///             This is case insensitive.

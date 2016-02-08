@@ -159,6 +159,17 @@ namespace hpp {
         return server_->problemSolver();
       }
 
+      bool Problem::selectProblem (const char* name)
+        throw (hpp::Error)
+      {
+        std::string psName (name);
+        corbaServer::ProblemSolverMapPtr_t psMap (server_->problemSolverMap());
+        bool has = psMap->has (psName);
+        if (!has) psMap->map_[psName] = ProblemSolver::create ();
+        psMap->selected_ = psName;
+        return !has;
+      }
+
       Names_t* Problem::getAvailable (const char* what) throw (hpp::Error)
       {
         std::string w (what);
