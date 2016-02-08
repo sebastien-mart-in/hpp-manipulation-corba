@@ -14,6 +14,8 @@
 // received a copy of the GNU Lesser General Public License along with
 // hpp-manipulation. If not, see <http://www.gnu.org/licenses/>.
 
+#include "graph.impl.hh"
+
 #include <fstream>
 #include <sstream>
 
@@ -29,7 +31,7 @@
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/constraint-set.hh>
 
-#include "graph.impl.hh"
+#include <hpp/corbaserver/manipulation/server.hh>
 
 namespace hpp {
   namespace manipulation {
@@ -80,22 +82,27 @@ namespace hpp {
       }
 
       Graph::Graph () :
-        problemSolver_ (0x0), graph_ ()
+        server_ (0x0), graph_ ()
       {}
+
+      ProblemSolverPtr_t Graph::problemSolver ()
+      {
+        return server_->problemSolver();
+      }
 
       Long Graph::createGraph(const char* graphName)
         throw (hpp::Error)
       {
-        DevicePtr_t robot = problemSolver_->robot ();
+        DevicePtr_t robot = problemSolver()->robot ();
         if (!robot) throw Error ("Build the robot first.");
 	// Create default steering method to store in edges, until we define a
 	// factory for steering methods.
         graph_ = graph::Graph::create(graphName, robot,
-            problemSolver_->problem());
-        graph_->maxIterations (problemSolver_->maxIterations ());
-        graph_->errorThreshold (problemSolver_->errorThreshold ());
-        problemSolver_->constraintGraph (graph_);
-        problemSolver_->problem()->constraintGraph (graph_);
+            problemSolver()->problem());
+        graph_->maxIterations (problemSolver()->maxIterations ());
+        graph_->errorThreshold (problemSolver()->errorThreshold ());
+        problemSolver()->constraintGraph (graph_);
+        problemSolver()->problem()->constraintGraph (graph_);
         return (Long) graph_->id ();
       }
 
@@ -106,7 +113,7 @@ namespace hpp {
           throw Error ("You should create the graph"
               " before creating subgraph.");
         graph::GuidedNodeSelectorPtr_t ns = graph::GuidedNodeSelector::create
-          (subgraphName, problemSolver_->roadmap ());
+          (subgraphName, problemSolver()->roadmap ());
         graph_->nodeSelector(ns);
         return (Long) ns->id ();
       }
@@ -320,12 +327,12 @@ namespace hpp {
             std::string name (condNC [i]);
             edge->insertConditionConstraint (
                 HPP_STATIC_PTR_CAST(NumericalConstraint,
-                problemSolver_->get <NumericalConstraintPtr_t>(name)->copy ())
+                problemSolver()->get <NumericalConstraintPtr_t>(name)->copy ())
                 );
           }
           for (CORBA::ULong i=0; i<condLJ.length (); ++i) {
             std::string name (condLJ [i]);
-            edge->insertConditionConstraint (problemSolver_->get <LockedJointPtr_t> (name));
+            edge->insertConditionConstraint (problemSolver()->get <LockedJointPtr_t> (name));
           }
 
           std::vector <std::string> pdofNames = expandPassiveDofsNameVector
@@ -334,16 +341,16 @@ namespace hpp {
             std::string name (paramNC [i]);
             edge->insertParamConstraint (
                 HPP_STATIC_PTR_CAST(NumericalConstraint,
-                problemSolver_->get <NumericalConstraintPtr_t>(name)->copy ()),
-                problemSolver_->passiveDofs (pdofNames [i]));
+                problemSolver()->get <NumericalConstraintPtr_t>(name)->copy ()),
+                problemSolver()->passiveDofs (pdofNames [i]));
           }
           for (CORBA::ULong i=0; i<paramLJ.length (); ++i) {
             std::string name (paramLJ [i]);
-            edge->insertParamConstraint (problemSolver_->get <LockedJointPtr_t> (name));
+            edge->insertParamConstraint (problemSolver()->get <LockedJointPtr_t> (name));
           }
 
           edge->buildHistogram ();
-          RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver_->roadmap());
+          RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver()->roadmap());
           if (!roadmap)
             throw Error ("The roadmap is not of type hpp::manipulation::Roadmap.");
           roadmap->insertHistogram (edge->histogram ());
@@ -390,13 +397,13 @@ namespace hpp {
               (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
-              if (!problemSolver_->numericalConstraint (name))
+              if (!problemSolver()->numericalConstraint (name))
                 throw Error ("The numerical function does not exist.");
               component->addNumericalConstraint
 		(HPP_STATIC_PTR_CAST
 		 (NumericalConstraint,
-		  problemSolver_->numericalConstraint(name)->copy ()),
-		 problemSolver_->passiveDofs (pdofNames [i]));
+		  problemSolver()->numericalConstraint(name)->copy ()),
+		 problemSolver()->passiveDofs (pdofNames [i]));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -420,8 +427,8 @@ namespace hpp {
               n->addNumericalConstraintForPath
 		(HPP_STATIC_PTR_CAST
 		 (NumericalConstraint,
-		  problemSolver_->numericalConstraint(name)->copy ()),
-		 problemSolver_->passiveDofs (pdofNames [i]));
+		  problemSolver()->numericalConstraint(name)->copy ()),
+		 problemSolver()->passiveDofs (pdofNames [i]));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -442,7 +449,7 @@ namespace hpp {
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               component->addLockedJointConstraint
-		(problemSolver_->get <LockedJointPtr_t> (name));
+		(problemSolver()->get <LockedJointPtr_t> (name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());

@@ -34,10 +34,10 @@ namespace hpp {
       {
       public:
 	Problem ();
-	void setProblemSolver (const ProblemSolverPtr_t& problemSolver)
-	{
-	  problemSolver_ = problemSolver;
-	}
+        void setServer (Server* server)
+        {
+          server_ = server;
+        }
 
         virtual Names_t* getAvailable (const char* what) throw (hpp::Error);
 
@@ -101,7 +101,8 @@ namespace hpp {
           throw (hpp::Error);
 
       private:
-	ProblemSolverPtr_t problemSolver_;
+	ProblemSolverPtr_t problemSolver();
+        Server* server_;
       }; // class Problem
     } // namespace impl
   } // namespace manipulation

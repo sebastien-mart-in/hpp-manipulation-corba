@@ -17,6 +17,8 @@
 
 #include "problem.impl.hh"
 
+#include <hpp/corbaserver/manipulation/server.hh>
+
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -148,8 +150,13 @@ namespace hpp {
 	return result;
       }
 
-      Problem::Problem () : problemSolver_ (0x0)
+      Problem::Problem () : server_ (0x0)
       {
+      }
+
+      ProblemSolverPtr_t Problem::problemSolver ()
+      {
+        return server_->problemSolver();
       }
 
       Names_t* Problem::getAvailable (const char* what) throw (hpp::Error)
@@ -160,15 +167,15 @@ namespace hpp {
         Ret_t ret;
 
         if (w == "gripper") {
-          ret = getRobotOrThrow (problemSolver_)->getKeys <model::GripperPtr_t, Ret_t> ();
+          ret = getRobotOrThrow (problemSolver())->getKeys <model::GripperPtr_t, Ret_t> ();
         } else if (w == "handle") {
-          ret = getRobotOrThrow (problemSolver_)->getKeys <HandlePtr_t, Ret_t> ();
+          ret = getRobotOrThrow (problemSolver())->getKeys <HandlePtr_t, Ret_t> ();
         } else if (w == "lockedjoint") {
-          ret = problemSolver_->getKeys <core::LockedJointPtr_t, Ret_t> ();
+          ret = problemSolver()->getKeys <core::LockedJointPtr_t, Ret_t> ();
         } else if (w == "robotcontact") {
-          ret = getRobotOrThrow (problemSolver_)->getKeys <JointAndShapes_t, Ret_t> ();
+          ret = getRobotOrThrow (problemSolver())->getKeys <JointAndShapes_t, Ret_t> ();
         } else if (w == "envcontact") {
-          ret = problemSolver_->getKeys <JointAndShapes_t, Ret_t> ();
+          ret = problemSolver()->getKeys <JointAndShapes_t, Ret_t> ();
         } else if (w == "type") {
           ret = boost::assign::list_of ("Gripper") ("Handle")
             ("LockedJoint")("RobotContact")("EnvContact");
@@ -193,7 +200,7 @@ namespace hpp {
 				 const char* handleName)
 	throw (hpp::Error)
       {
-	DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+	DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	hppDout (info, *robot);
 	try {
           GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
@@ -211,9 +218,9 @@ namespace hpp {
 	  NumericalConstraintPtr_t constraint (handle->createGrasp (gripper));
 	  NumericalConstraintPtr_t complement
 	    (handle->createGraspComplement (gripper));
-	  problemSolver_->addNumericalConstraint (graspName, constraint);
-	  problemSolver_->addNumericalConstraint (std::string(graspName) + "/complement", complement);
-          problemSolver_->addGrasp(constraint, gripper, handle);
+	  problemSolver()->addNumericalConstraint (graspName, constraint);
+	  problemSolver()->addNumericalConstraint (std::string(graspName) + "/complement", complement);
+          problemSolver()->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -224,7 +231,7 @@ namespace hpp {
                                     const char* handleName)
 	throw (hpp::Error)
       {
-        DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+        DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
           const GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
           const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
@@ -232,8 +239,8 @@ namespace hpp {
           value_type c = handle->clearance () + gripper->clearance ();
 	  NumericalConstraintPtr_t constraint =
 	    handle->createPreGrasp (gripper, c);
-	  problemSolver_->addNumericalConstraint (name, constraint);
-          problemSolver_->addGrasp(constraint, gripper, handle);
+	  problemSolver()->addNumericalConstraint (name, constraint);
+          problemSolver()->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -246,12 +253,12 @@ namespace hpp {
       {
 	try {
 	  // Get robot in hppPlanner object.
-          DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  JointPtr_t joint = robot->getJointByName (jointName);
 	  vector_t config = floatSeqToVector (value);
 
           LockedJointPtr_t lockedJoint (LockedJoint::create (joint, config));
-          problemSolver_->add <LockedJointPtr_t> (lockedJointName, lockedJoint);
+          problemSolver()->add <LockedJointPtr_t> (lockedJointName, lockedJoint);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
@@ -264,12 +271,12 @@ namespace hpp {
       {
 	try {
 	  // Get robot in hppPlanner object.
-          DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  vector_t config = floatSeqToVector (value);
 
           LockedJointPtr_t lockedJoint
             (LockedJoint::create (robot, index, config));
-          problemSolver_->add <LockedJointPtr_t> (lockedDofName, lockedJoint);
+          problemSolver()->add <LockedJointPtr_t> (lockedDofName, lockedJoint);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
@@ -280,7 +287,7 @@ namespace hpp {
       {
         try {
 	  typedef core::Container <JointAndShapes_t>::ElementMap_t ShapeMap;
-	  const ShapeMap& m = problemSolver_->getAll <JointAndShapes_t> ();
+	  const ShapeMap& m = problemSolver()->getAll <JointAndShapes_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
@@ -304,7 +311,7 @@ namespace hpp {
       {
         try {
 	  typedef core::Container <JointAndShapes_t>::ElementMap_t ShapeMap;
-          DevicePtr_t r = getRobotOrThrow (problemSolver_);
+          DevicePtr_t r = getRobotOrThrow (problemSolver());
 	  const ShapeMap& m = r->getAll <JointAndShapes_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
@@ -330,7 +337,7 @@ namespace hpp {
       {
         try {
 	  const JointAndShapes_t& js =
-            problemSolver_->get <JointAndShapes_t> (name);
+            problemSolver()->get <JointAndShapes_t> (name);
 
           return jointAndShapes (js, indexes, points);
 	} catch (const std::exception& exc) {
@@ -343,7 +350,7 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-          DevicePtr_t r = getRobotOrThrow (problemSolver_);
+          DevicePtr_t r = getRobotOrThrow (problemSolver());
 	  const JointAndShapes_t& js = r->get <JointAndShapes_t> (name);
 
           return jointAndShapes (js, indexes, points);
@@ -358,7 +365,7 @@ namespace hpp {
         throw (hpp::Error)
       {
 	try {
-	  problemSolver_->createPlacementConstraint (placName, surface1,
+	  problemSolver()->createPlacementConstraint (placName, surface1,
 						     surface2, 1e-3);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
@@ -372,7 +379,7 @@ namespace hpp {
         throw (hpp::Error)
       {
 	try {
-	  problemSolver_->createPrePlacementConstraint (placName,
+	  problemSolver()->createPrePlacementConstraint (placName,
               surface1, surface2, width, 1e-3);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
@@ -385,7 +392,7 @@ namespace hpp {
       {
 	try {
 	  // Get robot in hppPlanner object.
-          DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
 
           using constraints::ConvexShape;
           using constraints::QPStaticStability;
@@ -420,7 +427,7 @@ namespace hpp {
           com->computeMass ();
           QPStaticStabilityPtr_t c = QPStaticStability::create (placName, robot,
               fds, com);
-          problemSolver_->addNumericalConstraint (placName,
+          problemSolver()->addNumericalConstraint (placName,
               NumericalConstraint::create (c, core::EqualToZero::create())
               );
 	} catch (const std::exception& exc) {
@@ -442,15 +449,15 @@ namespace hpp {
           graph::NodePtr_t node = HPP_DYNAMIC_PTR_CAST(graph::Node, comp);
           if (edge) {
             constraint =
-	      problemSolver_->constraintGraph ()->configConstraint (edge);
-            DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+	      problemSolver()->constraintGraph ()->configConstraint (edge);
+            DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	    if (core::ConfigProjectorPtr_t cp =
 		constraint->configProjector ()) {
 	      cp->rightHandSideFromConfig (robot->currentConfiguration());
 	    }
           } else if (node)
             constraint =
-	      problemSolver_->constraintGraph ()->configConstraint (node);
+	      problemSolver()->constraintGraph ()->configConstraint (node);
           else {
             std::stringstream ss;
             ss << "ID " << id << " is neither an edge nor a node";
@@ -462,7 +469,7 @@ namespace hpp {
         }
 
 	bool success = false;
-	ConfigurationPtr_t config = floatSeqToConfig (problemSolver_, input);
+	ConfigurationPtr_t config = floatSeqToConfig (problemSolver(), input);
 	try {
 	  success = constraint->apply (*config);
 	  if (hpp::core::ConfigProjectorPtr_t configProjector =
@@ -506,18 +513,18 @@ namespace hpp {
         }
 
 	bool success = false;
-	ConfigurationPtr_t config = floatSeqToConfig (problemSolver_, input);
-        ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver_, qnear);
+	ConfigurationPtr_t config = floatSeqToConfig (problemSolver(), input);
+        ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver(), qnear);
         try {
           value_type dist = 0;
-          core::NodePtr_t nNode = problemSolver_->roadmap()->nearestNode (qoffset, dist);
+          core::NodePtr_t nNode = problemSolver()->roadmap()->nearestNode (qoffset, dist);
           if (dist < 1e-8)
             success = edge->applyConstraints (nNode, *config);
           else
             success = edge->applyConstraints (*qoffset, *config);
 
           ConstraintSetPtr_t constraint =
-            problemSolver_->constraintGraph ()->configConstraint (edge);
+            problemSolver()->constraintGraph ()->configConstraint (edge);
 	  if (hpp::core::ConfigProjectorPtr_t configProjector =
 	      constraint ->configProjector ()) {
 	    residualError = configProjector->residualError ();
@@ -559,8 +566,8 @@ namespace hpp {
         }
 
 	bool success = false;
-	ConfigurationPtr_t q1 = floatSeqToConfig (problemSolver_, qb);
-        ConfigurationPtr_t q2 = floatSeqToConfig (problemSolver_, qe);
+	ConfigurationPtr_t q1 = floatSeqToConfig (problemSolver(), qb);
+        ConfigurationPtr_t q2 = floatSeqToConfig (problemSolver(), qe);
         core::PathVectorPtr_t pv;
         indexNotProj = -1;
         indexProj = -1;
@@ -569,29 +576,29 @@ namespace hpp {
 	  success = edge->build (path, *q1, *q2);
           if (!success) return false;
           pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, path);
-          indexNotProj = problemSolver_->paths ().size ();
+          indexNotProj = problemSolver()->paths ().size ();
           if (!pv) {
             pv = core::PathVector::create (path->outputSize (),
                 path->outputDerivativeSize ());
             pv->appendPath (path);
           }
-          problemSolver_->addPath (pv);
+          problemSolver()->addPath (pv);
 
           core::PathPtr_t projPath;
-          success = problemSolver_->problem()->pathProjector ()->apply (path, projPath);
+          success = problemSolver()->problem()->pathProjector ()->apply (path, projPath);
 
           if (!success) {
             if (!projPath || projPath->length () == 0)
               return false;
           }
           pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, projPath);
-          indexProj = problemSolver_->paths ().size ();
+          indexProj = problemSolver()->paths ().size ();
           if (!pv) {
             pv = core::PathVector::create (projPath->outputSize (),
                 projPath->outputDerivativeSize ());
             pv->appendPath (projPath);
           }
-          problemSolver_->addPath (pv);
+          problemSolver()->addPath (pv);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}

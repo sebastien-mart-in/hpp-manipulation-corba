@@ -32,9 +32,9 @@ namespace hpp {
       {
         public:
           Graph ();
-          void setProblemSolver (const ProblemSolverPtr_t& problemSolver)
+          void setServer (Server* server)
           {
-            problemSolver_ = problemSolver;
+            server_ = server;
           }
 
           virtual Long createGraph(const char* graphName)
@@ -141,7 +141,8 @@ namespace hpp {
             throw (hpp::Error);
 
         private:
-          ProblemSolverPtr_t problemSolver_;
+          ProblemSolverPtr_t problemSolver();
+          Server* server_;
           graph::GraphPtr_t graph_;
       }; // class Graph
     } // namespace impl

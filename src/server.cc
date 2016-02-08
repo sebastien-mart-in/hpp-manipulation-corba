@@ -32,20 +32,18 @@ namespace hpp {
       problemImpl_ (new corba::Server <impl::Problem>
 		    (argc, argv, multiThread, poaName)),
       robotImpl_ (new corba::Server <impl::Robot>
-		  (argc, argv, multiThread, poaName)) {}
+		  (argc, argv, multiThread, poaName))
+    {
+      graphImpl_->implementation ().setServer (this);
+      problemImpl_->implementation ().setServer (this);
+      robotImpl_->implementation ().setServer (this);
+    }
 
     Server::~Server () 
     {
       delete graphImpl_;
       delete problemImpl_;
       delete robotImpl_;
-    }
-    
-    void Server::setProblemSolver (ProblemSolverPtr_t problemSolver)
-    {
-      graphImpl_->implementation ().setProblemSolver (problemSolver);
-      problemImpl_->implementation ().setProblemSolver (problemSolver);
-      robotImpl_->implementation ().setProblemSolver (problemSolver);
     }
 
     /// Start corba server
@@ -69,5 +67,21 @@ namespace hpp {
 			     "Failed to start corba problem server.");
       }
     }
+
+    ProblemSolverPtr_t Server::problemSolver ()
+        throw (std::logic_error)
+    {
+      ProblemSolverPtr_t psm = dynamic_cast <ProblemSolverPtr_t>
+        (problemSolverMap_->selected());
+      if (psm == NULL)
+        throw std::logic_error ("ProblemSolver is not a manipulation problem");
+      return psm;
+    }
+
+    corbaServer::ProblemSolverMapPtr_t Server::problemSolverMap ()
+    {
+      return problemSolverMap_;
+    }
+
   } // namespace manipulation
 } // namespace hpp

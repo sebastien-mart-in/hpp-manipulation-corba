@@ -15,18 +15,21 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include "robot.impl.hh"
+
 #include <hpp/fcl/math/transform.h>
 #include <hpp/util/debug.hh>
-#include <hpp/manipulation/srdf/util.hh>
-#include <hpp/manipulation/device.hh>
-#include <hpp/manipulation/handle.hh>
 #include <hpp/model/humanoid-robot.hh>
 #include <hpp/model/gripper.hh>
 #include <hpp/model/body.hh>
 #include <hpp/model/object-factory.hh>
 #include <hpp/model/collision-object.hh>
+#include <hpp/manipulation/srdf/util.hh>
+#include <hpp/manipulation/device.hh>
+#include <hpp/manipulation/handle.hh>
 #include <hpp/manipulation/axial-handle.hh>
-#include "robot.impl.hh"
+
+#include <hpp/corbaserver/manipulation/server.hh>
 
 namespace hpp {
   namespace manipulation {
@@ -69,14 +72,19 @@ namespace hpp {
         }
       }
 
-      Robot::Robot () : problemSolver_ (0x0)
+      Robot::Robot () : server_ (0x0)
       {}
+
+      ProblemSolverPtr_t Robot::problemSolver ()
+      {
+        return server_->problemSolver();
+      }
 
       void Robot::create (const char* name)
 	throw (Error)
       {
 	try {
-          problemSolver_->robot (createRobot (std::string (name)));
+          problemSolver()->robot (createRobot (std::string (name)));
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -89,14 +97,14 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver_);
+          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver());
           robot->prepareInsertRobot ();
 	  manipulation::srdf::loadRobotModel (robot, robot->rootJoint (),
               std::string (robotName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
           robot->didInsertRobot ();
-          problemSolver_->resetProblem ();
+          problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -108,11 +116,11 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver_);
+          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver());
 	  manipulation::srdf::addRobotSRDFModel (robot, std::string (robotName),
               std::string (packageName), std::string (modelName),
               std::string (srdfSuffix));
-          problemSolver_->resetProblem ();
+          problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -125,14 +133,14 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver_);
+          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver());
           robot->prepareInsertRobot ();
           manipulation::srdf::loadObjectModel (robot, robot->rootJoint (),
               std::string (objectName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
           robot->didInsertRobot ();
-          problemSolver_->resetProblem ();
+          problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -145,14 +153,14 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver_);
+          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver());
           robot->prepareInsertRobot ();
 	  manipulation::srdf::loadHumanoidModel (robot, robot->rootJoint (),
               std::string (robotName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
           robot->didInsertRobot ();
-          problemSolver_->resetProblem ();
+          problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -176,7 +184,7 @@ namespace hpp {
 		 (hpp::model::COLLISION); !itObj.isEnd (); ++itObj) {
             model::CollisionObjectPtr_t obj = model::CollisionObject::create
 	      ((*itObj)->fcl ()->collisionGeometry(), (*itObj)->getTransform (), p + (*itObj)->name ());
-	    problemSolver_->addObstacle (obj, true, true);
+	    problemSolver()->addObstacle (obj, true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
           }
           typedef core::Container <JointAndShapes_t>::ElementMap_t ShapeMap;
@@ -192,7 +200,7 @@ namespace hpp {
                 newShape [i] = M.transform (itT->second[i]);
               shapes.push_back (JointAndShape_t (NULL, newShape));
             }
-            problemSolver_->add (p + it->first, shapes);
+            problemSolver()->add (p + it->first, shapes);
           }
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
@@ -204,7 +212,7 @@ namespace hpp {
         throw (Error)
       {
         try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
           model::JointPtr_t joint (NULL),
             root = robot->rootJoint ();
@@ -236,7 +244,7 @@ namespace hpp {
         throw (Error)
       {
         try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
           model::JointPtr_t joint (NULL),
             root = robot->rootJoint ();
@@ -263,9 +271,9 @@ namespace hpp {
 	throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  JointPtr_t joint =
-            getJointByBodyNameOrThrow (problemSolver_, linkName);
+            getJointByBodyNameOrThrow (problemSolver(), linkName);
 	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
 			       localPosition [5], localPosition [6]);
 	  fcl::Vec3f v (localPosition [0], localPosition [1],
@@ -283,9 +291,9 @@ namespace hpp {
 	throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  JointPtr_t joint =
-            getJointByBodyNameOrThrow (problemSolver_, linkName);
+            getJointByBodyNameOrThrow (problemSolver(), linkName);
 	  fcl::Quaternion3f q (p [3], p [4], p [5], p [6]);
 	  fcl::Vec3f v (p [0], p [1], p [2]);
           model::JointVector_t jointInCollision;
@@ -308,9 +316,9 @@ namespace hpp {
 	throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  JointPtr_t joint =
-            getJointByBodyNameOrThrow (problemSolver_, linkName);
+            getJointByBodyNameOrThrow (problemSolver(), linkName);
 	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
 			       localPosition [5], localPosition [6]);
 	  fcl::Vec3f v (localPosition [0], localPosition [1],
@@ -329,7 +337,7 @@ namespace hpp {
         throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
           GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
           if (!gripper)
             throw Error ("This gripper does not exists.");
@@ -351,7 +359,7 @@ namespace hpp {
         throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver_);
+          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
           HandlePtr_t handle = robot->get <HandlePtr_t> (handleName);
           if (!handle)
             throw Error ("This handle does not exists.");
