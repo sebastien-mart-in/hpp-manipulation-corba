@@ -112,6 +112,13 @@ namespace hpp {
           }
           return jointNames;
         }
+
+        std::list<std::string> toStringList (const Names_t& names) {
+          std::list<std::string> ret;
+          for (CORBA::ULong i = 0; i < names.length(); ++i)
+            ret.push_back (std::string(names[i]));
+          return ret;
+        }
       }
 
       static ConfigurationPtr_t floatSeqToConfig
@@ -371,27 +378,27 @@ namespace hpp {
       }
 
       void Problem::createPlacementConstraint (const char* placName,
-					       const char* surface1,
-					       const char* surface2)
+					       const Names_t& surface1,
+					       const Names_t& surface2)
         throw (hpp::Error)
       {
 	try {
-	  problemSolver()->createPlacementConstraint (placName, surface1,
-						     surface2, 1e-3);
+	  problemSolver()->createPlacementConstraint (placName,
+              toStringList (surface1), toStringList(surface2), 1e-3);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
       }
 
       void Problem::createPrePlacementConstraint (const char* placName,
-					          const char* surface1,
-					          const char* surface2,
+					          const Names_t& surface1,
+					          const Names_t& surface2,
                                                   CORBA::Double width)
         throw (hpp::Error)
       {
 	try {
 	  problemSolver()->createPrePlacementConstraint (placName,
-              surface1, surface2, width, 1e-3);
+              toStringList(surface1), toStringList(surface2), width, 1e-3);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}

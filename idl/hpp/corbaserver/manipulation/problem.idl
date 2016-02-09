@@ -123,16 +123,16 @@ module hpp {
 	/// Create a placement constraint between a shapes of robot and env.
 	///
 	/// \param placementName Name of the numerical constraint,
-	/// \param shapeName Name of the list of shapes as stored in the
+	/// \param shapeName List of names of the list of shapes as stored in the
 	///        Device instance,
-	/// \param envContactName Name of the list of shapes as stored in
+	/// \param envContactName list of names of the list of shapes as stored in
 	///        ProblemSolver instance
 	///
 	/// A placement constraint specifies that surfaces delimited by
 	/// one shape of the robot and one shape of the environment
 	/// should have an intersection of positive area.
         void createPlacementConstraint (in string placementName,
-            in string shapeName, in string envContactName)
+            in Names_t shapeName, in Names_t envContactName)
           raises (Error);
 
 	/// Create a pre-placement constraint between a shapes of robot and env.
@@ -148,7 +148,7 @@ module hpp {
 	/// one shape of the robot and one shape of the environment
 	/// should have an intersection of positive area.
         void createPrePlacementConstraint (in string placementName,
-            in string shapeName, in string envContactName, in double witdh)
+            in Names_t shapeName, in Names_t envContactName, in double witdh)
           raises (Error);
 
         /// Create a QPStaticStability constraints

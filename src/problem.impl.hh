@@ -74,11 +74,11 @@ namespace hpp {
           throw (hpp::Error);
 
         virtual void createPlacementConstraint (const char* placName,
-            const char* shapeName, const char* envContactName)
+            const Names_t& shapeName, const Names_t& envContactName)
 	  throw (hpp::Error);
 
         virtual void createPrePlacementConstraint (const char* placName,
-            const char* shapeName, const char* envContactName,
+            const Names_t& shapeName, const Names_t& envContactName,
             CORBA::Double width)
 	  throw (hpp::Error);
 
