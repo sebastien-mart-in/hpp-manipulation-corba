@@ -19,6 +19,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <boost/foreach.hpp>
+
 #include <hpp/util/debug.hh>
 #include <hpp/util/pointer.hh>
 
@@ -602,10 +604,15 @@ namespace hpp {
             toObjectList (objects, handlesPerObject, shapesPreObject),
             toStringList (envNames)
             );
-        graph_->maxIterations (problemSolver()->maxIterations ());
-        graph_->errorThreshold (problemSolver()->errorThreshold ());
         problemSolver()->constraintGraph (graph_);
         problemSolver()->problem()->constraintGraph (graph_);
+
+        RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver()->roadmap());
+        if (!roadmap)
+          throw Error ("The roadmap is not of type hpp::manipulation::Roadmap.");
+        BOOST_FOREACH (const graph::HistogramPtr_t& h, graph_->histograms()) {
+          roadmap->insertHistogram (h);
+        }
       }
     } // namespace impl
   } // namespace manipulation
