@@ -40,9 +40,12 @@
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/axial-handle.hh>
 
+#include "tools.hh"
+
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      using hpp::corbaserver::toStringList;
       namespace {
         core::ComparisonTypePtr_t stringToComparisonType (const std::string& s, const value_type& thr = 0) {
           // TODO: Comparison type DoubleInequality is omitted because the
@@ -111,13 +114,6 @@ namespace hpp {
             ++iJs;
           }
           return jointNames;
-        }
-
-        std::list<std::string> toStringList (const Names_t& names) {
-          std::list<std::string> ret;
-          for (CORBA::ULong i = 0; i < names.length(); ++i)
-            ret.push_back (std::string(names[i]));
-          return ret;
         }
       }
 
