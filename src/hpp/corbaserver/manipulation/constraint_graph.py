@@ -23,7 +23,7 @@ from subprocess import Popen
 #
 #  Passive joints are information provided to the constraint solver to get
 #  better performance and behavior in the resolution.
-class ConstraintAndPassiveJoints (object):
+class _ConstraintAndPassiveJoints (object):
     def __init__ (self, constraint, passiveJoints):
         self.constraint_ = constraint
         self.passiveJoints_ = passiveJoints
@@ -190,7 +190,7 @@ class ConstraintGraph (object):
     #        computational optimization only.
     def createGrasp (self, name, gripper, handle, passiveJoints = ""):
         self.client.problem.createGrasp (self._(name), gripper, handle)
-        self.grasps [name] = (ConstraintAndPassiveJoints (self._(name),
+        self.grasps [name] = (_ConstraintAndPassiveJoints (self._(name),
                                                           passiveJoints),)
 
     ## Create pre-grasp constraints between robot gripper and object handle
@@ -222,7 +222,7 @@ class ConstraintGraph (object):
     def createPreGrasp (self, name, gripper, handle, passiveJoints = ""):
         self.client.problem.createPreGrasp (self._(name), gripper, handle)
         self.pregrasps [name] = \
-            (ConstraintAndPassiveJoints (self._(name), passiveJoints),)
+            (_ConstraintAndPassiveJoints (self._(name), passiveJoints),)
 
     ## Set the constraints of an edge, a node or the whole graph
     #
