@@ -29,9 +29,12 @@
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/graph.hh>
 #include <hpp/manipulation/graph/edge.hh>
+#include <hpp/manipulation/graph/helper.hh>
 #include <hpp/manipulation/constraint-set.hh>
 
 #include <hpp/corbaserver/manipulation/server.hh>
+
+#include "tools.hh"
 
 namespace hpp {
   namespace manipulation {
@@ -43,6 +46,7 @@ namespace hpp {
       using graph::EdgePtr_t;
       using graph::LevelSetEdgePtr_t;
       using graph::WaypointEdgePtr_t;
+      using hpp::corbaserver::toStringList;
 
       namespace {
         template <typename T> std::string toStr () { return typeid(T).name(); }
@@ -68,6 +72,20 @@ namespace hpp {
             throw Error (ss.str().c_str());
           }
           return comp;
+        }
+
+        std::list<graph::helper::ObjectDef_t> toObjectList (
+            const Names_t& names, const Namess_t& hsPO, const Namess_t& shPO) {
+          using graph::helper::ObjectDef_t;
+          std::list<graph::helper::ObjectDef_t> ret;
+          for (CORBA::ULong i = 0; i < names.length(); ++i) {
+            ret.push_back (ObjectDef_t());
+            ObjectDef_t& od = ret.back ();
+            od.name = names[i];
+            od.handles = toStringList (hsPO[i]);
+            od.shapes = toStringList (shPO[i]);
+          }
+          return ret;
         }
       }
 
@@ -566,6 +584,28 @@ namespace hpp {
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
+      }
+
+      void Graph::autoBuild (
+          const char* graphName,
+          const Names_t& grippers,
+          const Names_t& objects,
+          const Namess_t& handlesPerObject,
+          const Namess_t& shapesPreObject,
+          const Names_t& envNames)
+        throw (hpp::Error)
+      {
+        graph_ = graph::helper::graphBuilder (
+            problemSolver(),
+            graphName,
+            toStringList (grippers),
+            toObjectList (objects, handlesPerObject, shapesPreObject),
+            toStringList (envNames)
+            );
+        graph_->maxIterations (problemSolver()->maxIterations ());
+        graph_->errorThreshold (problemSolver()->errorThreshold ());
+        problemSolver()->constraintGraph (graph_);
+        problemSolver()->problem()->constraintGraph (graph_);
       }
     } // namespace impl
   } // namespace manipulation

@@ -24,6 +24,8 @@
 module hpp {
   module corbaserver {
     module manipulation {
+      typedef sequence <Names_t> Namess_t;
+
       interface Graph {
         /// Initialize the graph of constraints.
         /// \note The composite hpp::manipulation::robot must be completely defined first.
@@ -180,6 +182,13 @@ module hpp {
 
         void setShort (in ID edgeId, in boolean isShort)
           raises (Error);
+
+        void autoBuild (in string graphName,
+            in Names_t grippers, in Names_t objects,
+            in Namess_t handlesPerObject, in Namess_t shapesPreObject,
+            in Names_t envNames)
+          raises (Error);
+
       }; // interface Graph
     }; // module manipulation
   }; // module corbaserver

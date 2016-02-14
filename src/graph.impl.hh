@@ -26,6 +26,7 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      using hpp::corbaserver::manipulation::Namess_t;
       using CORBA::Long;
 
       class Graph : public virtual POA_hpp::corbaserver::manipulation::Graph
@@ -138,6 +139,12 @@ namespace hpp {
             throw (hpp::Error);
 
           virtual void setShort (ID edgeId, CORBA::Boolean isShort)
+            throw (hpp::Error);
+
+          virtual void autoBuild (const char* graphName,
+              const Names_t& grippers, const Names_t& objects,
+              const Namess_t& handlesPerObject, const Namess_t& shapesPreObject,
+              const Names_t& envNames)
             throw (hpp::Error);
 
         private:
