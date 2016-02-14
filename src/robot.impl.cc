@@ -103,7 +103,7 @@ namespace hpp {
               std::string (robotName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
-          robot->didInsertRobot ();
+          robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -139,7 +139,7 @@ namespace hpp {
               std::string (objectName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
-          robot->didInsertRobot ();
+          robot->didInsertRobot (objectName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -159,7 +159,7 @@ namespace hpp {
               std::string (robotName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
-          robot->didInsertRobot ();
+          robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
