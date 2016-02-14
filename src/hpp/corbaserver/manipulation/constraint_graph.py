@@ -52,7 +52,7 @@ class ConstraintGraph (object):
             'svg': ['firefox']
             }
 
-    def __init__ (self, robot, graphName):
+    def __init__ (self, robot, graphName, makeGraph = True):
         self.client = robot.client.manipulation
         self.clientBasic = robot.client.basic
         self.graph = robot.client.manipulation.graph
@@ -61,8 +61,26 @@ class ConstraintGraph (object):
         self.pregrasps = dict ()
         self.nodes = dict ()
         self.edges = dict ()
-        self.graphId = self.graph.createGraph (graphName)
-        self.subGraphId = self.graph.createSubGraph (graphName + "_sg")
+        if makeGraph:
+            self.graphId = self.graph.createGraph (graphName)
+            self.subGraphId = self.graph.createSubGraph (graphName + "_sg")
+        else:
+            # fetch graph
+            try:
+                g = self.graph.getGraph ()
+                self.graphId = g[0].id
+                # self.subGraphId = self.graphId + 1
+                for n in g[1].nodes:
+                    if self.nodes.has_key(n.name):
+                        print "Erasing node", n.name, "id", self.nodes[n.name]
+                    self.nodes[n.name] = n.id
+                for e in g[1].edges:
+                    if self.edges.has_key(e.name):
+                        print "Erasing edge", e.name, "id", self.edges[e.name]
+                    self.edges[e.name] = e.id
+            except:
+                pass
+
         self.textToTex = dict ()
 
     ### Display the current graph.
