@@ -92,6 +92,9 @@ module hpp {
         void getGraph (out GraphComp graph, out GraphElements elmts)
           raises (Error);
 
+        void getEdgeStat (in ID edgeId, out Names_t reasons, out intSeq freqs)
+          raises (Error);
+
         /// Get config projector statistics
         /// \param output config, path object containing the number of success
         ///                       and the number of times a config projector has

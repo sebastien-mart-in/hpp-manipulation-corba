@@ -28,6 +28,37 @@ namespace hpp {
         ret.push_back (std::string(names[i]));
       return ret;
     }
+
+    template <typename InputIt>
+    inline Names_t* toNames_t (InputIt begin, InputIt end) {
+      std::size_t len = std::distance (begin, end);
+      char** nameList = Names_t::allocbuf((CORBA::ULong) len);
+      Names_t *ret = new Names_t ((CORBA::ULong) len, (CORBA::ULong) len, nameList);
+
+      std::size_t i = 0;
+      while (begin != end) {
+        nameList[i] = new char[begin->length ()+1];
+        strcpy (nameList[i], begin->c_str ());
+        ++begin;
+        ++i;
+      }
+      return ret;
+    }
+
+    template <typename InputIt>
+    inline intSeq* toIntSeq (InputIt begin, InputIt end) {
+      std::size_t len = std::distance (begin, end);
+      intSeq* indexes = new intSeq ();
+      indexes->length ((CORBA::ULong) len);
+
+      std::size_t i = 0;
+      while (begin != end) {
+        (*indexes)[i] = *begin;
+        ++begin;
+        ++i;
+      }
+      return indexes;
+    }
   } // namespace corbaserver 
 } // namespace hpp
 

@@ -74,6 +74,10 @@ namespace hpp {
           virtual void getGraph (GraphComp_out graph, GraphElements_out elmts)
             throw (hpp::Error);
 
+          virtual void getEdgeStat (ID edgeId,
+              Names_t_out reasons, intSeq_out freqs)
+            throw (hpp::Error);
+
           virtual bool getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
               ConfigProjStat_out path)
             throw (hpp::Error);

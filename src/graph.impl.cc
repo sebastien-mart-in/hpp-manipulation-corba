@@ -26,6 +26,7 @@
 
 #include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/roadmap.hh>
+#include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node-selector.hh>
 #include <hpp/manipulation/graph/guided-node-selector.hh>
 #include <hpp/manipulation/graph/node.hh>
@@ -49,6 +50,8 @@ namespace hpp {
       using graph::LevelSetEdgePtr_t;
       using graph::WaypointEdgePtr_t;
       using hpp::corbaserver::toStringList;
+      using hpp::corbaserver::toNames_t;
+      using hpp::corbaserver::toIntSeq;
 
       namespace {
         template <typename T> std::string toStr () { return typeid(T).name(); }
@@ -264,6 +267,28 @@ namespace hpp {
           throw Error (e.what());
         }
       }
+
+      void Graph::getEdgeStat (ID edgeId, Names_t_out reasons, intSeq_out freqs)
+        throw (hpp::Error)
+      {
+        if (!graph_) throw Error ("You should create the graph");
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
+        core::PathPlannerPtr_t p = problemSolver()->pathPlanner ();
+        if (!p) throw Error ("There is no planner");
+        ManipulationPlannerPtr_t mp =
+          HPP_DYNAMIC_PTR_CAST (ManipulationPlanner, p);
+        if (!mp) throw Error ("The planner must be a ManipulationPlanner");
+
+        StringList_t errors = ManipulationPlanner::errorList ();
+        ManipulationPlanner::ErrorFreqs_t fes = mp->getEdgeStat (edge);
+
+        Names_t *r_ptr = toNames_t (errors.begin (), errors.end());
+        intSeq *f_ptr = toIntSeq (fes.begin (), fes.end());
+
+        reasons = r_ptr;
+        freqs = f_ptr;
+      }
+
 
       bool Graph::getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
           ConfigProjStat_out path)
