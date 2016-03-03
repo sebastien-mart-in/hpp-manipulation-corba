@@ -69,7 +69,7 @@ class ConstraintGraph (object):
             try:
                 g = self.graph.getGraph ()
                 self.graphId = g[0].id
-                # self.subGraphId = self.graphId + 1
+                self.subGraphId = self.graphId + 1
                 for n in g[1].nodes:
                     if self.nodes.has_key(n.name):
                         print "Erasing node", n.name, "id", self.nodes[n.name]

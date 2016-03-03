@@ -613,7 +613,7 @@ namespace hpp {
 	}
       }
 
-      void Graph::autoBuild (
+      intSeq* Graph::autoBuild (
           const char* graphName,
           const Names_t& grippers,
           const Names_t& objects,
@@ -638,6 +638,10 @@ namespace hpp {
         BOOST_FOREACH (const graph::HistogramPtr_t& h, graph_->histograms()) {
           roadmap->insertHistogram (h);
         }
+        std::vector<int> ids (2);
+        ids[0] = graph_->id();
+        ids[1] = graph_->nodeSelector()->id();
+        return toIntSeq (ids.begin(), ids.end());
       }
     } // namespace impl
   } // namespace manipulation
