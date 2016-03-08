@@ -151,6 +151,12 @@ namespace hpp {
               const Names_t& envNames)
             throw (hpp::Error);
 
+          virtual void setWeight (ID edgeId, const Long weight)
+            throw (hpp::Error);
+
+          virtual Long getWeight (ID edgeId)
+            throw (hpp::Error);
+
         private:
           ProblemSolverPtr_t problemSolver();
           Server* server_;

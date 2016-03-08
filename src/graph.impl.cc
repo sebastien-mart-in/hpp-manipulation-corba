@@ -643,6 +643,28 @@ namespace hpp {
         ids[1] = graph_->nodeSelector()->id();
         return toIntSeq (ids.begin(), ids.end());
       }
+
+      void Graph::setWeight (ID edgeId, const Long weight)
+        throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+        try {
+          edge->from()->updateWeight (edge, weight);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      Long Graph::getWeight (ID edgeId)
+        throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+        try {
+          return edge->from ()->neighbors ().get (edge);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

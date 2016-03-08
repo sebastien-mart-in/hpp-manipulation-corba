@@ -192,6 +192,11 @@ module hpp {
             in Names_t envNames)
           raises (Error);
 
+        void setWeight (in ID edgeID, in long weight)
+          raises (Error);
+
+        long getWeight (in ID edgeID)
+          raises (Error);
       }; // interface Graph
     }; // module manipulation
   }; // module corbaserver
