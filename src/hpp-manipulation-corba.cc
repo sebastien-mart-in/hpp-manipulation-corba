@@ -26,6 +26,7 @@
 #include <hpp/wholebody-step/small-steps.hh>
 
 typedef hpp::core::DiscretizedCollisionChecking DiscretizedCollisionChecking;
+typedef hpp::core::ProblemSolver CPs_t;
 using hpp::core::PathOptimizerBuilder_t;
 
 typedef hpp::corbaServer::Server CorbaServer;
@@ -44,8 +45,8 @@ typedef hpp::manipulation::GraphPathValidation GraphPathValidation;
 int main (int argc, char* argv [])
 {
   ProblemSolverPtr_t problemSolver = new ProblemSolver();
-  problemSolver->add <PathOptimizerBuilder_t> ("Walkgen", SmallSteps::create);
-  problemSolver->add <PathOptimizerBuilder_t> ("Graph-Walkgen",
+  problemSolver->CPs_t::add <PathOptimizerBuilder_t> ("Walkgen", SmallSteps::create);
+  problemSolver->CPs_t::add <PathOptimizerBuilder_t> ("Graph-Walkgen",
       GraphOptimizer::create <SmallSteps>);
 
   CorbaServer corbaServer (problemSolver, argc,

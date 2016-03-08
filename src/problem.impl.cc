@@ -47,6 +47,9 @@ namespace hpp {
     namespace impl {
       using hpp::corbaserver::toStringList;
       namespace {
+        typedef core::ProblemSolver CPs_t;
+        typedef ProblemSolver::ThisC_t PsC_t;
+
         core::ComparisonTypePtr_t stringToComparisonType (const std::string& s, const value_type& thr = 0) {
           // TODO: Comparison type DoubleInequality is omitted because the
           // constructor requires a width parameter.
@@ -185,11 +188,11 @@ namespace hpp {
         } else if (w == "handle") {
           ret = getRobotOrThrow (problemSolver())->getKeys <HandlePtr_t, Ret_t> ();
         } else if (w == "lockedjoint") {
-          ret = problemSolver()->getKeys <core::LockedJointPtr_t, Ret_t> ();
+          ret = problemSolver()->PsC_t::getKeys <core::LockedJointPtr_t, Ret_t> ();
         } else if (w == "robotcontact") {
           ret = getRobotOrThrow (problemSolver())->getKeys <JointAndShapes_t, Ret_t> ();
         } else if (w == "envcontact") {
-          ret = problemSolver()->getKeys <JointAndShapes_t, Ret_t> ();
+          ret = problemSolver()->PsC_t::getKeys <JointAndShapes_t, Ret_t> ();
         } else if (w == "type") {
           ret = boost::assign::list_of ("Gripper") ("Handle")
             ("LockedJoint")("RobotContact")("EnvContact");
@@ -272,7 +275,7 @@ namespace hpp {
 	  vector_t config = floatSeqToVector (value);
 
           LockedJointPtr_t lockedJoint (LockedJoint::create (joint, config));
-          problemSolver()->add <LockedJointPtr_t> (lockedJointName, lockedJoint);
+          problemSolver()->PsC_t::add <LockedJointPtr_t> (lockedJointName, lockedJoint);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
@@ -290,7 +293,7 @@ namespace hpp {
 
           LockedJointPtr_t lockedJoint
             (LockedJoint::create (robot, index, config));
-          problemSolver()->add <LockedJointPtr_t> (lockedDofName, lockedJoint);
+          problemSolver()->PsC_t::add <LockedJointPtr_t> (lockedDofName, lockedJoint);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
@@ -301,7 +304,7 @@ namespace hpp {
       {
         try {
 	  typedef core::Container <JointAndShapes_t>::ElementMap_t ShapeMap;
-	  const ShapeMap& m = problemSolver()->getAll <JointAndShapes_t> ();
+	  const ShapeMap& m = problemSolver()->PsC_t::map <JointAndShapes_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
@@ -351,7 +354,7 @@ namespace hpp {
       {
         try {
 	  const JointAndShapes_t& js =
-            problemSolver()->get <JointAndShapes_t> (name);
+            problemSolver()->PsC_t::get <JointAndShapes_t> (name);
 
           return jointAndShapes (js, indexes, points);
 	} catch (const std::exception& exc) {

@@ -35,6 +35,9 @@ namespace hpp {
   namespace manipulation {
     namespace impl {
       namespace {
+        typedef core::ProblemSolver CPs_t;
+        typedef ProblemSolver::ThisC_t PSC_t;
+
         manipulation::DevicePtr_t createRobot (const std::string& name) {
           manipulation::DevicePtr_t r = manipulation::Device::create (name);
           fcl::Transform3f t; t.setIdentity ();
@@ -187,7 +190,7 @@ namespace hpp {
 	    problemSolver()->addObstacle (obj, true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
           }
-          typedef core::Container <JointAndShapes_t>::ElementMap_t ShapeMap;
+          typedef CPs_t::traits<JointAndShapes_t>::Map_t ShapeMap;
           const ShapeMap& m = object->getAll <JointAndShapes_t> ();
           for (ShapeMap::const_iterator it = m.begin ();
               it != m.end (); it++) {
@@ -200,7 +203,7 @@ namespace hpp {
                 newShape [i] = M.transform (itT->second[i]);
               shapes.push_back (JointAndShape_t (NULL, newShape));
             }
-            problemSolver()->add (p + it->first, shapes);
+            problemSolver()->PSC_t::add (p + it->first, shapes);
           }
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
