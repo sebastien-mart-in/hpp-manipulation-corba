@@ -28,6 +28,8 @@ SET(PROJECT_NAME hpp-manipulation-corba)
 SET(PROJECT_DESCRIPTION "Corba server for manipulation planning")
 SET(PROJECT_URL "")
 
+SET(CLIENT_ONLY FALSE CACHE BOOL "Set to true to install the client only")
+
 SET(CUSTOM_HEADER_DIR hpp/corbaserver/manipulation)
 
 SETUP_PROJECT ()
@@ -35,11 +37,16 @@ SETUP_PROJECT ()
 CONFIG_FILES (include/hpp/corbaserver/manipulation/doc.hh)
 
 SET(${PROJECT_NAME}_HEADERS
-  include/hpp/corbaserver/manipulation/server.hh
   include/hpp/corbaserver/manipulation/client.hh
-  include/hpp/corbaserver/manipulation/fwd.hh
-  ${CMAKE_BINARY_DIR}/include/hpp/corbaserver/manipulation/doc.hh
-)
+  )
+IF (NOT CLIENT_ONLY)
+  SET(${PROJECT_NAME}_HEADERS
+    include/hpp/corbaserver/manipulation/server.hh
+    include/hpp/corbaserver/manipulation/fwd.hh
+    ${CMAKE_BINARY_DIR}/include/hpp/corbaserver/manipulation/doc.hh
+    ${${PROJECT_NAME}_HEADERS}
+    )
+ENDIF (NOT CLIENT_ONLY)
 
 # Activate hpp-util logging if requested
 SET (HPP_DEBUG FALSE CACHE BOOL "trigger hpp-util debug output")
@@ -47,15 +54,19 @@ IF (HPP_DEBUG)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHPP_DEBUG")
 ENDIF()
 
-ADD_DOC_DEPENDENCY("hpp-core >= 3")
-ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
-ADD_REQUIRED_DEPENDENCY("hpp-wholebody-step-corba >= 3 ")
-ADD_REQUIRED_DEPENDENCY("hpp-manipulation")
-ADD_REQUIRED_DEPENDENCY("hpp-manipulation-urdf")
+IF (NOT CLIENT_ONLY)
+  ADD_DOC_DEPENDENCY("hpp-core >= 3")
+  ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
+  ADD_REQUIRED_DEPENDENCY("hpp-wholebody-step-corba >= 3 ")
+  ADD_REQUIRED_DEPENDENCY("hpp-manipulation")
+  ADD_REQUIRED_DEPENDENCY("hpp-manipulation-urdf")
+ENDIF (NOT CLIENT_ONLY)
 ADD_REQUIRED_DEPENDENCY("omniORB4 >= 4.1.4")
 
 ADD_SUBDIRECTORY(src)
 
-PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
+IF (NOT CLIENT_ONLY)
+  PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
+ENDIF (NOT CLIENT_ONLY)
 
 SETUP_PROJECT_FINALIZE()
