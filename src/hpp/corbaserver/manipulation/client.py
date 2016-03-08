@@ -35,7 +35,7 @@ class Client:
   """
   Connect and create clients for hpp-manipulation library.
   """
-  def __init__(self, url = "corbaloc:rir:/NameService"):
+  def __init__(self, url = None):
     """
     Initialize CORBA and create default clients.
     :param url: URL in the IOR, corbaloc, corbalocs, and corbanames formats.
@@ -44,7 +44,10 @@ class Client:
     """
     import sys
     self.orb = CORBA.ORB_init (sys.argv, CORBA.ORB_ID)
-    obj = self.orb.string_to_object (url)
+    if url is None:
+        obj = self.orb.string_to_object (_getIIOPurl())
+    else:
+        obj = self.orb.string_to_object (url)
     self.rootContext = obj._narrow(CosNaming.NamingContext)
     if self.rootContext is None:
         raise CorbaError ('failed to narrow the root context')
@@ -106,3 +109,16 @@ class Client:
             'failed to narrow client for service manipulation')
     self.robot = client
 
+  @staticmethod
+  def _getIIOPurl ():
+      import os
+      host = os.getenv ("HPP_HOST")
+      port = os.getenv ("HPP_PORT")
+      if host is None and port is None:
+          url = "corbaloc:rir:/NameService"
+      else:
+          url = "corbaloc:iiop:" \
+                + host if host is not None else "localhost" \
+                + ":" + port if port is not None else "2809" \
+                + "/NameService"
+      return url
