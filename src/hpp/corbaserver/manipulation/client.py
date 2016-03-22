@@ -20,6 +20,7 @@
 from omniORB import CORBA
 import CosNaming
 
+from hpp.corbaserver.client import _getIIOPurl
 from hpp.corbaserver.manipulation import Graph, Robot, Problem
 
 class CorbaError(Exception):
@@ -108,17 +109,3 @@ class Client:
         raise CorbaError (
             'failed to narrow client for service manipulation')
     self.robot = client
-
-  @staticmethod
-  def _getIIOPurl ():
-      import os
-      host = os.getenv ("HPP_HOST")
-      port = os.getenv ("HPP_PORT")
-      if host is None and port is None:
-          url = "corbaloc:rir:/NameService"
-      else:
-          url = "corbaloc:iiop:" \
-                + host if host is not None else "localhost" \
-                + ":" + port if port is not None else "2809" \
-                + "/NameService"
-      return url
