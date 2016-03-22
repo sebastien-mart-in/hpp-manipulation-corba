@@ -191,7 +191,7 @@ namespace hpp {
 	    hppDout (info, "Adding obstacle " << obj->name ());
           }
           typedef CPs_t::traits<JointAndShapes_t>::Map_t ShapeMap;
-          const ShapeMap& m = object->getAll <JointAndShapes_t> ();
+          const ShapeMap& m = object->map <JointAndShapes_t> ();
           for (ShapeMap::const_iterator it = m.begin ();
               it != m.end (); it++) {
             JointAndShapes_t shapes;

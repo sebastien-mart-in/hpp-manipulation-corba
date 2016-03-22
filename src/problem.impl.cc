@@ -303,7 +303,7 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  typedef core::Container <JointAndShapes_t>::ElementMap_t ShapeMap;
+	  typedef std::map<std::string, JointAndShapes_t> ShapeMap;
 	  const ShapeMap& m = problemSolver()->PsC_t::map <JointAndShapes_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
@@ -327,9 +327,9 @@ namespace hpp {
         throw (hpp::Error)
       {
         try {
-	  typedef core::Container <JointAndShapes_t>::ElementMap_t ShapeMap;
+          typedef std::map<std::string, JointAndShapes_t> ShapeMap;
           DevicePtr_t r = getRobotOrThrow (problemSolver());
-	  const ShapeMap& m = r->getAll <JointAndShapes_t> ();
+	  const ShapeMap& m = r->map <JointAndShapes_t> ();
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
