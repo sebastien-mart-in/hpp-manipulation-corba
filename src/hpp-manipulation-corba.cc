@@ -19,35 +19,20 @@
 #include <hpp/corbaserver/wholebody-step/server.hh>
 #include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/manipulation/problem-solver.hh>
-#include <hpp/manipulation/manipulation-planner.hh>
-#include <hpp/core/discretized-collision-checking.hh>
-#include <hpp/manipulation/graph-path-validation.hh>
-#include <hpp/manipulation/graph-optimizer.hh>
-#include <hpp/wholebody-step/small-steps.hh>
-
-typedef hpp::core::DiscretizedCollisionChecking DiscretizedCollisionChecking;
-typedef hpp::core::ProblemSolver CPs_t;
-using hpp::core::PathOptimizerBuilder_t;
 
 typedef hpp::corbaServer::Server CorbaServer;
 
 typedef hpp::wholebodyStep::Server WholebodyServer;
-typedef hpp::wholebodyStep::SmallSteps SmallSteps;
 
 typedef hpp::manipulation::Server ManipulationServer;
 typedef hpp::manipulation::ProblemSolver ProblemSolver;
 typedef hpp::manipulation::ProblemSolverPtr_t ProblemSolverPtr_t;
 typedef hpp::manipulation::ManipulationPlanner ManipulationPlanner;
 typedef hpp::manipulation::ManipulationPlannerPtr_t ManipulationPlannerPtr_t;
-typedef hpp::manipulation::GraphOptimizer GraphOptimizer;
-typedef hpp::manipulation::GraphPathValidation GraphPathValidation;
 
 int main (int argc, char* argv [])
 {
   ProblemSolverPtr_t problemSolver = new ProblemSolver();
-  problemSolver->CPs_t::add <PathOptimizerBuilder_t> ("Walkgen", SmallSteps::create);
-  problemSolver->CPs_t::add <PathOptimizerBuilder_t> ("Graph-Walkgen",
-      GraphOptimizer::create <SmallSteps>);
 
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), true);
