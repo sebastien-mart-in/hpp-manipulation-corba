@@ -456,8 +456,8 @@ class ProblemSolver (object):
     # \param inPathId rank of the path in the problem
     # \param atDistance : the user parameter choice
     # \return dofseq : the config at param
-    def configAtDistance(self, inPathId, atDistance):
-        return self.client.basic.problem.configAtDistance(inPathId, atDistance)
+    def configAtParam(self, inPathId, atDistance):
+        return self.client.basic.problem.configAtParam(inPathId, atDistance)
 
     ## Get way points of a path
     #  \param pathId rank of the path in the problem
