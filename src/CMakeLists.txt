@@ -51,9 +51,6 @@ ENDFOREACH()
 GENERATE_IDL_PYTHON (hpp/corbaserver/manipulation/common
   ${HPP_CORBASERVER_DATAROOTDIR}/idl/hpp/corbaserver)
 
-ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS})
-ADD_CUSTOM_TARGET(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
-
 IF (NOT CLIENT_ONLY)
   ADD_LIBRARY(${LIBRARY_NAME} SHARED
     ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/gcommon.hh
@@ -74,6 +71,8 @@ IF (NOT CLIENT_ONLY)
     client.cc
     )
 
+  ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS})
+  ADD_CUSTOM_TARGET(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
   ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_cpp)
   ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_python)
 
@@ -91,6 +90,9 @@ IF (NOT CLIENT_ONLY)
   PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-wholebody-step-corba)
 
   INSTALL (TARGETS hpp-manipulation-server DESTINATION ${CMAKE_INSTALL_BINDIR})
+ELSE (NOT CLIENT_ONLY)
+  ADD_CUSTOM_TARGET(generate_idl_cpp ALL DEPENDS ${ALL_IDL_CPP_STUBS})
+  ADD_CUSTOM_TARGET(generate_idl_python ALL DEPENDS ${ALL_IDL_PYTHON_STUBS})
 ENDIF (NOT CLIENT_ONLY)
 
 INSTALL(
