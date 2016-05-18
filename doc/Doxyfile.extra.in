@@ -14,3 +14,5 @@ INPUT		= @CMAKE_SOURCE_DIR@/include \
 FILE_PATTERNS   = *.cc *.cpp \
                   *.hh *.hxx \
 		  *.idl *.py
+
+GENERATE_TREEVIEW	 = @DOXYGEN_TREEVIEW@
