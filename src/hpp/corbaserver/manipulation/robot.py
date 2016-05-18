@@ -202,7 +202,7 @@ class Robot (object):
 
     ## Set static position of joint in its parent frame
     def setJointPosition (self, jointName, position):
-        return self.client.basic.robot.setJointPosition (jointName, position)
+        return self.client.basic.robot.setJointPositionInParentFrame (jointName, position)
 
     ## Get joint number degrees of freedom.
     def getJointNumberDof (self, jointName):
