@@ -62,7 +62,7 @@ namespace hpp {
         template <> std::string toStr <graph::Edge> () { return "Edge"; }
         template <> std::string toStr <graph::Graph> () { return "Graph"; }
         template <> std::string toStr <graph::NodeSelector> () { return "SubGraph"; }
-        template <> std::string toStr <graph::GuidedNodeSelector> () { return "SubGraph"; }
+        template <> std::string toStr <graph::GuidedNodeSelector> () { return "Guided Node Selector"; }
         template <> std::string toStr <graph::LevelSetEdge> () { return "LevelSetEdge"; }
         template <> std::string toStr <graph::WaypointEdge> () { return "WaypointEdge"; }
 
