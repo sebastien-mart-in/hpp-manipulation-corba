@@ -663,7 +663,7 @@ namespace hpp {
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
-          return edge->from ()->neighbors ().get (edge);
+          return edge->from ()->getWeight (edge);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
