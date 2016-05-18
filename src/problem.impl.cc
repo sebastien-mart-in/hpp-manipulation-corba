@@ -39,6 +39,7 @@
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/axial-handle.hh>
+#include <hpp/manipulation/graph-steering-method.hh>
 
 #include "tools.hh"
 
@@ -581,7 +582,13 @@ namespace hpp {
         } catch (std::exception& e ) {
           throw Error (e.what());
         }
-
+	// If steering method is not completely set in the graph, create
+	// one.
+	if (!edge->parentGraph ()->problem ()->steeringMethod () ||
+	    !edge->parentGraph ()->problem ()->steeringMethod ()
+	    ->innerSteeringMethod()) {
+	  problemSolver ()->initSteeringMethod ();
+	}
 	bool success = false;
 	ConfigurationPtr_t q1 = floatSeqToConfig (problemSolver(), qb);
         ConfigurationPtr_t q2 = floatSeqToConfig (problemSolver(), qe);
@@ -602,7 +609,19 @@ namespace hpp {
           problemSolver()->addPath (pv);
 
           core::PathPtr_t projPath;
-          success = problemSolver()->problem()->pathProjector ()->apply (path, projPath);
+	  PathProjectorPtr_t pathProjector
+	    (problemSolver()->problem()->pathProjector ());
+	  if (!pathProjector) {
+	    problemSolver ()->initPathProjector ();
+	    pathProjector =
+	      problemSolver()->problem()->pathProjector ();
+	  }
+	  if (pathProjector) {
+	    success = pathProjector->apply (path, projPath);
+	  } else {
+	    success = true;
+	    projPath = path->copy ();
+	  }
 
           if (!success) {
             if (!projPath || projPath->length () == 0)
