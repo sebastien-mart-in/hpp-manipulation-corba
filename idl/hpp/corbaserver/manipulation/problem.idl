@@ -169,13 +169,15 @@ module hpp {
             out double residualError)
           raises (Error);
 
-        /// Apply constaints to a configuration using Edge::applyConstraints
+        /// Apply constaints to a configuration
         ///
         /// \param IDedge ID of an edge
         /// \param qnear configuration to initiliaze the projector,
         /// \param input input configuration,
         /// \retval output output configuration,
         /// \retval error norm of the residual error.
+	///
+	/// Call method using hpp::manipulation::graph::Edge::applyConstraints.
         boolean applyConstraintsWithOffset (in ID IDedge, in floatSeq qnear, in floatSeq input, out floatSeq output,
             out double residualError)
           raises (Error);

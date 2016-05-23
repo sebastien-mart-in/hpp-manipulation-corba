@@ -431,10 +431,14 @@ class ProblemSolver (object):
 
     ## Make direct connection between two configurations
     #  \param startConfig, endConfig: the configurations to link.
-    #  \throw Error if steering method fails to create a direct path of if
-    #  direct path is not valid
-    def directPath (self, startConfig, endConfig):
-        return self.client.basic.problem.directPath (startConfig, endConfig)
+    #  \param validate whether path should be validated. If true, path
+    #         validation is called and only valid part of path is inserted
+    #         in the path vector.
+    #  \return True if the path is fully valid, false otherwise.
+    #  \return the path index of the collission-free part from startConfig
+    def directPath (self, startConfig, endConfig, validate):
+        return self.client.basic.problem.directPath (startConfig, endConfig,
+                                                     validate)
 
     ## Get Number of paths
     def numberPaths (self):
