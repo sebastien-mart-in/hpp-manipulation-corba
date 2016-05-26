@@ -62,7 +62,7 @@ namespace hpp {
         template <> std::string toStr <graph::Edge> () { return "Edge"; }
         template <> std::string toStr <graph::Graph> () { return "Graph"; }
         template <> std::string toStr <graph::NodeSelector> () { return "SubGraph"; }
-        template <> std::string toStr <graph::GuidedNodeSelector> () { return "SubGraph"; }
+        template <> std::string toStr <graph::GuidedNodeSelector> () { return "Guided Node Selector"; }
         template <> std::string toStr <graph::LevelSetEdge> () { return "LevelSetEdge"; }
         template <> std::string toStr <graph::WaypointEdge> () { return "WaypointEdge"; }
 
@@ -663,7 +663,7 @@ namespace hpp {
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
-          return edge->from ()->neighbors ().get (edge);
+          return edge->from ()->getWeight (edge);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
