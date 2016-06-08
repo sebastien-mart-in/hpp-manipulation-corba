@@ -56,7 +56,7 @@ namespace hpp {
                                    const Long nodeToId,
                                    const char* edgeName,
                                    const Long weight,
-                                   const bool isInNodeFrom)
+                                   const Long isInNodeId)
             throw (hpp::Error);
 
           virtual Long createWaypointEdge (const Long nodeFromId,
@@ -64,7 +64,7 @@ namespace hpp {
                                            const char* edgeBaseName,
                                            const Long number,
                                            const Long weight,
-                                           const bool isInNodeFrom)
+                                           const Long isInNodeId)
             throw (hpp::Error);
 
           virtual void setWaypoint (const ID waypointEdgeId, const Long index,

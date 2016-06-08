@@ -168,36 +168,34 @@ namespace hpp {
         return (Long) node->id ();
       }
 
-      Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
+      Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const Long isInNodeId)
         throw (hpp::Error)
       {
         graph::NodePtr_t from = getComp <graph::Node> (nodeFromId),
-                         to   = getComp <graph::Node> (nodeToId  );
+	  to = getComp <graph::Node> (nodeToId),
+	  isInNode = getComp <graph::Node> (isInNodeId);
 
         EdgePtr_t edge = from->linkTo
           (edgeName, to, (size_type)w, (graph::Node::EdgeFactory)Edge::create);
-
-        if (isInNodeFrom) edge->node (from);
-        else edge->node (to);
+	edge->node (isInNode);
 
         return (Long) edge->id ();
       }
 
       Long Graph::createWaypointEdge(const Long nodeFromId, const Long nodeToId,
           const char* edgeName, const Long nb, const Long w,
-          const bool isInNodeFrom)
+          const Long isInNodeId)
         throw (hpp::Error)
       {
         graph::NodePtr_t from = getComp <graph::Node> (nodeFromId),
-                         to   = getComp <graph::Node> (nodeToId  );
+	  to = getComp <graph::Node> (nodeToId),
+	  isInNode = getComp <graph::Node> (isInNodeId);
 
         EdgePtr_t edge_pc = from->linkTo
           (edgeName, to, (size_type)w,
            (graph::Node::EdgeFactory)WaypointEdge::create);
 
-        if (isInNodeFrom) edge_pc->node (from);
-        else edge_pc->node (to);
-
+        edge_pc->node (isInNode);
         WaypointEdgePtr_t edge = HPP_DYNAMIC_PTR_CAST (WaypointEdge, edge_pc);
 
         edge->nbWaypoints (nb);

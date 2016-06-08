@@ -120,18 +120,36 @@ class ConstraintGraph (object):
     ## \param nodeFrom, nodeTo the extremities of the edge,
     ## \param name name of the edge,
     ## \param weight see note,
-    ## \param isInNodeFrom true if a path corresponding to this edge lies in nodeFrom;
-    ##       this will be automatically set if you leave it.
+    ## \param isInNode name of the node in which paths of the edge are included.
     ## \note The weights define the probability of selecting an edge among all the
     ## outgoing edges of a node. The probability of an edge is \f$ \frac{w_i}{\sum_j{w_j}} \f$,
     ## where each \f$ w_j \f$ corresponds to an outgoing edge from a given node.
     ## To have an edge that cannot be selected by the M-RRT algorithm but is still acceptable,
     ## set its weight to zero.
-    def createEdge (self, nodeFrom, nodeTo, name, weight = 1, isInNodeFrom = None):
-        if isInNodeFrom is None:
-            isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
-        self.edges [name] =\
-            self.graph.createEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, isInNodeFrom)
+    def createEdge (self, nodeFrom, nodeTo, name, weight = 1, isInNode = None):
+        if (type (isInNode) != str) :
+            from warnings import warn
+            warn ("argument isInNode should be of type string")
+            if isInNode is None:
+                isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
+            else:
+                isInNodeFrom = isInNode
+            if isInNodeFrom:
+                isInNode = nodeFrom
+            else:
+                isInNode = nodeTo
+        self.edges [name] = self.graph.createEdge \
+                            (self.nodes[nodeFrom], self.nodes[nodeTo],
+                             self._(name), weight, self.nodes[isInNode])
+        return self.edges [name]
+
+    ## Set in which node an edge is.
+    #  \param edge the edge,
+    #  \param node the node.
+    #  Paths satisfying the edge constraints satisfy the node constraints.
+    def setContainingNode (self, edge, node) :
+        return self.graph.setContainingNode (self.edges [edge],
+                                             self.nodes [node])
 
     ## Get in which node an edge is.
     #  \param edge the edge,
@@ -140,7 +158,7 @@ class ConstraintGraph (object):
         return self.graph.getContainingNode (self.edges [edge])
 
     ### Create a WaypointEdge.
-    ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note,
+    ## \param nodeFrom, nodeTo, name, weight, isInNode see createEdge note,
     ## \param nb number of waypoints,
     ## \note See documentation of class hpp::manipulation::graph::WaypointEdge for more information.
     ##
@@ -150,9 +168,18 @@ class ConstraintGraph (object):
     ## For a finer control of what you are doing, set automaticBuilder to
     ## False.
     def createWaypointEdge (self, nodeFrom, nodeTo, name, nb = 1, weight = 1,
-            isInNodeFrom = None, automaticBuilder = True):
-        if isInNodeFrom is None:
-            isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
+                            isInNode = None, automaticBuilder = True):
+        if (type (isInNode) != str) :
+            from warnings import warn
+            warn ("argument isInNode should be of type string")
+            if isInNode is None:
+                isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
+            else:
+                isInNodeFrom = isInNode
+            if isInNodeFrom:
+                isInNode = nodeFrom
+            else:
+                isInNode = nodeTo
 
         if automaticBuilder:
             n = name + "_e" + str(nb)
@@ -160,13 +187,13 @@ class ConstraintGraph (object):
             n = name
         wid = self.edges[n] = self.graph.createWaypointEdge (
                 self.nodes[nodeFrom], self.nodes[nodeTo], self._(name),
-                nb, weight, isInNodeFrom)
+                nb, weight, self.nodes [isInNode])
 
         if not automaticBuilder:
             return
 
         waypoints = list ()
-        previous = self.nodes[nodeFrom]
+        previous = nodeFrom
         for i in range(nb):
             waypoints.append((name + "_e" + str(i), name + "_n" + str(i)))
             n = waypoints[-1][1]
@@ -174,9 +201,10 @@ class ConstraintGraph (object):
             newN = self.nodes[n] = \
                     self.graph.createNode (self.subGraphId, self._(n), True)
             newE = self.edges[e] = \
-                    self.graph.createEdge (previous, newN, self._(e), -1, isInNodeFrom)
+                    self.createEdge (previous, n, self._(e), -1,
+                                     isInNode)
             self.graph.setWaypoint (wid, i, newE, newN);
-            previous = newN
+            previous = n
 
     ### Create a LevelSetEdge.
     ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note.
@@ -255,10 +283,10 @@ class ConstraintGraph (object):
     #
     ## \param graph set to true if you are defining constraints for every nodes,
     ## \param node edge name of a component of the graph,
-    ## \param grasps list of names of grasp. Each grasp 
+    ## \param grasps list of names of grasp. Each grasp
     ## \param pregrasps list of names of pregrasps
     ## \note Exaclty one of the parameter graph, node and edge must be set.
-    def setConstraints (self, graph = False, node = None, edge = None, 
+    def setConstraints (self, graph = False, node = None, edge = None,
                         grasps = None, pregrasps = None, lockDof = [],
                         numConstraints = [], passiveJoints = [],
                         grasp = None, pregrasp = None):
@@ -347,13 +375,29 @@ class ConstraintGraph (object):
 
         self.graph.setLevelSetFoliation (self.edges [edge], cond_nc, condLJ, param_nc, pdofs, paramLJ)
 
+    ## Print set of constraints relative to a node in a string
+    #
+    #  \param config Configuration,
+    #  \param nodeId id of the node.
+    #  \return string displaying constraints
+    def displayNodeConstraints (self, node) :
+        return self.graph.displayNodeConstraints (self.nodes [node])
+
+    ## Print set of constraints relative to an edge in a string
+    #
+    #  \param config Configuration,
+    #  \param edgeId id of the edge.
+    #  \return string displaying constraints
+    def displayEdgeConstraints (self, edge) :
+        return self.graph.displayEdgeConstraints (self.edges [edge])
+
     ## Add entry to the local dictionnary
     # \param text plain text
     # \param tex its latex translation
     # \sa ConstraintGraph.setTextToTeXTranslation
     def addTextToTeXTranslation (self, text, tex):
         self.textToTex[text] = tex
-    
+
     ## Set the local dictionnary
     # \param textToTex a dictionnary of (plain text, TeX replacment)
     # If the name of a node or an edges is a key of the dictionnary,
