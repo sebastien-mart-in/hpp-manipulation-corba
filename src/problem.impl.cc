@@ -94,7 +94,7 @@ namespace hpp {
               strcpy (nameList[rank], "NONE");
             }
             nbPts += itJs->second.size ();
-            (*indexes)[rank] = nbPts;
+            (*indexes)[rank] = (int) nbPts;
             ++rank;
           }
 
@@ -201,8 +201,10 @@ namespace hpp {
           throw Error ("Type not understood");
         }
 
-        char** nameList = Names_t::allocbuf(ret.size());
-        Names_t *names = new Names_t (ret.size(), ret.size(), nameList);
+        char** nameList = Names_t::allocbuf((CORBA::Long) ret.size());
+        Names_t *names = new Names_t ((CORBA::Long) ret.size(),
+				      (CORBA::Long) ret.size(),
+				      nameList);
         std::size_t i = 0;
         for (Ret_t::const_iterator it = ret.begin (); it != ret.end(); ++it) {
           nameList [i] =
@@ -600,7 +602,7 @@ namespace hpp {
 	  success = edge->build (path, *q1, *q2);
           if (!success) return false;
           pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, path);
-          indexNotProj = problemSolver()->paths ().size ();
+          indexNotProj = (CORBA::Long) problemSolver()->paths ().size ();
           if (!pv) {
             pv = core::PathVector::create (path->outputSize (),
                 path->outputDerivativeSize ());
@@ -628,7 +630,7 @@ namespace hpp {
               return false;
           }
           pv = HPP_DYNAMIC_PTR_CAST (core::PathVector, projPath);
-          indexProj = problemSolver()->paths ().size ();
+          indexProj = (CORBA::Long) problemSolver()->paths ().size ();
           if (!pv) {
             pv = core::PathVector::create (projPath->outputSize (),
                 projPath->outputDerivativeSize ());
