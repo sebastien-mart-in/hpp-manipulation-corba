@@ -430,6 +430,20 @@ namespace hpp {
         }
       }
 
+      char* Graph::getContainingNode (const ID edgeId)
+            throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+        try {
+	  std::string name (edge->node ()->name ());
+	  char* res = new char [name.size () + 1];
+	  strcpy (res, name.c_str ());
+	  return res;
+        } catch (std::exception& err) {
+          throw Error (err.what());
+        }
+      }
+
       void Graph::setNumericalConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames,
           const hpp::Names_t& passiveDofsNames)

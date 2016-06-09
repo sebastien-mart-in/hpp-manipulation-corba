@@ -100,6 +100,9 @@ namespace hpp {
           virtual void setContainingNode (const ID edgeId, const ID nodeId)
             throw (hpp::Error);
 
+          virtual char* getContainingNode (const ID edgeId)
+            throw (hpp::Error);
+
           virtual void setLevelSetFoliation (const Long edgeId,
                                              const hpp::Names_t& condNC,
                                              const hpp::Names_t& condLJ,

@@ -133,6 +133,12 @@ class ConstraintGraph (object):
         self.edges [name] =\
             self.graph.createEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, isInNodeFrom)
 
+    ## Get in which node an edge is.
+    #  \param edge the edge,
+    #  Paths satisfying the edge constraints satisfy the node constraints.
+    def getContainingNode (self, edge) :
+        return self.graph.getContainingNode (self.edges [edge])
+
     ### Create a WaypointEdge.
     ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note,
     ## \param nb number of waypoints,

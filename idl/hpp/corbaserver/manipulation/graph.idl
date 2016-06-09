@@ -68,6 +68,12 @@ module hpp {
         void setContainingNode (in ID edgeId, in ID nodeId)
           raises (Error);
 
+        /// Get in which node an edge is.
+        /// \param edgeId the ID of the edge,
+	/// \return the name of the containing node.
+        string getContainingNode (in ID edgeId)
+          raises (Error);
+
         /// Add an edge with waypoint between two nodes of the graph.
         /// \param nodeFromId, nodeToId the ID of the ends of the new edge.
         /// \param edgeBaseName basename of the new edge.
