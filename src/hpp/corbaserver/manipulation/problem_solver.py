@@ -17,7 +17,11 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-import hpp.corbaserver.wholebody_step
+try:
+    import hpp.corbaserver.wholebody_step
+except ImportError:
+    hpp=None
+    pass
 
 ## Definition of a manipulation planning problem
 #
@@ -28,8 +32,9 @@ import hpp.corbaserver.wholebody_step
 #  goal of this class is to hide them and to expose those that can be
 #  considered as public.
 class ProblemSolver (object):
-    SLIDING = hpp.corbaserver.wholebody_step.Problem.SLIDING
-    ALIGNED_COM = hpp.corbaserver.wholebody_step.Problem.ALIGNED_COM
+    if hpp:
+        SLIDING = hpp.corbaserver.wholebody_step.Problem.SLIDING
+        ALIGNED_COM = hpp.corbaserver.wholebody_step.Problem.ALIGNED_COM
 
     def __init__ (self, robot):
         self.client = robot.client
