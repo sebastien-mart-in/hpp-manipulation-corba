@@ -157,6 +157,18 @@ class ConstraintGraph (object):
     def getContainingNode (self, edge) :
         return self.graph.getContainingNode (self.edges [edge])
 
+    ## Set that an edge is short
+    #  \param edge name of the edge
+    #  \param True or False
+    #
+    #  When an edge is tagged as short, extension along this edge is
+    #  done differently in RRT-like algorithms. Instead of projecting
+    #  a random configuration in the destination node, the
+    #  configuration to extend itself is projected in the destination
+    #  node. This makes the rate of success higher.
+    def setShort (self, edge, isShort) :
+      return self.client.graph.setShort (self.edges [edge], isShort)
+
     ### Create a WaypointEdge.
     ## \param nodeFrom, nodeTo, name, weight, isInNode see createEdge note,
     ## \param nb number of waypoints,
@@ -374,6 +386,61 @@ class ConstraintGraph (object):
                     pdofs.extend (pair.passiveJoints)
 
         self.graph.setLevelSetFoliation (self.edges [edge], cond_nc, condLJ, param_nc, pdofs, paramLJ)
+
+    ## Apply constaints to a configuration
+    #
+    #  \param node name of the node the constraints of which to apply
+    #  \param input input configuration,
+    #  \retval output output configuration,
+    #  \retval error norm of the residual error.
+    def  applyNodeConstraints (self, node,  input) :
+        return self.client.problem.applyConstraints (self.nodes [node],
+                                                     input)
+
+    ## Apply edge constaints to a configuration
+    #
+    #  \param edge name of the edge
+    #  \param qfrom configuration defining the right hand side of the edge
+    #         constraint,
+    #  \param input input configuration,
+    #  \retval output output configuration,
+    #  \retval error norm of the residual error.
+    #
+    #  Compute a configuration in the destination node of the edge,
+    #  reachable from qFrom.
+    def generateTargetConfig (self, edge, qfrom, input) :
+        return self.client.problem.applyConstraintsWithOffset \
+            (self.edges [edge], qfrom, input)
+
+    ## Build a path from qb to qe using the Edge::build.
+    #  \param edge name of the edge to use.
+    #  \param qb configuration at the beginning of the path
+    #  \param qe configuration at the end of the path
+    #  \retval return true if the path is built and fully projected.
+    #  \retval indexNotProj -1 is the path could not be built. The index
+    #                       of the built path (before projection) in the
+    #                       in the ProblemSolver path vector.
+    #  \retval indexProj -1 is the path could not be fully projected. The
+    #                    index of the built path (before projection) in the
+    #                    in the ProblemSolver path vector.
+    #  No path validation is made. The paths can be retrieved using
+    #  corbaserver::Problem::configAtParam
+    def buildAndProjectPath (self, edge, qb, qe) :
+        return self.client.problem.buildAndProjectPath \
+            (self.edges [edge], qb, qe)
+
+    ## Get error of a config with respect to a node constraint
+    #
+    #  \param config Configuration,
+    #  \param node name of the node.
+    #  \retval error the error of the node constraint for the
+    #         configuration
+    #  \return whether the configuration belongs to the node.
+    #  Call method core::ConstraintSet::isSatisfied for the node
+    #  constraints.
+    def getConfigErrorForNode (self, config, nodeId) :
+        return self.client.graph.getConfigErrorForNode \
+          (config, self.nodes [nodeId])
 
     ## Print set of constraints relative to a node in a string
     #
