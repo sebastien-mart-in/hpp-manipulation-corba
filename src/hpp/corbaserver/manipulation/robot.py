@@ -19,7 +19,11 @@
 import warnings
 from hpp import Transform
 from hpp.corbaserver.manipulation import Client as ManipulationClient
-from hpp.corbaserver.wholebody_step import Client as WholebodyStepClient
+try:
+    from hpp.corbaserver.wholebody_step import Client as WholebodyStepClient
+except ImportError:
+    WholebodyStepClient=None
+    pass
 from hpp.corbaserver import Client as BasicClient
 
 ## Corba clients to the various servers
@@ -31,7 +35,8 @@ class CorbaClient:
     def __init__ (self):
         self.basic = BasicClient ()
         self.manipulation = ManipulationClient ()
-        self.wholebodyStep = WholebodyStepClient ()
+        if WholebodyStepClient:
+            self.wholebodyStep = WholebodyStepClient ()
 
 ## Load and handle a composite robot for manipulation planning
 #

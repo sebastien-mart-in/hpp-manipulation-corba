@@ -16,14 +16,16 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <hpp/corbaserver/server.hh>
-#include <hpp/corbaserver/wholebody-step/server.hh>
+#if HPP_MANIPULATION_HAS_WHOLEBODY_STEP
+  #include <hpp/corbaserver/wholebody-step/server.hh>
+#endif
 #include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/manipulation/problem-solver.hh>
 
 typedef hpp::corbaServer::Server CorbaServer;
-
-typedef hpp::wholebodyStep::Server WholebodyServer;
-
+#if HPP_MANIPULATION_HAS_WHOLEBODY_STEP
+  typedef hpp::wholebodyStep::Server WholebodyServer;
+#endif
 typedef hpp::manipulation::Server ManipulationServer;
 typedef hpp::manipulation::ProblemSolver ProblemSolver;
 typedef hpp::manipulation::ProblemSolverPtr_t ProblemSolverPtr_t;
@@ -36,14 +38,18 @@ int main (int argc, char* argv [])
 
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), true);
-  WholebodyServer wbsServer (argc, const_cast<const char**> (argv), true);
-  wbsServer.setProblemSolverMap (corbaServer.problemSolverMap());
+  #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP  
+    WholebodyServer wbsServer (argc, const_cast<const char**> (argv), true);
+    wbsServer.setProblemSolverMap (corbaServer.problemSolverMap());
+  #endif
   ManipulationServer manipServer (argc, const_cast<const char**> (argv), true);
   manipServer.setProblemSolverMap (corbaServer.problemSolverMap());
 
   corbaServer.startCorbaServer ();
-  wbsServer.startCorbaServer ("hpp", "corbaserver",
+  #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP  
+    wbsServer.startCorbaServer ("hpp", "corbaserver",
 				"wholebodyStep", "problem");
+  #endif
   manipServer.startCorbaServer ("hpp", "corbaserver",
 				"manipulation");
   corbaServer.processRequest(true);

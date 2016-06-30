@@ -87,7 +87,11 @@ IF (NOT CLIENT_ONLY)
   TARGET_LINK_LIBRARIES (hpp-manipulation-server ${LIBRARY_NAME})
   PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-manipulation)
   PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-manipulation-urdf)
-  PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-wholebody-step-corba)
+  PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-corbaserver)
+  IF(HPP_MANIPULATION_HAS_WHOLEBODY_STEP)
+    PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-wholebody-step-corba)
+  ENDIF(HPP_MANIPULATION_HAS_WHOLEBODY_STEP)
+
 
   INSTALL (TARGETS hpp-manipulation-server DESTINATION ${CMAKE_INSTALL_BINDIR})
 ELSE (NOT CLIENT_ONLY)
