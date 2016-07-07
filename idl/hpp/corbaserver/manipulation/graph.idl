@@ -140,6 +140,12 @@ module hpp {
         void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames, in Names_t passiveDofsNames)
           raises (Error);
 
+	/// Get the list of numerical constraints applied to a component.
+	/// \param graphComponentId Id of the component.
+	/// \return the list of constraints name.
+	void getNumericalConstraints (in long graphComponentId, out Names_t constraintNames)
+	  raises (Error);
+
         /// Set the numerical constraints for path of a node.
         /// \param nodeId ID of the node.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
