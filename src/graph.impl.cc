@@ -475,6 +475,7 @@ namespace hpp {
 	for (core::NumericalConstraints_t::iterator it = constraints.begin();
 	     it != constraints.end(); ++it) {
 	  names[i] = (*it)->function().name().c_str();
+	  i++;
 	}
       }
 
