@@ -469,12 +469,18 @@ namespace hpp {
 	if (!elmt)
 	  throw Error("The component doesn't exists");
 	core::NumericalConstraints_t constraints = elmt->numericalConstraints();
+	core::LockedJoints_t lockedJoints = elmt->lockedJoints();
 	names = new hpp::Names_t;
-	names->length(constraints.size());
+	names->length(constraints.size() + lockedJoints.size());
 	int i = 0;
 	for (core::NumericalConstraints_t::iterator it = constraints.begin();
 	     it != constraints.end(); ++it) {
 	  names[i] = (*it)->function().name().c_str();
+	  i++;
+	}
+	for (core::LockedJoints_t::iterator it = lockedJoints.begin();
+	     it != lockedJoints.end(); ++it) {
+	  names[i] = std::string("Lock " + (*it)->jointName()).c_str();
 	  i++;
 	}
       }
