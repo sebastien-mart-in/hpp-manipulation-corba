@@ -146,6 +146,12 @@ module hpp {
 	void getNumericalConstraints (in long graphComponentId, out Names_t constraintNames)
 	  raises (Error);
 
+	/// Get the list of locked joints in a component.
+	/// \param graphComponentId Id of the component.
+	/// \return the list of joints name.
+	void getLockedJoints (in long graphComponentId, out Names_t constraintNames)
+	  raises (Error);
+
         /// Set the numerical constraints for path of a node.
         /// \param nodeId ID of the node.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.

@@ -469,15 +469,28 @@ namespace hpp {
 	if (!elmt)
 	  throw Error("The component doesn't exists");
 	core::NumericalConstraints_t constraints = elmt->numericalConstraints();
-	core::LockedJoints_t lockedJoints = elmt->lockedJoints();
 	names = new hpp::Names_t;
-	names->length(constraints.size() + lockedJoints.size());
+	names->length(constraints.size());
 	int i = 0;
 	for (core::NumericalConstraints_t::iterator it = constraints.begin();
 	     it != constraints.end(); ++it) {
 	  names[i] = (*it)->function().name().c_str();
 	  i++;
 	}
+      }
+
+      void Graph::getLockedJoints(const Long graphComponentId, hpp::Names_t_out names)
+	throw(hpp::Error)
+      {
+	if (!graph_)
+	  throw Error("You should create a graph");
+	graph::GraphComponentPtr_t elmt = graph::GraphComponent::get(graphComponentId).lock();
+	if (!elmt)
+	  throw Error("The component doesn't exists");
+	core::LockedJoints_t lockedJoints = elmt->lockedJoints();
+	names = new hpp::Names_t;
+	names->length(lockedJoints.size());
+	int i = 0;
 	for (core::LockedJoints_t::iterator it = lockedJoints.begin();
 	     it != lockedJoints.end(); ++it) {
 	  names[i] = std::string("Lock " + (*it)->jointName()).c_str();
