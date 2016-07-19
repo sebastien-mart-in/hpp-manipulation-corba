@@ -460,6 +460,8 @@ namespace hpp {
 
       void Graph::resetConstraints(const Long graphComponentId) throw (hpp::Error)
       {
+	if (!graph_)
+	  throw Error("You should create a graph");
         graph::GraphComponentPtr_t component = graph::GraphComponent::get(graphComponentId).lock();
         if (!component)
           throw Error ("The ID does not exist.");
