@@ -35,6 +35,8 @@
 #include <hpp/manipulation/graph/helper.hh>
 #include <hpp/manipulation/constraint-set.hh>
 
+#include <hpp/constraints/differentiable-function.hh>
+
 #include <hpp/corbaserver/manipulation/server.hh>
 
 #include "tools.hh"
@@ -456,6 +458,25 @@ namespace hpp {
             throw Error (err.what());
           }
         }
+      }
+
+      void Graph::getNumericalConstraints(const Long graphComponentId, hpp::Names_t_out names)
+	throw(hpp::Error)
+      {
+	if (!graph_)
+	  throw Error("You should create a graph");
+	graph::GraphComponentPtr_t elmt = graph::GraphComponent::get(graphComponentId).lock();
+	if (!elmt)
+	  throw Error("The component doesn't exists");
+	core::NumericalConstraints_t constraints = elmt->numericalConstraints();
+	names = new hpp::Names_t;
+	names->length(constraints.size());
+	int i = 0;
+	for (core::NumericalConstraints_t::iterator it = constraints.begin();
+	     it != constraints.end(); ++it) {
+	  names[i] = (*it)->function().name().c_str();
+	  i++;
+	}
       }
 
       void Graph::resetConstraints(const Long graphComponentId) throw (hpp::Error)

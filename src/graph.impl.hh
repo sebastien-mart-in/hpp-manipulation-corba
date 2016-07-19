@@ -114,6 +114,9 @@ namespace hpp {
                                        const hpp::Names_t& passiveDofsNames)
             throw (hpp::Error);
 
+	  virtual void getNumericalConstraints(const Long elmtId, hpp::Names_t_out names)
+	    throw(hpp::Error);
+
 	  virtual void resetConstraints(const Long graphComponentId) 
 	    throw (hpp::Error);
 
