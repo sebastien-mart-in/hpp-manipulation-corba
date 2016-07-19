@@ -16,6 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <hpp/corbaserver/server.hh>
+#include <hpp/manipulation/package-config.hh>
 #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP
   #include <hpp/corbaserver/wholebody-step/server.hh>
 #endif
