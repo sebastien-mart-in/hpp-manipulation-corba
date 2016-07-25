@@ -474,7 +474,7 @@ namespace hpp {
 	int i = 0;
 	for (core::NumericalConstraints_t::iterator it = constraints.begin();
 	     it != constraints.end(); ++it) {
-	  names[i] = (*it)->function().name().c_str();
+	  (*names)[i] = (*it)->function().name().c_str();
 	  i++;
 	}
       }
@@ -493,7 +493,7 @@ namespace hpp {
 	int i = 0;
 	for (core::LockedJoints_t::iterator it = lockedJoints.begin();
 	     it != lockedJoints.end(); ++it) {
-	  names[i] = std::string("Lock " + (*it)->jointName()).c_str();
+	  (*names)[i] = (*it)->jointName().c_str();
 	  i++;
 	}
       }
