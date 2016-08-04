@@ -35,6 +35,8 @@
 #include <hpp/manipulation/graph/helper.hh>
 #include <hpp/manipulation/constraint-set.hh>
 
+#include <hpp/constraints/differentiable-function.hh>
+
 #include <hpp/corbaserver/manipulation/server.hh>
 
 #include "tools.hh"
@@ -290,7 +292,6 @@ namespace hpp {
         freqs = f_ptr;
       }
 
-
       bool Graph::getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
           ConfigProjStat_out path)
         throw (hpp::Error)
@@ -471,6 +472,56 @@ namespace hpp {
         }
       }
 
+      void Graph::getNumericalConstraints(const Long graphComponentId, hpp::Names_t_out names)
+	throw(hpp::Error)
+      {
+	if (!graph_)
+	  throw Error("You should create a graph");
+	graph::GraphComponentPtr_t elmt = graph::GraphComponent::get(graphComponentId).lock();
+	if (!elmt)
+	  throw Error("The component doesn't exists");
+	core::NumericalConstraints_t constraints = elmt->numericalConstraints();
+	names = new hpp::Names_t;
+	names->length(constraints.size());
+	int i = 0;
+	for (core::NumericalConstraints_t::iterator it = constraints.begin();
+	     it != constraints.end(); ++it) {
+	  (*names)[i] = (*it)->function().name().c_str();
+	  i++;
+	}
+      }
+
+      void Graph::getLockedJoints(const Long graphComponentId, hpp::Names_t_out names)
+	throw(hpp::Error)
+      {
+	if (!graph_)
+	  throw Error("You should create a graph");
+	graph::GraphComponentPtr_t elmt = graph::GraphComponent::get(graphComponentId).lock();
+	if (!elmt)
+	  throw Error("The component doesn't exists");
+	core::LockedJoints_t lockedJoints = elmt->lockedJoints();
+	names = new hpp::Names_t;
+	names->length(lockedJoints.size());
+	int i = 0;
+	for (core::LockedJoints_t::iterator it = lockedJoints.begin();
+	     it != lockedJoints.end(); ++it) {
+	  (*names)[i] = (*it)->jointName().c_str();
+	  i++;
+	}
+      }
+
+      void Graph::resetConstraints(const Long graphComponentId) throw (hpp::Error)
+      {
+	if (!graph_)
+	  throw Error("You should create a graph");
+        graph::GraphComponentPtr_t component = graph::GraphComponent::get(graphComponentId).lock();
+        if (!component)
+          throw Error ("The ID does not exist.");
+
+	component->resetNumericalConstraints();
+	component->resetLockedJoints();
+      }
+
       void Graph::setNumericalConstraintsForPath (const Long nodeId,
           const hpp::Names_t& constraintNames,
           const hpp::Names_t& passiveDofsNames)
@@ -520,6 +571,7 @@ namespace hpp {
       void Graph::getNode (const hpp::floatSeq& dofArray, ID_out output)
         throw (hpp::Error)
       {
+        if (!graph_) throw Error ("There is no graph");
         try {
           vector_t config; config.resize (dofArray.length());
           for (int iDof = 0; iDof < config.size(); iDof++) {
@@ -634,15 +686,23 @@ namespace hpp {
           const Names_t& objects,
           const Namess_t& handlesPerObject,
           const Namess_t& shapesPreObject,
-          const Names_t& envNames)
+          const Names_t& envNames,
+	  const Rules& rulesList)
         throw (hpp::Error)
       {
+	std::vector<graph::helper::Rule> rules(rulesList.length());
+
+	for (int i = 0; i < rulesList.length(); ++i) {
+	  rules[i] = graph::helper::Rule(rulesList[i].gripper.in(), rulesList[i].handle.in(),
+					 rulesList[i].link);
+	}
         graph_ = graph::helper::graphBuilder (
             problemSolver(),
             graphName,
             toStringList (grippers),
             toObjectList (objects, handlesPerObject, shapesPreObject),
-            toStringList (envNames)
+            toStringList (envNames),
+	    rules
             );
         problemSolver()->constraintGraph (graph_);
         problemSolver()->problem()->constraintGraph (graph_);

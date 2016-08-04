@@ -26,6 +26,14 @@ module hpp {
     module manipulation {
       typedef sequence <Names_t> Namess_t;
 
+      /// Describe a rule to link or not, a gripper and a handle.
+      struct Rule {
+	string gripper;
+	string handle;
+	boolean link;
+      };
+      typedef sequence<Rule> Rules;
+
       interface Graph {
         /// Initialize the graph of constraints.
         /// \note The composite hpp::manipulation::robot must be completely defined first.
@@ -128,6 +136,10 @@ module hpp {
         void setLevelSetFoliation (in long edgeId, in Names_t condNC, in Names_t condLJ, in Names_t paramNC, in Names_t paramPassiveJoints, in Names_t paramLJ)
           raises (Error);
 
+	/// Reset the numerical constraints and the locked joints of a component.
+        /// \param graphComponentId ID of the component.
+	void resetConstraints(in long graphComponentId) raises (Error);
+
         /// Set the numerical constraints of a component.
         /// \param graphComponentId ID of the component.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
@@ -136,6 +148,18 @@ module hpp {
         ///       which corresponds to an empty vector of passive dofs.
         void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames, in Names_t passiveDofsNames)
           raises (Error);
+
+	/// Get the list of numerical constraints applied to a component.
+	/// \param graphComponentId Id of the component.
+	/// \return the list of constraints name.
+	void getNumericalConstraints (in long graphComponentId, out Names_t constraintNames)
+	  raises (Error);
+
+	/// Get the list of locked joints in a component.
+	/// \param graphComponentId Id of the component.
+	/// \return the list of joints name.
+	void getLockedJoints (in long graphComponentId, out Names_t constraintNames)
+	  raises (Error);
 
         /// Set the numerical constraints for path of a node.
         /// \param nodeId ID of the node.
@@ -198,7 +222,7 @@ module hpp {
         intSeq autoBuild (in string graphName,
             in Names_t grippers, in Names_t objects,
             in Namess_t handlesPerObject, in Namess_t shapesPreObject,
-            in Names_t envNames)
+	    in Names_t envNames, in Rules rulesList)
           raises (Error);
 
         void setWeight (in ID edgeID, in long weight)
