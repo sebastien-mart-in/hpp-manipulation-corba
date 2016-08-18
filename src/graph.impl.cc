@@ -88,6 +88,21 @@ namespace hpp {
             const Names_t& names, const Namess_t& hsPO, const Namess_t& shPO) {
           using graph::helper::ObjectDef_t;
           std::list<graph::helper::ObjectDef_t> ret;
+	  // Check size of lists
+	  if (hsPO.length () != names.length ()) {
+	    std::ostringstream oss;
+	    oss << "Number of constact lists (" << hsPO.length ()
+		<< ") does not match number of objects (" << names.length ()
+		<< ").";
+	    throw Error (oss.str ().c_str ());
+	  }
+	  if (shPO.length () != names.length ()) {
+	    std::ostringstream oss;
+	    oss << "Number of handle lists (" << shPO.length ()
+		<< ") does not match number of objects (" << names.length ()
+		<< ").";
+	    throw Error (oss.str ().c_str ());
+	  }
           for (CORBA::ULong i = 0; i < names.length(); ++i) {
             ret.push_back (ObjectDef_t());
             ObjectDef_t& od = ret.back ();
