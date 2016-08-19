@@ -405,8 +405,16 @@ class ProblemSolver (object):
         return self.client.basic.problem.lockDof (jointName, value, 0, 0)
 
     ## error threshold in numerical constraint resolution
+    def getErrorThreshold (self):
+        return self.client.basic.problem.getErrorThreshold ()
+
+    ## error threshold in numerical constraint resolution
     def setErrorThreshold (self, threshold):
         return self.client.basic.problem.setErrorThreshold (threshold)
+
+    ## Set the maximal number of iterations
+    def getMaxIterations (self):
+	return self.client.basic.problem.getMaxIterations ()
 
     ## Set the maximal number of iterations
     def setMaxIterations (self, iterations):
