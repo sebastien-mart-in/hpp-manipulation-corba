@@ -34,6 +34,7 @@
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/graph/helper.hh>
 #include <hpp/manipulation/constraint-set.hh>
+#include <hpp/manipulation/graph-steering-method.hh>
 
 #include <hpp/constraints/differentiable-function.hh>
 
@@ -612,6 +613,38 @@ namespace hpp {
             config [iDof] = dofArray[(ULong) iDof];
           }
 	  bool res = graph_->getConfigErrorForNode (config, node, err);
+	  floatSeq* e = new floatSeq ();
+	  e->length ((ULong) err.size ());
+	  for (std::size_t i=0; i < (std::size_t) err.size (); ++i) {
+	    (*e) [(ULong) i] = err [i];
+	  }
+	  error = e;
+	  return res;
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      CORBA::Boolean Graph::getConfigErrorForEdge
+      (ID edgeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
+	throw (hpp::Error)
+      {
+	try {
+	  graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+	  // If steering method is not completely set in the graph, create
+	  // one.
+	  if (!edge->parentGraph ()->problem ()->steeringMethod () ||
+	      !edge->parentGraph ()->problem ()->steeringMethod ()
+	      ->innerSteeringMethod()) {
+	    problemSolver ()->initSteeringMethod ();
+	  }
+	  vector_t err;
+          Configuration_t config; config.resize (dofArray.length());
+          for (std::size_t iDof = 0; iDof < (std::size_t)config.size();
+	       ++iDof) {
+            config [iDof] = dofArray[(ULong) iDof];
+          }
+	  bool res = graph_->getConfigErrorForEdge (config, edge, err);
 	  floatSeq* e = new floatSeq ();
 	  e->length ((ULong) err.size ());
 	  for (std::size_t i=0; i < (std::size_t) err.size (); ++i) {

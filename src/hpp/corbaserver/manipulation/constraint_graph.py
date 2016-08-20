@@ -442,6 +442,20 @@ class ConstraintGraph (object):
         return self.client.graph.getConfigErrorForNode \
           (self.nodes [nodeId], config)
 
+    ## Get error of a config with respect to a edge constraint
+    #
+    #  \param edge name of the edge.
+    #  \param config Configuration,
+    #  \retval error the error of the edge constraint for the
+    #         configuration
+    #  \return whether the configuration belongs to the edge.
+    #  Call methods core::ConfigProjector::rightHandSideFromConfig with
+    #  the input configuration and then core::ConstraintSet::isSatisfied
+    #  on the edge constraints.
+    def getConfigErrorForEdge (self, edgeId, config) :
+        return self.client.graph.getConfigErrorForEdge \
+          (self.edges [edgeId], config)
+
     ## Print set of constraints relative to a node in a string
     #
     #  \param config Configuration,

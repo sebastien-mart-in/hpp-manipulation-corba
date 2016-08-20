@@ -194,6 +194,20 @@ module hpp {
 	boolean getConfigErrorForNode (in ID nodeId, in floatSeq config,
 				       out floatSeq errorVector) raises (Error);
 
+	/// Get error of a config with respect to an edge constraint
+	///
+	/// \param edgeId id of the edge.
+	/// \param config Configuration,
+	/// \retval error the error of the edge constraint for the
+	///        configuration
+	/// \return whether the configuration can be the start point of a
+	///         path of the edge.
+	/// Call methods core::ConfigProjector::rightHandSideFromConfig with
+	/// the input configuration and then core::ConstraintSet::isSatisfied
+	/// on the edge constraints.
+	boolean getConfigErrorForEdge (in ID EdgeId, in floatSeq config,
+				       out floatSeq errorVector) raises (Error);
+
 	/// Print set of constraints relative to a node in a string
 	///
 	/// \param config Configuration,
