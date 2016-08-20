@@ -139,7 +139,7 @@ namespace hpp {
             throw (hpp::Error);
 
 	virtual CORBA::Boolean getConfigErrorForNode
-	(const hpp::floatSeq& dofArray, ID nodeId, hpp::floatSeq_out error)
+	(ID nodeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
 	  throw (hpp::Error);
 
 	virtual void displayNodeConstraints

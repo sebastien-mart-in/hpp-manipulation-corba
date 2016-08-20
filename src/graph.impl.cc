@@ -600,7 +600,7 @@ namespace hpp {
       }
 
       CORBA::Boolean Graph::getConfigErrorForNode
-      (const hpp::floatSeq& dofArray, ID nodeId, hpp::floatSeq_out error)
+      (ID nodeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
 	throw (hpp::Error)
       {
 	graph::NodePtr_t node = getComp <graph::Node> (nodeId);

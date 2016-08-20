@@ -431,16 +431,16 @@ class ConstraintGraph (object):
 
     ## Get error of a config with respect to a node constraint
     #
-    #  \param config Configuration,
     #  \param node name of the node.
+    #  \param config Configuration,
     #  \retval error the error of the node constraint for the
     #         configuration
     #  \return whether the configuration belongs to the node.
     #  Call method core::ConstraintSet::isSatisfied for the node
     #  constraints.
-    def getConfigErrorForNode (self, config, nodeId) :
+    def getConfigErrorForNode (self, nodeId, config) :
         return self.client.graph.getConfigErrorForNode \
-          (config, self.nodes [nodeId])
+          (self.nodes [nodeId], config)
 
     ## Print set of constraints relative to a node in a string
     #

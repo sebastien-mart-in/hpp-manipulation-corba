@@ -184,14 +184,14 @@ module hpp {
 
 	/// Get error of a config with respect to a node constraint
 	///
-	/// \param config Configuration,
 	/// \param nodeId id of the node.
+	/// \param config Configuration,
 	/// \retval error the error of the node constraint for the
 	///        configuration
 	/// \return whether the configuration belongs to the node.
 	/// Call method core::ConstraintSet::isSatisfied for the node
 	/// constraints.
-	boolean getConfigErrorForNode (in floatSeq config, in ID nodeId,
+	boolean getConfigErrorForNode (in ID nodeId, in floatSeq config,
 				       out floatSeq errorVector) raises (Error);
 
 	/// Print set of constraints relative to a node in a string
