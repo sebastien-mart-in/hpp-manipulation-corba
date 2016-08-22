@@ -57,6 +57,32 @@ namespace hpp {
       using hpp::corbaserver::toIntSeq;
 
       namespace {
+	static Configuration_t floatSeqToConfig
+	(hpp::manipulation::ProblemSolverPtr_t problemSolver,
+	 const hpp::floatSeq& dofArray)
+	{
+	  size_type configDim = (size_type)dofArray.length();
+	  Configuration_t config (configDim);
+
+	  // Get robot in hppPlanner object.
+	  DevicePtr_t robot = problemSolver->robot ();
+
+	  // Compare size of input array with number of degrees of freedom of
+	  // robot.
+	  if (configDim != robot->configSize ()) {
+	    hppDout (error, "robot nb dof=" << configDim <<
+		     " is different from config size=" << robot->configSize());
+	    throw std::runtime_error
+	      ("robot nb dof is different from config size");
+	  }
+
+	  // Fill dof vector with dof array.
+	  for (size_type iDof=0; iDof < configDim; ++iDof) {
+	    config [iDof] = dofArray [(ULong) iDof];
+	  }
+	  return config;
+	}
+
         typedef core::ProblemSolver CPs_t;
         typedef ProblemSolver::ThisC_t PsC_t;
 
@@ -589,10 +615,8 @@ namespace hpp {
       {
         if (!graph_) throw Error ("There is no graph");
         try {
-          vector_t config; config.resize (dofArray.length());
-          for (int iDof = 0; iDof < config.size(); iDof++) {
-            config [iDof] = dofArray[iDof];
-          }
+          Configuration_t config (floatSeqToConfig (problemSolver (),
+						    dofArray));
           graph::NodePtr_t node = graph_->getNode (config);
           output = (Long) node->id();
         } catch (std::exception& e) {
@@ -607,11 +631,8 @@ namespace hpp {
 	graph::NodePtr_t node = getComp <graph::Node> (nodeId);
 	try {
 	  vector_t err;
-          Configuration_t config; config.resize (dofArray.length());
-          for (std::size_t iDof = 0; iDof < (std::size_t)config.size();
-	       ++iDof) {
-            config [iDof] = dofArray[(ULong) iDof];
-          }
+          Configuration_t config (floatSeqToConfig (problemSolver (),
+						    dofArray));
 	  bool res = graph_->getConfigErrorForNode (config, node, err);
 	  floatSeq* e = new floatSeq ();
 	  e->length ((ULong) err.size ());
@@ -639,11 +660,8 @@ namespace hpp {
 	    problemSolver ()->initSteeringMethod ();
 	  }
 	  vector_t err;
-          Configuration_t config; config.resize (dofArray.length());
-          for (std::size_t iDof = 0; iDof < (std::size_t)config.size();
-	       ++iDof) {
-            config [iDof] = dofArray[(ULong) iDof];
-          }
+          Configuration_t config (floatSeqToConfig (problemSolver (),
+						    dofArray));
 	  bool res = graph_->getConfigErrorForEdge (config, edge, err);
 	  floatSeq* e = new floatSeq ();
 	  e->length ((ULong) err.size ());
@@ -672,16 +690,10 @@ namespace hpp {
 	    problemSolver ()->initSteeringMethod ();
 	  }
 	  vector_t err;
-          Configuration_t leafConfig; leafConfig.resize (leafDofArray.length());
-          for (std::size_t iDof = 0; iDof < (std::size_t)leafConfig.size();
-	       ++iDof) {
-            leafConfig [iDof] = leafDofArray[(ULong) iDof];
-          }
-          Configuration_t config; config.resize (dofArray.length());
-          for (std::size_t iDof = 0; iDof < (std::size_t)config.size();
-	       ++iDof) {
-            config [iDof] = dofArray[(ULong) iDof];
-          }
+          Configuration_t leafConfig (floatSeqToConfig (problemSolver (),
+							leafDofArray));
+          Configuration_t config (floatSeqToConfig (problemSolver (),
+						    dofArray));
 	  bool res = graph_->getConfigErrorForEdgeLeaf
 	    (leafConfig, config, edge, err);
 	  floatSeq* e = new floatSeq ();
