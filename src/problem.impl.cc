@@ -543,11 +543,12 @@ namespace hpp {
           else
             success = edge->applyConstraints (*qoffset, *config);
 
-          ConstraintSetPtr_t constraint =
-            problemSolver()->constraintGraph ()->configConstraint (edge);
-	  if (hpp::core::ConfigProjectorPtr_t configProjector =
-	      constraint ->configProjector ()) {
+	  hpp::core::ConfigProjectorPtr_t configProjector
+	    (edge->configConstraint ()->configProjector ());
+	  if (configProjector) {
 	    residualError = configProjector->residualError ();
+	  } else {
+	    hppDout (info, "No config projector.");
 	  }
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());

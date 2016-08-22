@@ -456,6 +456,21 @@ class ConstraintGraph (object):
         return self.client.graph.getConfigErrorForEdge \
           (self.edges [edgeId], config)
 
+    ## Get error of a config with respect to an edge foliation leaf
+    #
+    #  \param edgeId id of the edge.
+    #  \param leafConfig Configuration that determines the foliation leaf,
+    #  \param config Configuration the error of which is computed
+    #  \retval error the error
+    #  \return whether config can be the end point of a path of the edge
+    #          starting at leafConfig
+    #  Call methods core::ConfigProjector::rightHandSideFromConfig with
+    #  leafConfig and then core::ConstraintSet::isSatisfied with config.
+    #  on the edge constraints.
+    def getConfigErrorForEdgeLeaf (self, edgeId, leafConfig, config) :
+        return self.client.graph.getConfigErrorForEdgeLeaf \
+            (edgeId, leafConfig, config)
+
     ## Print set of constraints relative to a node in a string
     #
     #  \param config Configuration,
