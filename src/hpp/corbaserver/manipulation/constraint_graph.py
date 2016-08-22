@@ -469,7 +469,7 @@ class ConstraintGraph (object):
     #  on the edge constraints.
     def getConfigErrorForEdgeLeaf (self, edgeId, leafConfig, config) :
         return self.client.graph.getConfigErrorForEdgeLeaf \
-            (edgeId, leafConfig, config)
+            (self.edges[edgeId], leafConfig, config)
 
     ## Print set of constraints relative to a node in a string
     #
