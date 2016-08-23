@@ -235,7 +235,16 @@ module hpp {
 	///
 	/// \param config Configuration,
 	/// \param edgeId id of the edge.
-	/// \return string displaying constraints
+	/// \return string displaying constraints of the edge and of the target
+	///         node
+	void displayEdgeTargetConstraints (in ID edgeId, out string constraints)
+	  raises (Error);
+
+	/// Print set of constraints relative to an edge in a string
+	///
+	/// \param config Configuration,
+	/// \param edgeId id of the edge.
+	/// \return string displaying path constraints of the edge
 	void displayEdgeConstraints (in ID edgeId, out string constraints)
 	  raises (Error);
 

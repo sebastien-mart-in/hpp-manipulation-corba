@@ -719,11 +719,21 @@ namespace hpp {
 	constraints = oss.str ().c_str ();
       }
 
-      void Graph::displayEdgeConstraints
+      void Graph::displayEdgeTargetConstraints
       (hpp::ID edgeId, CORBA::String_out constraints) throw (Error)
       {
 	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	ConstraintSetPtr_t cs (graph_->configConstraint (edge));
+	std::ostringstream oss;
+	oss << (*cs);
+	constraints = oss.str ().c_str ();
+      }
+
+      void Graph::displayEdgeConstraints
+      (hpp::ID edgeId, CORBA::String_out constraints) throw (Error)
+      {
+	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+	ConstraintSetPtr_t cs (graph_->pathConstraint (edge));
 	std::ostringstream oss;
 	oss << (*cs);
 	constraints = oss.str ().c_str ();

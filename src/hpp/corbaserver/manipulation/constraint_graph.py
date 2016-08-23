@@ -516,10 +516,18 @@ class ConstraintGraph (object):
     #
     #  \param config Configuration,
     #  \param edgeId id of the edge.
-    #  \return string displaying constraints
+    #  \return string displaying path constraints of the edge
     def displayEdgeConstraints (self, edge) :
         return self.graph.displayEdgeConstraints (self.edges [edge])
 
+    ## Print set of constraints relative to an edge in a string
+    #
+    #  \param config Configuration,
+    #  \param edgeId id of the edge.
+    #  \return string displaying constraints of the edge and of the target
+    #          node
+    def displayEdgeTargetConstraints (self, edge) :
+        return self.graph.displayEdgeTargetConstraints (self.edges [edge])
     ##
     # \}
 
