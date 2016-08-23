@@ -334,6 +334,28 @@ namespace hpp {
         freqs = f_ptr;
       }
 
+      Long Graph::getFrequencyOfNodeInRoadmap (ID nodeId, intSeq_out freqPerConnectedComponent)
+        throw (hpp::Error)
+      {
+        if (!graph_) throw Error ("You should create the graph");
+        graph::NodePtr_t node = getComp <graph::Node> (nodeId, true);
+        // Long nb = graph_->nodeHistogram()->freq(graph::NodeBin(node));
+        Long nb = 0;
+        const core::ConnectedComponents_t& ccs = problemSolver()->roadmap ()->connectedComponents();
+        core::ConnectedComponents_t::const_iterator _cc;
+        std::vector<std::size_t> freqs;
+        for (_cc = ccs.begin(); _cc != ccs.end(); ++_cc) {
+          manipulation::ConnectedComponentPtr_t cc =
+            HPP_DYNAMIC_PTR_CAST(manipulation::ConnectedComponent, *_cc);
+          if (!cc)
+            throw Error ("Connected component is not of the right type.");
+          freqs.push_back(cc->getRoadmapNodes(node).size());
+          nb += freqs.back();
+        }
+        freqPerConnectedComponent = toIntSeq(freqs.begin(), freqs.end());
+        return nb;
+      }
+
       bool Graph::getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
           ConfigProjStat_out path)
         throw (hpp::Error)
