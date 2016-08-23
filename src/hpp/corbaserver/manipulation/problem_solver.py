@@ -34,7 +34,12 @@ except ImportError:
 class ProblemSolver (object):
     if hpp:
         SLIDING = hpp.corbaserver.wholebody_step.Problem.SLIDING
-        ALIGNED_COM = hpp.corbaserver.wholebody_step.Problem.ALIGNED_COM
+        SLIDING_ALIGNED_COM = \
+            hpp.corbaserver.wholebody_step.Problem.SLIDING_ALIGNED_COM
+        FIXED_ON_THE_GROUND = \
+            hpp.corbaserver.wholebody_step.Problem.FIXED_ON_THE_GROUND
+        FIXED_ALIGNED_COM = \
+            hpp.corbaserver.wholebody_step.Problem.FIXED_ALIGNED_COM
 
     def __init__ (self, robot):
         self.client = robot.client
@@ -158,12 +163,19 @@ class ProblemSolver (object):
                                         constraintName + "/relative-position",
                                         constraintName + "/orientation-left-foot",
                                         constraintName + "/position-left-foot"]
-        elif type == self.ALIGNED_COM:
-            self.balanceConstraints_ = [constraintName + "/com-between-feet",
-                                        constraintName + "/orientation-right",
-                                        constraintName + "/orientation-left",
-                                        constraintName + "/position-right",
-                                        constraintName + "/position-left"]
+        elif type == self.SLIDING_ALIGNED_COM:
+            self.balanceConstraints_ = [constraintName + '/com-between-feet',
+                                        constraintName + '/pose-left-foot',
+                                        constraintName + '/pose-right-foot']
+        elif type == self.FIXED_ON_THE_GROUND:
+            self.balanceConstraints_ = [constraintName + '/pose-left-foot',
+                                        constraintName + '/pose-right-foot',
+                                        constraintName + '/relative-com']
+
+        elif type == self.FIXED_ALIGNED_COM:
+            self.balanceConstraints_ = [constraintName + '/com-between-feet',
+                                        constraintName + '/pose-left-foot',
+                                        constraintName + '/pose-right-foot']
 
 
     ##  Create complement of static stability constraints
