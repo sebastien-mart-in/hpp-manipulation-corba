@@ -157,6 +157,10 @@ namespace hpp {
 	virtual void displayEdgeConstraints
 	(hpp::ID edgeId, CORBA::String_out constraints) throw (Error);
 
+	virtual void getNodesConnectedByEdge
+	(hpp::ID edgeId, CORBA::String_out from, CORBA::String_out to)
+	  throw (Error);
+
           virtual void display (const char* filename)
             throw (hpp::Error);
 

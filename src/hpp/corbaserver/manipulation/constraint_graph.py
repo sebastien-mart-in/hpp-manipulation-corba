@@ -412,6 +412,14 @@ class ConstraintGraph (object):
             viewCmd.append (pdfOut + '.' + format)
             Popen (viewCmd)
 
+    ## Get nodes connected by an edge
+    #
+    #  \param edge name of the edge
+    #  \param from name of the node the edge starts from,
+    #  \param to name of the node the edge finishes in.
+    def getNodesConnectedByEdge (self, edge):
+        return self.client.graph.getNodesConnectedByEdge (self.edges [edge])
+
     ## Apply constaints to a configuration
     #
     #  \param node name of the node the constraints of which to apply

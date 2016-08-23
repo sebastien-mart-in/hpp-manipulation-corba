@@ -729,6 +729,15 @@ namespace hpp {
 	constraints = oss.str ().c_str ();
       }
 
+       void Graph::getNodesConnectedByEdge
+       (hpp::ID edgeId, CORBA::String_out from, CORBA::String_out to)
+	 throw (Error)
+       {
+	 graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+	 from = edge->from ()->name ().c_str ();
+	 to = edge->to ()->name ().c_str ();
+       }
+
       void Graph::display (const char* filename)
         throw (hpp::Error)
       {

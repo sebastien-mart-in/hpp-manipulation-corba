@@ -239,6 +239,14 @@ module hpp {
 	void displayEdgeConstraints (in ID edgeId, out string constraints)
 	  raises (Error);
 
+	/// Get nodes connected by an edge
+	///
+	/// \param edgeId id of the edge
+	/// \param from name of the node the edge starts from,
+	/// \param to name of the node the edge finishes in.
+	void getNodesConnectedByEdge (in ID edgeId, out string from,
+				      out string to) raises (Error);
+
         void display (in string filename)
           raises (Error);
 
