@@ -83,27 +83,8 @@ class ConstraintGraph (object):
 
         self.textToTex = dict ()
 
-    ### Display the current graph.
-    ## The graph is printed in DOT format. Command dot must be
-    ## available.
-    ## \param dotOut full path of the generated DOT file.
-    ## \param pdfOut fill path of the generated PDF document.
-    ## \param openPDF set to False if you just want to generate the PDF.
-    ## \note DOT and PDF files will be overwritten and are not automatically
-    ## deleted so you can keep them.
-    def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph', format = 'pdf', open = True):
-        self.graph.display (dotOut)
-        if not self.cmdDot.has_key (format):
-            raise TypeError ("This format is not supported. See member cmdDot for supported format.")
-        dotCmd = self.cmdDot [format]
-        dotCmd.append ('-o' + pdfOut + '.' + format)
-        dotCmd.append (dotOut)
-        dot = Popen (dotCmd)
-        dot.wait ()
-        if open and self.cmdViewer.has_key (format):
-            viewCmd = self.cmdViewer [format]
-            viewCmd.append (pdfOut + '.' + format)
-            Popen (viewCmd)
+    ##
+    # \name Building the constraint graph
 
     ### Create one or several node
     ## \param node name (resp. list of names) of the node(s) to be created.
@@ -387,6 +368,50 @@ class ConstraintGraph (object):
 
         self.graph.setLevelSetFoliation (self.edges [edge], cond_nc, condLJ, param_nc, pdofs, paramLJ)
 
+    ## Add entry to the local dictionnary
+    # \param text plain text
+    # \param tex its latex translation
+    # \sa ConstraintGraph.setTextToTeXTranslation
+    def addTextToTeXTranslation (self, text, tex):
+        self.textToTex[text] = tex
+
+    ## Set the local dictionnary
+    # \param textToTex a dictionnary of (plain text, TeX replacment)
+    # If the name of a node or an edges is a key of the dictionnary,
+    # it is replaced by the corresponding value.
+    def setTextToTeXTranslation (self, textToTex):
+        if type (textToTex) is not dict:
+            raise TypeError ("Argument textToTex must be a dictionnary.")
+        self.textToTex = textToTex
+
+    ##
+    # \}
+
+    ##
+    # \name Working with the constraint graph
+
+    ### Display the current graph.
+    ## The graph is printed in DOT format. Command dot must be
+    ## available.
+    ## \param dotOut full path of the generated DOT file.
+    ## \param pdfOut fill path of the generated PDF document.
+    ## \param openPDF set to False if you just want to generate the PDF.
+    ## \note DOT and PDF files will be overwritten and are not automatically
+    ## deleted so you can keep them.
+    def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph', format = 'pdf', open = True):
+        self.graph.display (dotOut)
+        if not self.cmdDot.has_key (format):
+            raise TypeError ("This format is not supported. See member cmdDot for supported format.")
+        dotCmd = self.cmdDot [format]
+        dotCmd.append ('-o' + pdfOut + '.' + format)
+        dotCmd.append (dotOut)
+        dot = Popen (dotCmd)
+        dot.wait ()
+        if open and self.cmdViewer.has_key (format):
+            viewCmd = self.cmdViewer [format]
+            viewCmd.append (pdfOut + '.' + format)
+            Popen (viewCmd)
+
     ## Apply constaints to a configuration
     #
     #  \param node name of the node the constraints of which to apply
@@ -487,6 +512,11 @@ class ConstraintGraph (object):
     def displayEdgeConstraints (self, edge) :
         return self.graph.displayEdgeConstraints (self.edges [edge])
 
+    ##
+    # \}
+
+    ##
+    # \name Automatic building
     @staticmethod
     ## Build a graph
     # \return a Initialized ConstraintGraph object
@@ -495,21 +525,8 @@ class ConstraintGraph (object):
                 (name, grippers, objects, handlesPerObjects, shapesPerObjects, envNames, rules)
         return ConstraintGraph (robot, name, makeGraph = False);
 
-    ## Add entry to the local dictionnary
-    # \param text plain text
-    # \param tex its latex translation
-    # \sa ConstraintGraph.setTextToTeXTranslation
-    def addTextToTeXTranslation (self, text, tex):
-        self.textToTex[text] = tex
-
-    ## Set the local dictionnary
-    # \param textToTex a dictionnary of (plain text, TeX replacment)
-    # If the name of a node or an edges is a key of the dictionnary,
-    # it is replaced by the corresponding value.
-    def setTextToTeXTranslation (self, textToTex):
-        if type (textToTex) is not dict:
-            raise TypeError ("Argument textToTex must be a dictionnary.")
-        self.textToTex = textToTex
+    ##
+    # \}
 
     ## get the textToTex translation
     def _ (self, text):
