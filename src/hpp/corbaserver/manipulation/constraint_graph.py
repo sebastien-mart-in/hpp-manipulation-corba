@@ -368,6 +368,19 @@ class ConstraintGraph (object):
 
         self.graph.setLevelSetFoliation (self.edges [edge], cond_nc, condLJ, param_nc, pdofs, paramLJ)
 
+    ## Get weight of an edge
+    #
+    def getWeight (self, edge):
+        return self.client.graph.getWeight (self.edges [edge])
+
+    ## Set weight of an edge
+    #
+    def setWeight (self, edge, weight):
+        if self.client.graph.getWeight (self.edges [edge]) == -1:
+            raise RuntimeError ('You cannot set weight for "' + edge +
+                                '". Perhaps it is a waypoint edge ?')
+        return self.client.graph.setWeight (self.edges [edge], weight)
+
     ## Add entry to the local dictionnary
     # \param text plain text
     # \param tex its latex translation
