@@ -439,10 +439,6 @@ namespace hpp {
           }
 
           edge->buildHistogram ();
-          RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver()->roadmap());
-          if (!roadmap)
-            throw Error ("The roadmap is not of type hpp::manipulation::Roadmap.");
-          roadmap->insertHistogram (edge->histogram ());
         } catch (std::exception& err) {
           throw Error (err.what());
         }
@@ -826,12 +822,6 @@ namespace hpp {
         problemSolver()->constraintGraph (graph_);
         problemSolver()->problem()->constraintGraph (graph_);
 
-        RoadmapPtr_t roadmap = HPP_DYNAMIC_PTR_CAST (Roadmap, problemSolver()->roadmap());
-        if (!roadmap)
-          throw Error ("The roadmap is not of type hpp::manipulation::Roadmap.");
-        BOOST_FOREACH (const graph::HistogramPtr_t& h, graph_->histograms()) {
-          roadmap->insertHistogram (h);
-        }
         std::vector<int> ids (2);
         ids[0] = graph_->id();
         ids[1] = graph_->nodeSelector()->id();
