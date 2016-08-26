@@ -41,29 +41,24 @@ namespace hpp {
         typedef core::ProblemSolver CPs_t;
         typedef ProblemSolver::ThisC_t PSC_t;
 
-        manipulation::DevicePtr_t createRobot (const std::string& name) {
-          manipulation::DevicePtr_t r = manipulation::Device::create (name);
-          fcl::Transform3f t; t.setIdentity ();
-          model::ObjectFactory of;
-          JointPtr_t rj = of.createJointAnchor (t);
-          rj->name ("base_joint");
-          r->rootJoint (rj);
+        DevicePtr_t createRobot (const std::string& name) {
+          DevicePtr_t r = Device::create (name);
           return r;
         }
 
-        manipulation::DevicePtr_t getOrCreateRobot (ProblemSolver* p,
+        DevicePtr_t getOrCreateRobot (ProblemSolver* p,
             const std::string& name = "Robot")
         {
-          manipulation::DevicePtr_t r = p->robot ();
+          DevicePtr_t r = p->robot ();
           if (r) return r;
           r = createRobot (name);
           p->robot (r);
           return r;
         }
 
-        manipulation::DevicePtr_t getRobotOrThrow (ProblemSolver* p)
+        DevicePtr_t getRobotOrThrow (ProblemSolver* p)
         {
-          manipulation::DevicePtr_t r = p->robot ();
+          DevicePtr_t r = p->robot ();
           if (!r) throw hpp::Error ("Robot not found.");
           return r;
         }
@@ -71,7 +66,7 @@ namespace hpp {
         JointPtr_t getJointByBodyNameOrThrow (ProblemSolver* p,
             const std::string& n)
         {
-          manipulation::DevicePtr_t r = getRobotOrThrow (p);
+          DevicePtr_t r = getRobotOrThrow (p);
           JointPtr_t j = r->getJointByBodyName (n);
           if (!j) throw hpp::Error ("Joint not found.");
           return j;
@@ -103,9 +98,9 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          robot->prepareInsertRobot ();
-	  manipulation::srdf::loadRobotModel (robot, robot->rootJoint (),
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+          // robot->prepareInsertRobot ();
+	  srdf::loadRobotModel (robot, 0,
               std::string (robotName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
@@ -122,8 +117,8 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver());
-	  manipulation::srdf::addRobotSRDFModel (robot, std::string (robotName),
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+	  srdf::addRobotSRDFModel (robot, std::string (robotName),
               std::string (packageName), std::string (modelName),
               std::string (srdfSuffix));
           problemSolver()->resetProblem ();
@@ -139,9 +134,9 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          robot->prepareInsertRobot ();
-          manipulation::srdf::loadObjectModel (robot, robot->rootJoint (),
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+          // robot->prepareInsertRobot ();
+          srdf::loadObjectModel (robot, 0,
               std::string (objectName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
@@ -159,9 +154,9 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          robot->prepareInsertRobot ();
-	  manipulation::srdf::loadHumanoidModel (robot, robot->rootJoint (),
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+          // robot->prepareInsertRobot ();
+	  srdf::loadHumanoidModel (robot, 0,
               std::string (robotName), std::string (rootJointType),
               std::string (packageName), std::string (modelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
@@ -178,21 +173,27 @@ namespace hpp {
 	throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t object =
-            manipulation::Device::create (std::string (envModelName));
-          manipulation::srdf::loadEnvironmentModel (object,
+          DevicePtr_t object =
+            Device::create (std::string (envModelName));
+          srdf::loadEnvironmentModel (object,
               std::string (package), std::string (envModelName),
               std::string (urdfSuffix), std::string (srdfSuffix));
           std::string p (prefix);
+          object->controlComputation(Device::JOINT_POSITION);
+          object->computeForwardKinematics();
+          object->updateGeometryPlacements();
 
 	  // Detach objects from joints
-	  for (model::ObjectIterator itObj = object->objectIterator
-		 (hpp::model::COLLISION); !itObj.isEnd (); ++itObj) {
-            model::CollisionObjectPtr_t obj = model::CollisionObject::create
-	      ((*itObj)->fcl ()->collisionGeometry(), (*itObj)->getTransform (), p + (*itObj)->name ());
-	    problemSolver()->addObstacle (obj, true, true);
+          using pinocchio::DeviceObjectVector;
+          DeviceObjectVector& objects = object->objectVector();
+          for (DeviceObjectVector::iterator itObj = objects.begin();
+              itObj != objects.end(); ++itObj) {
+            problemSolver()->addObstacle (
+                std::string (prefix) + (*itObj)->name (),
+                *(*itObj)->fcl (),
+                true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
-          }
+	  }
           typedef CPs_t::traits<JointAndShapes_t>::Map_t ShapeMap;
           const ShapeMap& m = object->map <JointAndShapes_t> ();
           for (ShapeMap::const_iterator it = m.begin ();
@@ -200,11 +201,11 @@ namespace hpp {
             JointAndShapes_t shapes;
             for (JointAndShapes_t::const_iterator itT = it->second.begin ();
                 itT != it->second.end(); ++itT) {
-              const fcl::Transform3f& M = itT->first->currentTransformation ();
+              const Transform3f& M = itT->first->currentTransformation ();
               Shape_t newShape (itT->second.size());
               for (std::size_t i = 0; i < newShape.size (); ++i)
-                newShape [i] = M.transform (itT->second[i]);
-              shapes.push_back (JointAndShape_t (NULL, newShape));
+                newShape [i] = M.act (itT->second[i]);
+              shapes.push_back (JointAndShape_t (JointPtr_t(), newShape));
             }
             problemSolver()->PSC_t::add (p + it->first, shapes);
           }
@@ -218,27 +219,15 @@ namespace hpp {
         throw (Error)
       {
         try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
-          model::JointPtr_t joint (NULL),
-            root = robot->rootJoint ();
-          for (size_t i = 0; i < root->numberChildJoints (); ++i)
-            if (root->childJoint (i)->name ().compare (0, n.size(), n) == 0) {
-              joint = root->childJoint (i);
-              break;
-            }
-          if (!joint)
+          if (!robot->has<JointIndexes_t> (n))
             throw hpp::Error
               ("Root of subtree with the provided prefix not found");
+          JointPtr_t joint (new Joint (robot, robot->get<JointIndexes_t>(n)[0]));
           const Transform3f& T = joint->positionInParentFrame ();
           double* res = new Transform_;
-          res [0] = T.getTranslation () [0];
-          res [1] = T.getTranslation () [1];
-          res [2] = T.getTranslation () [2];
-          res [3] = T.getQuatRotation () [0];
-          res [4] = T.getQuatRotation () [1];
-          res [5] = T.getQuatRotation () [2];
-          res [6] = T.getQuatRotation () [3];
+          Transform3fTohppTransform (T, res);
           return res;
         } catch (const std::exception& exc) {
           throw Error (exc.what ());
@@ -250,23 +239,15 @@ namespace hpp {
         throw (Error)
       {
         try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
-          model::JointPtr_t joint (NULL),
-            root = robot->rootJoint ();
-          for (size_t i = 0; i < root->numberChildJoints (); ++i)
-            if (root->childJoint (i)->name ().compare (0, n.size(), n) == 0) {
-              joint = root->childJoint (i);
-              break;
-            }
-          if (!joint)
+          if (!robot->has<JointIndexes_t> (n))
             throw hpp::Error
               ("Root of subtree with the provided prefix not found");
-	  fcl::Quaternion3f q (position [3], position [4],
-			       position [5], position [6]);
-	  fcl::Vec3f v (position [0], position [1],
-			 position [2]);
-          joint->positionInParentFrame (fcl::Transform3f (q, v));
+          JointPtr_t joint (new Joint (robot, robot->get<JointIndexes_t>(n)[0]));
+          Transform3f T;
+          hppTransformToTransform3f (position, T);
+          joint->positionInParentFrame (T);
         } catch (const std::exception& exc) {
           throw Error (exc.what ());
         }
@@ -277,15 +258,12 @@ namespace hpp {
 	throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  JointPtr_t joint =
             getJointByBodyNameOrThrow (problemSolver(), linkName);
-	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
-			       localPosition [5], localPosition [6]);
-	  fcl::Vec3f v (localPosition [0], localPosition [1],
-			 localPosition [2]);
-	  HandlePtr_t handle = Handle::create (handleName, Transform3f (q, v),
-					       joint);
+          Transform3f T;
+          hppTransformToTransform3f(localPosition, T);
+	  HandlePtr_t handle = Handle::create (handleName, T, joint);
 	  robot->add (handleName, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -293,23 +271,19 @@ namespace hpp {
       }
 
       void Robot::addGripper(const char* linkName, const char* gripperName,
-          const ::hpp::Transform_ p, const Names_t& bodyInCollisionNames)
+          const ::hpp::Transform_ p)
 	throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  JointPtr_t joint =
             getJointByBodyNameOrThrow (problemSolver(), linkName);
-	  fcl::Quaternion3f q (p [3], p [4], p [5], p [6]);
-	  fcl::Vec3f v (p [0], p [1], p [2]);
-          model::JointVector_t jointInCollision;
-          for (CORBA::ULong i=0; i<bodyInCollisionNames.length (); ++i) {     
-	    std::string bodyName (bodyInCollisionNames [i]);
-            jointInCollision.push_back(robot->getJointByBodyName(bodyName));
-          }
-	  GripperPtr_t gripper = model::Gripper::create (gripperName, joint, 
-                                                  Transform3f (q, v),
-                                                  jointInCollision);
+          Transform3f T;
+          hppTransformToTransform3f(p, T);
+          robot->model().addFrame(
+              se3::Frame(gripperName, joint->index(), T, se3::OP_FRAME)
+              );
+	  GripperPtr_t gripper = Gripper::create (gripperName, robot);
 	  robot->add (gripperName, gripper);
           // hppDout (info, "add Gripper: " << *gripper); 
 	} catch (const std::exception& exc) {
@@ -322,15 +296,12 @@ namespace hpp {
 	throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  JointPtr_t joint =
             getJointByBodyNameOrThrow (problemSolver(), linkName);
-	  fcl::Quaternion3f q (localPosition [3], localPosition [4],
-			       localPosition [5], localPosition [6]);
-	  fcl::Vec3f v (localPosition [0], localPosition [1],
-			 localPosition [2]);
-	  HandlePtr_t handle = AxialHandle::create
-	    (handleName, Transform3f (q, v), joint);
+          Transform3f T;
+          hppTransformToTransform3f(localPosition, T);
+	  HandlePtr_t handle = AxialHandle::create (handleName, T, joint);
 	  robot->add (handleName, handle);
           hppDout (info, "add Handle: " << *handle); 
 	} catch (const std::exception& exc) {
@@ -343,15 +314,12 @@ namespace hpp {
         throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
           GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
           if (!gripper)
             throw Error ("This gripper does not exists.");
-          const fcl::Transform3f& t = gripper->objectPositionInJoint ();
-          for (std::size_t i = 0; i < 3; ++i)
-            position[  i] = t.getTranslation  ()[i];
-          for (std::size_t i = 0; i < 4; ++i)
-            position[3+i] = t.getQuatRotation ()[i];
+          const Transform3f& t = gripper->objectPositionInJoint ();
+          Transform3fTohppTransform (t, position);
           char* name = new char[gripper->joint ()->name ().length()+1];
           strcpy (name, gripper->joint ()->name ().c_str ());
           return name;
@@ -365,15 +333,12 @@ namespace hpp {
         throw (hpp::Error)
       {
 	try {
-          manipulation::DevicePtr_t robot = getRobotOrThrow (problemSolver());
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
           HandlePtr_t handle = robot->get <HandlePtr_t> (handleName);
           if (!handle)
             throw Error ("This handle does not exists.");
-          const fcl::Transform3f& t = handle->localPosition ();
-          for (std::size_t i = 0; i < 3; ++i)
-            position[  i] = t.getTranslation  ()[i];
-          for (std::size_t i = 0; i < 4; ++i)
-            position[3+i] = t.getQuatRotation ()[i];
+          const Transform3f& t = handle->localPosition ();
+          Transform3fTohppTransform (t, position);
           char* name = new char[handle->joint ()->name ().length()+1];
           strcpy (name, handle->joint ()->name ().c_str ());
           return name;

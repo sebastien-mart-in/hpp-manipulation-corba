@@ -80,8 +80,7 @@ namespace hpp {
             throw (hpp::Error);
 
           virtual void addGripper(const char* linkName, const char* gripperName,
-              const ::hpp::Transform_ handlePositioninJoint,
-              const hpp::Names_t& bodyInCollisionNames)
+              const ::hpp::Transform_ handlePositioninJoint)
             throw (hpp::Error);
 
           virtual void addAxialHandle (const char* linkName,

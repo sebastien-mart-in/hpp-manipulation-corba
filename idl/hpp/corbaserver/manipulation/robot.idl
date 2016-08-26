@@ -118,7 +118,7 @@ module hpp
     /// \param gripperName name of the gripper,
     /// \param handlePositioninJoint position of the handle in the joint frame.
     void addGripper (in string linkName, in string gripperName, 
-        in Transform_ handlePositioninJoint, in Names_t bodyInCollisionNames)
+        in Transform_ handlePositioninJoint)
       raises (Error);
 
     /// Add Handle to an object
