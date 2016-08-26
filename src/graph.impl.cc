@@ -52,9 +52,6 @@ namespace hpp {
       using graph::EdgePtr_t;
       using graph::LevelSetEdgePtr_t;
       using graph::WaypointEdgePtr_t;
-      using hpp::corbaserver::toStringList;
-      using hpp::corbaserver::toNames_t;
-      using hpp::corbaserver::toIntSeq;
 
       namespace {
 	static Configuration_t floatSeqToConfig

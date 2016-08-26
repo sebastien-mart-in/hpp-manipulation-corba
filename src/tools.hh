@@ -18,18 +18,21 @@
 #ifndef HPP_MANIPULATION_CORBA_TOOLS_HH
 # define HPP_MANIPULATION_CORBA_TOOLS_HH
 
+# include <pinocchio/spatial/se3.hpp>
+
 # include <hpp/manipulation/problem-solver.hh>
 
 namespace hpp {
-  namespace corbaserver {
-    inline std::list<std::string> toStringList (const Names_t& names) {
-      std::list<std::string> ret;
-      for (CORBA::ULong i = 0; i < names.length(); ++i)
-        ret.push_back (std::string(names[i]));
-      return ret;
-    }
+  using pinocchio::Transform3f;
 
-    template <typename InputIt>
+  inline std::list<std::string> toStringList (const Names_t& names) {
+    std::list<std::string> ret;
+    for (CORBA::ULong i = 0; i < names.length(); ++i)
+      ret.push_back (std::string(names[i]));
+    return ret;
+  }
+
+  template <typename InputIt>
     inline Names_t* toNames_t (InputIt begin, InputIt end) {
       std::size_t len = std::distance (begin, end);
       char** nameList = Names_t::allocbuf((CORBA::ULong) len);
@@ -45,7 +48,7 @@ namespace hpp {
       return ret;
     }
 
-    template <typename InputIt>
+  template <typename InputIt>
     inline intSeq* toIntSeq (InputIt begin, InputIt end) {
       std::size_t len = std::distance (begin, end);
       intSeq* indexes = new intSeq ();
@@ -59,7 +62,24 @@ namespace hpp {
       }
       return indexes;
     }
-  } // namespace corbaserver 
+
+  inline void Transform3fTohppTransform (const Transform3f& transform, CORBA::Double* config)
+  {
+    Transform3f::Quaternion_t q (transform.rotation());
+    config[3] = q.x();
+    config[4] = q.y();
+    config[5] = q.z();
+    config[6] = q.w();
+    for(int i=0; i<3; i++)
+      config [i] = transform.translation() [i];
+  }
+
+  inline void hppTransformToTransform3f (const CORBA::Double* inConfig, Transform3f& transform)
+  {
+    Transform3f::Quaternion_t Q (inConfig [6], inConfig [3], inConfig [4], inConfig [5]);
+    transform.translation() << inConfig [0], inConfig [1], inConfig [2];
+    transform.rotation() = Q.matrix();
+  }
 } // namespace hpp
 
 #endif // HPP_MANIPULATION_CORBA_TOOLS_HH

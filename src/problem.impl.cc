@@ -23,13 +23,14 @@
 #include <boost/assign/list_of.hpp>
 
 #include <hpp/util/debug.hh>
+#include <hpp/core/roadmap.hh>
 #include <hpp/core/distance.hh>
 #include <hpp/core/comparison-type.hh>
 #include <hpp/core/locked-joint.hh>
 #include <hpp/core/config-projector.hh>
 #include <hpp/core/path-projector.hh>
 #include <hpp/core/path-vector.hh>
-#include <hpp/model/gripper.hh>
+#include <hpp/pinocchio/gripper.hh>
 #include <hpp/constraints/convex-shape-contact.hh>
 #include <hpp/constraints/qp-static-stability.hh>
 #include <hpp/manipulation/device.hh>
@@ -46,7 +47,6 @@
 namespace hpp {
   namespace manipulation {
     namespace impl {
-      using hpp::corbaserver::toStringList;
       namespace {
         typedef core::ProblemSolver CPs_t;
         typedef ProblemSolver::ThisC_t PsC_t;

@@ -17,13 +17,13 @@
 
 #include "robot.impl.hh"
 
-#include <hpp/fcl/math/transform.h>
+#include <pinocchio/multibody/model.hpp>
+
 #include <hpp/util/debug.hh>
-#include <hpp/model/humanoid-robot.hh>
-#include <hpp/model/gripper.hh>
-#include <hpp/model/body.hh>
-#include <hpp/model/object-factory.hh>
-#include <hpp/model/collision-object.hh>
+#include <hpp/pinocchio/humanoid-robot.hh>
+#include <hpp/pinocchio/gripper.hh>
+#include <hpp/pinocchio/joint.hh>
+#include <hpp/pinocchio/collision-object.hh>
 #include <hpp/manipulation/srdf/util.hh>
 #include <hpp/manipulation/device.hh>
 #include <hpp/manipulation/handle.hh>
@@ -31,10 +31,13 @@
 
 #include <hpp/corbaserver/manipulation/server.hh>
 
+#include "tools.hh"
+
 namespace hpp {
   namespace manipulation {
     namespace impl {
       namespace {
+        using pinocchio::Gripper;
         typedef core::ProblemSolver CPs_t;
         typedef ProblemSolver::ThisC_t PSC_t;
 

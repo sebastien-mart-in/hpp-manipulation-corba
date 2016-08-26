@@ -20,6 +20,8 @@
 #ifndef HPP_MANIPULATION_CORBA_SERVER_HH
 # define HPP_MANIPULATION_CORBA_SERVER_HH
 
+# include <stdexcept>
+
 # include <hpp/corba/template/server.hh>
 
 # include <hpp/corbaserver/problem-solver-map.hh>
