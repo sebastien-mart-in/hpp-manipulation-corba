@@ -185,7 +185,7 @@ namespace hpp {
         Ret_t ret;
 
         if (w == "gripper") {
-          ret = getRobotOrThrow (problemSolver())->getKeys <model::GripperPtr_t, Ret_t> ();
+          ret = getRobotOrThrow (problemSolver())->getKeys <pinocchio::GripperPtr_t, Ret_t> ();
         } else if (w == "handle") {
           ret = getRobotOrThrow (problemSolver())->getKeys <HandlePtr_t, Ret_t> ();
         } else if (w == "lockedjoint") {
@@ -277,6 +277,8 @@ namespace hpp {
 	  JointPtr_t joint = robot->getJointByName (jointName);
 	  vector_t config = floatSeqToVector (value);
 
+          if (joint->configSize() != config.size())
+            throw hpp::Error ("The config should be of the same size as the joint configuration");
           LockedJointPtr_t lockedJoint (LockedJoint::create (joint, config));
           problemSolver()->PsC_t::add <LockedJointPtr_t> (lockedJointName, lockedJoint);
 	} catch (const std::exception& exc) {
@@ -418,8 +420,8 @@ namespace hpp {
           using constraints::QPStaticStability;
           using constraints::QPStaticStabilityPtr_t;
           typedef constraints::QPStaticStability::ForceData ForceData;
-          using model::CenterOfMassComputation;
-          using model::CenterOfMassComputationPtr_t;
+          using pinocchio::CenterOfMassComputation;
+          using pinocchio::CenterOfMassComputationPtr_t;
 
           std::vector <ForceData> fds;
           std::size_t nbPoints = 0;
@@ -433,7 +435,7 @@ namespace hpp {
               ConvexShape c (ConvexShape (it->second, it->first));
               ForceData fd;
               fd.joint = c.joint_;
-              fd.supportJoint = NULL;
+              fd.supportJoint = JointPtr_t();
               fd.normal = - c.N_;
               fd.points = c.Pts_;
               nbPoints += c.Pts_.size ();
