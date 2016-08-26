@@ -79,6 +79,9 @@ namespace hpp {
               Names_t_out reasons, intSeq_out freqs)
             throw (hpp::Error);
 
+          virtual Long getFrequencyOfNodeInRoadmap (ID nodeId, intSeq_out freqPerConnectedComponent)
+            throw (hpp::Error);
+
           virtual bool getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
               ConfigProjStat_out path)
             throw (hpp::Error);

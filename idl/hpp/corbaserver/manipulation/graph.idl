@@ -112,6 +112,12 @@ module hpp {
         void getEdgeStat (in ID edgeId, out Names_t reasons, out intSeq freqs)
           raises (Error);
 
+        /// Get the number of nodes in the roadmap being in the node nodeId of the graph
+        /// \return freqPerConnectedComponent is a vector of same number, by connected components.
+        /// \warning The connected components of the roadmap are in no specific order.
+        long getFrequencyOfNodeInRoadmap (in ID nodeId, out intSeq freqPerConnectedComponent)
+          raises (Error);
+
         /// Get config projector statistics
         /// \param output config, path object containing the number of success
         ///                       and the number of times a config projector has
