@@ -375,12 +375,8 @@ class ProblemSolver (object):
     def lockFreeFlyerJoint (self, freeflyerBname, lockJointBname,
                             values = (0,0,0,1,0,0,0)):
         lockedJoints = list ()
-        namet = lockJointBname + '_xyz'
-        namer = lockJointBname + '_SO3'
-        self.createLockedJoint (namet, freeflyerBname + '_xyz', values[:3])
-        lockedJoints.append (namet)
-        self.createLockedJoint (namer, freeflyerBname + '_SO3', values[3:])
-        lockedJoints.append (namer)
+        self.createLockedJoint (lockJointBname, freeflyerBname, values)
+        lockedJoints.append (lockJointBname)
         return lockedJoints
 
     ## Lock degree of freedom of a planar joint
@@ -389,14 +385,10 @@ class ProblemSolver (object):
     # \param lockJointBname base name of the LockedJoint constraints
     #        (It will be completed by '_xy' and '_rz'),
     # \param values config of the locked joints (4 float)
-    def lockPlanarJoint (self, planarBname, lockJointBname, values = (0,0,1,0)):
+    def lockPlanarJoint (self, planarBname, lockJointBname, values = (0,0,0)):
         lockedJoints = list ()
-        namet = lockJointBname + '_xy'
-        namer = lockJointBname + '_rz'
-        self.createLockedJoint (namet, planarBname + '_xy', values[:2])
-        lockedJoints.append (namet)
-        self.createLockedJoint (namer, planarBname + '_rz', values[2:])
-        lockedJoints.append (namer)
+        self.createLockedJoint (lockJointBname, planarBname, values)
+        lockedJoints.append (lockJointBname)
         return lockedJoints
 
     ## Lock degree of freedom with given value
