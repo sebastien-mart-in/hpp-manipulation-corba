@@ -134,10 +134,12 @@ namespace hpp {
 	// Compare size of input array with number of degrees of freedom of
 	// robot.
 	if (configDim != robot->configSize ()) {
-	  hppDout (error, "robot nb dof=" << configDim <<
-		   " is different from config size=" << robot->configSize());
-	  throw std::runtime_error
-	    ("robot nb dof is different from config size");
+	  std::ostringstream oss;
+	  oss << "Input configuration size (" << configDim <<
+	    ") does not match robot configuration size ("
+	      << robot->configSize () << ").";
+	  hppDout (error, oss.str ().c_str ());
+	  throw std::runtime_error (oss.str ().c_str ());
 	}
 
 	// Fill dof vector with dof array.
@@ -464,7 +466,8 @@ namespace hpp {
         /// First get the constraint.
         ConstraintSetPtr_t constraint;
         try {
-          graph::GraphComponentPtr_t comp = graph::GraphComponent::get ((size_t)id).lock ();
+          graph::GraphComponentPtr_t comp = graph::GraphComponent::get
+	    ((size_t)id).lock ();
           graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
           graph::NodePtr_t node = HPP_DYNAMIC_PTR_CAST(graph::Node, comp);
           if (edge) {
@@ -484,30 +487,25 @@ namespace hpp {
             std::string errmsg = ss.str();
             throw Error (errmsg.c_str());
           }
-        } catch (std::exception& e ) {
-          throw Error (e.what());
-        }
-
-	bool success = false;
-	ConfigurationPtr_t config = floatSeqToConfig (problemSolver(), input);
-	try {
+	  bool success = false;
+	  ConfigurationPtr_t config = floatSeqToConfig (problemSolver(), input);
 	  success = constraint->apply (*config);
 	  if (hpp::core::ConfigProjectorPtr_t configProjector =
 	      constraint ->configProjector ()) {
 	    residualError = configProjector->residualError ();
 	  }
+	  ULong size = (ULong) config->size ();
+	  hpp::floatSeq* q_ptr = new hpp::floatSeq ();
+	  q_ptr->length (size);
+
+	  for (std::size_t i=0; i<size; ++i) {
+	    (*q_ptr) [(ULong) i] = (*config) [i];
+	  }
+	  output = q_ptr;
+	  return success;
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
-	ULong size = (ULong) config->size ();
-	hpp::floatSeq* q_ptr = new hpp::floatSeq ();
-	q_ptr->length (size);
-
-	for (std::size_t i=0; i<size; ++i) {
-	  (*q_ptr) [(ULong) i] = (*config) [i];
-	}
-	output = q_ptr;
-	return success;
       }
 
       bool Problem::applyConstraintsWithOffset (hpp::ID IDedge,
@@ -528,16 +526,13 @@ namespace hpp {
             std::string errmsg = ss.str();
             throw Error (errmsg.c_str());
           }
-        } catch (std::exception& e ) {
-          throw Error (e.what());
-        }
-
-	bool success = false;
-	ConfigurationPtr_t config = floatSeqToConfig (problemSolver(), input);
-        ConfigurationPtr_t qoffset = floatSeqToConfig (problemSolver(), qnear);
-        try {
+	  bool success = false;
+	  ConfigurationPtr_t config = floatSeqToConfig (problemSolver(), input);
+	  ConfigurationPtr_t qoffset =
+	    floatSeqToConfig (problemSolver(), qnear);
           value_type dist = 0;
-          core::NodePtr_t nNode = problemSolver()->roadmap()->nearestNode (qoffset, dist);
+          core::NodePtr_t nNode = problemSolver()->roadmap()->nearestNode
+	    (qoffset, dist);
           if (dist < 1e-8)
             success = edge->applyConstraints (nNode, *config);
           else
@@ -550,18 +545,18 @@ namespace hpp {
 	  } else {
 	    hppDout (info, "No config projector.");
 	  }
+	  ULong size = (ULong) config->size ();
+	  hpp::floatSeq* q_ptr = new hpp::floatSeq ();
+	  q_ptr->length (size);
+
+	  for (std::size_t i=0; i<size; ++i) {
+	    (*q_ptr) [(ULong) i] = (*config) [i];
+	  }
+	  output = q_ptr;
+	  return success;
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
-	ULong size = (ULong) config->size ();
-	hpp::floatSeq* q_ptr = new hpp::floatSeq ();
-	q_ptr->length (size);
-
-	for (std::size_t i=0; i<size; ++i) {
-	  (*q_ptr) [(ULong) i] = (*config) [i];
-	}
-	output = q_ptr;
-	return success;
       }
 
       bool Problem::buildAndProjectPath (hpp::ID IDedge,
@@ -582,23 +577,19 @@ namespace hpp {
             std::string errmsg = ss.str();
             throw Error (errmsg.c_str());
           }
-        } catch (std::exception& e ) {
-          throw Error (e.what());
-        }
-	// If steering method is not completely set in the graph, create
-	// one.
-	if (!edge->parentGraph ()->problem ()->steeringMethod () ||
-	    !edge->parentGraph ()->problem ()->steeringMethod ()
-	    ->innerSteeringMethod()) {
-	  problemSolver ()->initSteeringMethod ();
-	}
-	bool success = false;
-	ConfigurationPtr_t q1 = floatSeqToConfig (problemSolver(), qb);
-        ConfigurationPtr_t q2 = floatSeqToConfig (problemSolver(), qe);
-        core::PathVectorPtr_t pv;
-        indexNotProj = -1;
-        indexProj = -1;
-        try {
+	  // If steering method is not completely set in the graph, create
+	  // one.
+	  if (!edge->parentGraph ()->problem ()->steeringMethod () ||
+	      !edge->parentGraph ()->problem ()->steeringMethod ()
+	      ->innerSteeringMethod()) {
+	    problemSolver ()->initSteeringMethod ();
+	  }
+	  bool success = false;
+	  ConfigurationPtr_t q1 = floatSeqToConfig (problemSolver(), qb);
+	  ConfigurationPtr_t q2 = floatSeqToConfig (problemSolver(), qe);
+	  core::PathVectorPtr_t pv;
+	  indexNotProj = -1;
+	  indexProj = -1;
           core::PathPtr_t path;
 	  success = edge->build (path, *q1, *q2);
           if (!success) return false;
@@ -638,10 +629,10 @@ namespace hpp {
             pv->appendPath (projPath);
           }
           problemSolver()->addPath (pv);
+	  return success;
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
-	return success;
       }
     } // namespace impl
   } // namespace manipulation
