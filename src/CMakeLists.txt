@@ -51,6 +51,9 @@ ENDFOREACH()
 GENERATE_IDL_PYTHON (hpp/corbaserver/manipulation/common
   ${HPP_CORBASERVER_DATAROOTDIR}/idl/hpp/corbaserver)
 
+ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS})
+ADD_CUSTOM_TARGET(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
+
 IF (NOT CLIENT_ONLY)
   ADD_LIBRARY(${LIBRARY_NAME} SHARED
     ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/gcommon.hh
@@ -70,11 +73,6 @@ IF (NOT CLIENT_ONLY)
     server.cc
     client.cc
     )
-
-  ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS})
-  ADD_CUSTOM_TARGET(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
-  ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_cpp)
-  ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_python)
 
   PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation)
   PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation-urdf)
@@ -96,9 +94,25 @@ IF (NOT CLIENT_ONLY)
 
   INSTALL (TARGETS hpp-manipulation-server DESTINATION ${CMAKE_INSTALL_BINDIR})
 ELSE (NOT CLIENT_ONLY)
-  ADD_CUSTOM_TARGET(generate_idl_cpp ALL DEPENDS ${ALL_IDL_CPP_STUBS})
-  ADD_CUSTOM_TARGET(generate_idl_python ALL DEPENDS ${ALL_IDL_PYTHON_STUBS})
+  ADD_LIBRARY(${LIBRARY_NAME} SHARED
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/gcommon.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/graph.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/robot.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/problem.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/gcommonSK.cc
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/graphSK.cc
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/robotSK.cc
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/problemSK.cc
+    client.cc
+    )
+
+  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} omniORB4)
+
+  INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION lib)
 ENDIF (NOT CLIENT_ONLY)
+
+ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_cpp)
+ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_python)
 
 INSTALL(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/common_idl.py
