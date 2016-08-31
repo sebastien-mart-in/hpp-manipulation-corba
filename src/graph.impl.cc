@@ -26,6 +26,7 @@
 
 #include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/roadmap.hh>
+#include <hpp/manipulation/connected-component.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node-selector.hh>
 #include <hpp/manipulation/graph/guided-node-selector.hh>
