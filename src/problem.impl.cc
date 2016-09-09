@@ -65,13 +65,6 @@ namespace hpp {
           throw Error ((s + std::string (" is not a ComparisonType")).c_str ());
         }
 
-        DevicePtr_t getRobotOrThrow (ProblemSolverPtr_t p)
-        {
-          DevicePtr_t robot = p->robot ();
-          if (!robot) throw Error ("Robot not found.");
-          return robot;
-        }
-
         Names_t* jointAndShapes (const JointAndShapes_t& js,
             intSeq_out indexes_out, floatSeqSeq_out points) {
           char** nameList = Names_t::allocbuf((ULong) js.size ());
@@ -125,36 +118,9 @@ namespace hpp {
       (hpp::manipulation::ProblemSolverPtr_t problemSolver,
        const hpp::floatSeq& dofArray)
       {
-	size_type configDim = (size_type)dofArray.length();
-	ConfigurationPtr_t config (new Configuration_t (configDim));
-
-	// Get robot in hppPlanner object.
-	DevicePtr_t robot = problemSolver->robot ();
-
-	// Compare size of input array with number of degrees of freedom of
-	// robot.
-	if (configDim != robot->configSize ()) {
-	  hppDout (error, "robot nb dof=" << configDim <<
-		   " is different from config size=" << robot->configSize());
-	  throw std::runtime_error
-	    ("robot nb dof is different from config size");
-	}
-
-	// Fill dof vector with dof array.
-	for (size_type iDof=0; iDof < configDim; ++iDof) {
-	  (*config) [iDof] = dofArray [(ULong) iDof];
-	}
-	return config;
-      }
-
-      static vector_t floatSeqToVector (const hpp::floatSeq& dofArray)
-      {
-	// Fill dof vector with dof array.
-	vector_t result (dofArray.length ());
-	for (size_type iDof=0; iDof < result.size (); ++iDof) {
-	  result [iDof] = dofArray [(ULong) iDof];
-	}
-	return result;
+        return ConfigurationPtr_t (new Configuration_t (
+              floatSeqToVector (dofArray, problemSolver->robot()->configSize())
+              ));
       }
 
       Problem::Problem () : server_ (0x0)
@@ -275,10 +241,7 @@ namespace hpp {
 	  // Get robot in hppPlanner object.
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  JointPtr_t joint = robot->getJointByName (jointName);
-	  vector_t config = floatSeqToVector (value);
-
-          if (joint->configSize() != config.size())
-            throw hpp::Error ("The config should be of the same size as the joint configuration");
+	  vector_t config = floatSeqToVector (value, joint->configSize());
           LockedJointPtr_t lockedJoint (LockedJoint::create (joint, config));
           problemSolver()->PsC_t::add <LockedJointPtr_t> (lockedJointName, lockedJoint);
 	} catch (const std::exception& exc) {

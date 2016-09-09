@@ -59,26 +59,7 @@ namespace hpp {
 	(hpp::manipulation::ProblemSolverPtr_t problemSolver,
 	 const hpp::floatSeq& dofArray)
 	{
-	  size_type configDim = (size_type)dofArray.length();
-	  Configuration_t config (configDim);
-
-	  // Get robot in hppPlanner object.
-	  DevicePtr_t robot = problemSolver->robot ();
-
-	  // Compare size of input array with number of degrees of freedom of
-	  // robot.
-	  if (configDim != robot->configSize ()) {
-	    hppDout (error, "robot nb dof=" << configDim <<
-		     " is different from config size=" << robot->configSize());
-	    throw std::runtime_error
-	      ("robot nb dof is different from config size");
-	  }
-
-	  // Fill dof vector with dof array.
-	  for (size_type iDof=0; iDof < configDim; ++iDof) {
-	    config [iDof] = dofArray [(ULong) iDof];
-	  }
-	  return config;
+          return floatSeqToVector (dofArray, problemSolver->robot()->configSize());
 	}
 
         typedef core::ProblemSolver CPs_t;
@@ -115,18 +96,14 @@ namespace hpp {
           std::list<graph::helper::ObjectDef_t> ret;
 	  // Check size of lists
 	  if (hsPO.length () != names.length ()) {
-	    std::ostringstream oss;
-	    oss << "Number of constact lists (" << hsPO.length ()
+            HPP_THROW(Error, "Number of constact lists (" << hsPO.length ()
 		<< ") does not match number of objects (" << names.length ()
-		<< ").";
-	    throw Error (oss.str ().c_str ());
+		<< ").");
 	  }
 	  if (shPO.length () != names.length ()) {
-	    std::ostringstream oss;
-	    oss << "Number of handle lists (" << shPO.length ()
+            HPP_THROW(Error, "Number of handle lists (" << shPO.length ()
 		<< ") does not match number of objects (" << names.length ()
-		<< ").";
-	    throw Error (oss.str ().c_str ());
+		<< ").");
 	  }
           for (CORBA::ULong i = 0; i < names.length(); ++i) {
             ret.push_back (ObjectDef_t());
@@ -143,9 +120,9 @@ namespace hpp {
           const hpp::Names_t& names, const size_t& s)
       {
         assert (s >= names.length ());
-        std::vector <std::string> ret (s, std::string ());
-        for (CORBA::ULong i=0; i<names.length (); ++i)
-          ret [i] = std::string (names[i]);
+        std::vector <std::string> ret =
+          corbaServer::toStrings< std::vector<std::string> > (names);
+        ret.resize (s, std::string());
         return ret;
       }
 

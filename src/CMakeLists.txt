@@ -72,6 +72,7 @@ IF (NOT CLIENT_ONLY)
     robot.impl.hh
     server.cc
     client.cc
+    tools.cc
     )
 
   PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation)

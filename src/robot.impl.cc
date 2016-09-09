@@ -56,13 +56,6 @@ namespace hpp {
           return r;
         }
 
-        DevicePtr_t getRobotOrThrow (ProblemSolver* p)
-        {
-          DevicePtr_t r = p->robot ();
-          if (!r) throw hpp::Error ("Robot not found.");
-          return r;
-        }
-
         JointPtr_t getJointByBodyNameOrThrow (ProblemSolver* p,
             const std::string& n)
         {
@@ -221,13 +214,18 @@ namespace hpp {
         try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
-          if (!robot->has<JointIndexes_t> (n))
+          if (!robot->has<FrameIndexes_t> (n))
             throw hpp::Error
               ("Root of subtree with the provided prefix not found");
-          JointPtr_t joint (new Joint (robot, robot->get<JointIndexes_t>(n)[0]));
-          const Transform3f& T = joint->positionInParentFrame ();
+          const se3::Model& model = robot->model();
+          const se3::Frame& rf = model.frames[
+            robot->get<FrameIndexes_t>(n)[0]
+            ];
           double* res = new Transform_;
-          Transform3fTohppTransform (T, res);
+          if (rf.type == se3::JOINT)
+            Transform3fTohppTransform (model.jointPlacements[rf.parent], res);
+          else
+            Transform3fTohppTransform (rf.placement, res);
           return res;
         } catch (const std::exception& exc) {
           throw Error (exc.what ());
@@ -241,13 +239,9 @@ namespace hpp {
         try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
-          if (!robot->has<JointIndexes_t> (n))
-            throw hpp::Error
-              ("Root of subtree with the provided prefix not found");
-          JointPtr_t joint (new Joint (robot, robot->get<JointIndexes_t>(n)[0]));
           Transform3f T;
           hppTransformToTransform3f (position, T);
-          joint->positionInParentFrame (T);
+          robot->setRobotRootPosition(n, T);
         } catch (const std::exception& exc) {
           throw Error (exc.what ());
         }
@@ -281,7 +275,9 @@ namespace hpp {
           Transform3f T;
           hppTransformToTransform3f(p, T);
           robot->model().addFrame(
-              se3::Frame(gripperName, joint->index(), T, se3::OP_FRAME)
+              se3::Frame(gripperName, joint->index(),
+                robot->model().getFrameId(joint->name()),
+                T, se3::OP_FRAME)
               );
 	  GripperPtr_t gripper = Gripper::create (gripperName, robot);
 	  robot->add (gripperName, gripper);
