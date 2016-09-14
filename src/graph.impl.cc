@@ -27,9 +27,9 @@
 #include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/roadmap.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
-#include <hpp/manipulation/graph/node-selector.hh>
-#include <hpp/manipulation/graph/guided-node-selector.hh>
-#include <hpp/manipulation/graph/node.hh>
+#include <hpp/manipulation/graph/state-selector.hh>
+#include <hpp/manipulation/graph/guided-state-selector.hh>
+#include <hpp/manipulation/graph/state.hh>
 #include <hpp/manipulation/graph/graph.hh>
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/graph/helper.hh>
@@ -87,11 +87,11 @@ namespace hpp {
         typedef ProblemSolver::ThisC_t PsC_t;
 
         template <typename T> std::string toStr () { return typeid(T).name(); }
-        template <> std::string toStr <graph::Node> () { return "Node"; }
+        template <> std::string toStr <graph::State> () { return "Node"; }
         template <> std::string toStr <graph::Edge> () { return "Edge"; }
         template <> std::string toStr <graph::Graph> () { return "Graph"; }
-        template <> std::string toStr <graph::NodeSelector> () { return "SubGraph"; }
-        template <> std::string toStr <graph::GuidedNodeSelector> () { return "Guided Node Selector"; }
+        template <> std::string toStr <graph::StateSelector> () { return "SubGraph"; }
+        template <> std::string toStr <graph::GuidedStateSelector> () { return "Guided Node Selector"; }
         template <> std::string toStr <graph::LevelSetEdge> () { return "LevelSetEdge"; }
         template <> std::string toStr <graph::WaypointEdge> () { return "WaypointEdge"; }
 
@@ -182,21 +182,21 @@ namespace hpp {
         if (!graph_)
           throw Error ("You should create the graph"
               " before creating subgraph.");
-        graph::GuidedNodeSelectorPtr_t ns = graph::GuidedNodeSelector::create
+        graph::GuidedStateSelectorPtr_t ns = graph::GuidedStateSelector::create
           (subgraphName, problemSolver()->roadmap ());
-        graph_->nodeSelector(ns);
+        graph_->stateSelector(ns);
         return (Long) ns->id ();
       }
 
       void Graph::setTargetNodeList(const ID subgraph, const hpp::IDseq& nodes)
         throw (hpp::Error)
       {
-        graph::GuidedNodeSelectorPtr_t ns = getComp <graph::GuidedNodeSelector> (subgraph);
+        graph::GuidedStateSelectorPtr_t ns = getComp <graph::GuidedStateSelector> (subgraph);
         try {
-          graph::Nodes_t nl;
+          graph::States_t nl;
           for (unsigned int i = 0; i < nodes.length(); ++i)
-            nl.push_back (getComp <graph::Node> (nodes[i]));
-          ns->setNodeList (nl);
+            nl.push_back (getComp <graph::State> (nodes[i]));
+          ns->setStateList (nl);
         } catch (std::out_of_range& e) {
           throw Error (e.what());
         }
@@ -206,22 +206,22 @@ namespace hpp {
           const bool waypoint)
         throw (hpp::Error)
       {
-        graph::NodeSelectorPtr_t ns = getComp <graph::NodeSelector> (subgraphId);
+        graph::StateSelectorPtr_t ns = getComp <graph::StateSelector> (subgraphId);
 
-        graph::NodePtr_t node = ns->createNode (nodeName, waypoint);
-        return (Long) node->id ();
+        graph::StatePtr_t state = ns->createState (nodeName, waypoint);
+        return (Long) state->id ();
       }
 
       Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const Long isInNodeId)
         throw (hpp::Error)
       {
-        graph::NodePtr_t from = getComp <graph::Node> (nodeFromId),
-	  to = getComp <graph::Node> (nodeToId),
-	  isInNode = getComp <graph::Node> (isInNodeId);
+        graph::StatePtr_t from = getComp <graph::State> (nodeFromId),
+	  to = getComp <graph::State> (nodeToId),
+	  isInState = getComp <graph::State> (isInNodeId);
 
         EdgePtr_t edge = from->linkTo
-          (edgeName, to, (size_type)w, (graph::Node::EdgeFactory)Edge::create);
-	edge->node (isInNode);
+          (edgeName, to, (size_type)w, (graph::State::EdgeFactory)Edge::create);
+	edge->state (isInState);
 
         return (Long) edge->id ();
       }
@@ -231,15 +231,15 @@ namespace hpp {
           const Long isInNodeId)
         throw (hpp::Error)
       {
-        graph::NodePtr_t from = getComp <graph::Node> (nodeFromId),
-	  to = getComp <graph::Node> (nodeToId),
-	  isInNode = getComp <graph::Node> (isInNodeId);
+        graph::StatePtr_t from = getComp <graph::State> (nodeFromId),
+	  to = getComp <graph::State> (nodeToId),
+	  isInNode = getComp <graph::State> (isInNodeId);
 
         EdgePtr_t edge_pc = from->linkTo
           (edgeName, to, (size_type)w,
-           (graph::Node::EdgeFactory)WaypointEdge::create);
+           (graph::State::EdgeFactory)WaypointEdge::create);
 
-        edge_pc->node (isInNode);
+        edge_pc->state (isInNode);
         WaypointEdgePtr_t edge = HPP_DYNAMIC_PTR_CAST (WaypointEdge, edge_pc);
 
         edge->nbWaypoints (nb);
@@ -252,11 +252,11 @@ namespace hpp {
       {
         WaypointEdgePtr_t we = getComp <graph::WaypointEdge> (waypointEdgeId);
         EdgePtr_t edge = getComp <Edge> (edgeId);
-        graph::NodePtr_t node = getComp <graph::Node> (nodeId);
+        graph::StatePtr_t state = getComp <graph::State> (nodeId);
 
         if (index < 0 || (std::size_t)index >= we->nbWaypoints ())
           throw Error ("Invalid index");
-        we->setWaypoint (index, edge, node);
+        we->setWaypoint (index, edge, state);
       }
 
       void Graph::getGraph (GraphComp_out graph_out, GraphElements_out elmts)
@@ -266,7 +266,7 @@ namespace hpp {
         GraphComps_t comp_n, comp_e;
         GraphComp comp_g, current;
 
-        graph::NodePtr_t n;
+        graph::StatePtr_t n;
         graph::EdgePtr_t e;
 
         CORBA::ULong len_edges = 0;
@@ -284,7 +284,7 @@ namespace hpp {
             if (!gcomponent) continue;
             current.name = gcomponent->name ().c_str ();
             current.id   = (Long) gcomponent->id ();
-            n = HPP_DYNAMIC_PTR_CAST(graph::Node, gcomponent);
+            n = HPP_DYNAMIC_PTR_CAST(graph::State, gcomponent);
             e = HPP_DYNAMIC_PTR_CAST(graph::Edge, gcomponent);
             if (n) {
               comp_n.length (len_nodes + 1);
@@ -338,7 +338,7 @@ namespace hpp {
         throw (hpp::Error)
       {
         if (!graph_) throw Error ("You should create the graph");
-        graph::NodePtr_t node = getComp <graph::Node> (nodeId, true);
+        graph::StatePtr_t state = getComp <graph::State> (nodeId, true);
         // Long nb = graph_->nodeHistogram()->freq(graph::NodeBin(node));
         Long nb = 0;
         const core::ConnectedComponents_t& ccs = problemSolver()->roadmap ()->connectedComponents();
@@ -349,7 +349,7 @@ namespace hpp {
             HPP_DYNAMIC_PTR_CAST(manipulation::ConnectedComponent, *_cc);
           if (!cc)
             throw Error ("Connected component is not of the right type.");
-          freqs.push_back(cc->getRoadmapNodes(node).size());
+          freqs.push_back(cc->getRoadmapNodes(state).size());
           nb += freqs.back();
         }
         freqPerConnectedComponent = toIntSeq(freqs.begin(), freqs.end());
@@ -362,11 +362,11 @@ namespace hpp {
       {
         if (!graph_)
           throw Error ("You should create the graph");
-        graph::NodePtr_t node = getComp <graph::Node> (elmt, false);
+        graph::StatePtr_t state = getComp <graph::State> (elmt, false);
         graph::EdgePtr_t edge = getComp <graph::Edge> (elmt, false);
-        if (node) {
+        if (state) {
           ConfigProjectorPtr_t proj =
-            graph_->configConstraint (node)->configProjector ();
+            graph_->configConstraint (state)->configProjector ();
           if (proj) {
             config.success = (Long) proj->statistics().nbSuccess();
             config.error = (Long) proj->statistics().nbFailure();
@@ -413,15 +413,15 @@ namespace hpp {
       Long Graph::createLevelSetEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
         throw (hpp::Error)
       {
-        graph::NodePtr_t from = getComp <graph::Node> (nodeFromId),
-                         to   = getComp <graph::Node> (nodeToId  );
+        graph::StatePtr_t from = getComp <graph::State> (nodeFromId),
+                         to   = getComp <graph::State> (nodeToId  );
 
         graph::EdgePtr_t edge = from->linkTo
           (edgeName, to, (size_type)w,
-           (graph::Node::EdgeFactory)graph::LevelSetEdge::create);
+           (graph::State::EdgeFactory)graph::LevelSetEdge::create);
 
-        if (isInNodeFrom) edge->node (from);
-        else edge->node (to);
+        if (isInNodeFrom) edge->state (from);
+        else edge->state (to);
 
         return (Long) edge->id ();
       }
@@ -481,9 +481,9 @@ namespace hpp {
         throw (hpp::Error)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-        graph::NodePtr_t node = getComp <graph::Node> (nodeId);
+        graph::StatePtr_t state = getComp <graph::State> (nodeId);
         try {
-          edge->node (node);
+          edge->state (state);
         } catch (std::exception& err) {
           throw Error (err.what());
         }
@@ -494,7 +494,7 @@ namespace hpp {
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
-	  std::string name (edge->node ()->name ());
+	  std::string name (edge->state ()->name ());
 	  char* res = new char [name.size () + 1];
 	  strcpy (res, name.c_str ());
 	  return res;
@@ -587,7 +587,7 @@ namespace hpp {
           const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
       {
-        graph::NodePtr_t n = getComp <graph::Node> (nodeId);
+        graph::StatePtr_t n = getComp <graph::State> (nodeId);
 
         if (constraintNames.length () > 0) {
           try {
@@ -635,8 +635,8 @@ namespace hpp {
         try {
           Configuration_t config (floatSeqToConfig (problemSolver (),
 						    dofArray));
-          graph::NodePtr_t node = graph_->getNode (config);
-          output = (Long) node->id();
+          graph::StatePtr_t state = graph_->getState (config);
+          output = (Long) state->id();
         } catch (std::exception& e) {
           throw Error (e.what());
         }
@@ -646,12 +646,12 @@ namespace hpp {
       (ID nodeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
 	throw (hpp::Error)
       {
-	graph::NodePtr_t node = getComp <graph::Node> (nodeId);
+	graph::StatePtr_t state = getComp <graph::State> (nodeId);
 	try {
 	  vector_t err;
           Configuration_t config (floatSeqToConfig (problemSolver (),
 						    dofArray));
-	  bool res = graph_->getConfigErrorForNode (config, node, err);
+	  bool res = graph_->getConfigErrorForState (config, state, err);
 	  floatSeq* e = new floatSeq ();
 	  e->length ((ULong) err.size ());
 	  for (std::size_t i=0; i < (std::size_t) err.size (); ++i) {
@@ -730,8 +730,8 @@ namespace hpp {
       void Graph::displayNodeConstraints
       (hpp::ID nodeId, CORBA::String_out constraints) throw (Error)
       {
-	graph::NodePtr_t node = getComp <graph::Node> (nodeId);
-	ConstraintSetPtr_t cs (graph_->configConstraint (node));
+	graph::StatePtr_t state = getComp <graph::State> (nodeId);
+	ConstraintSetPtr_t cs (graph_->configConstraint (state));
 	std::ostringstream oss;
 	oss << (*cs);
 	constraints = oss.str ().c_str ();
@@ -846,7 +846,7 @@ namespace hpp {
 
         std::vector<int> ids (2);
         ids[0] = graph_->id();
-        ids[1] = graph_->nodeSelector()->id();
+        ids[1] = graph_->stateSelector()->id();
         return toIntSeq (ids.begin(), ids.end());
       }
 

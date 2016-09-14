@@ -469,7 +469,7 @@ namespace hpp {
           graph::GraphComponentPtr_t comp = graph::GraphComponent::get
 	    ((size_t)id).lock ();
           graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
-          graph::NodePtr_t node = HPP_DYNAMIC_PTR_CAST(graph::Node, comp);
+          graph::StatePtr_t state = HPP_DYNAMIC_PTR_CAST(graph::State, comp);
           if (edge) {
             constraint =
 	      problemSolver()->constraintGraph ()->configConstraint (edge);
@@ -478,12 +478,12 @@ namespace hpp {
 		constraint->configProjector ()) {
 	      cp->rightHandSideFromConfig (robot->currentConfiguration());
 	    }
-          } else if (node)
+          } else if (state)
             constraint =
-	      problemSolver()->constraintGraph ()->configConstraint (node);
+	      problemSolver()->constraintGraph ()->configConstraint (state);
           else {
             std::stringstream ss;
-            ss << "ID " << id << " is neither an edge nor a node";
+            ss << "ID " << id << " is neither an edge nor a state";
             std::string errmsg = ss.str();
             throw Error (errmsg.c_str());
           }
