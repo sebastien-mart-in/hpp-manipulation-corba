@@ -271,9 +271,37 @@ module hpp {
         void setShort (in ID edgeId, in boolean isShort)
           raises (Error);
 
+	/// Automatically build a constraint graph
+	///
+	/// \param graphName name of the graph,
+	/// \param grippers list of gripper names,
+	/// \param objects list of object names,
+	/// \param handlesPerObject list of lists of handles, one list per
+	///        object
+	/// \param contactsPerObject list of lists of contact surfaces, one list
+	///        per object
+	/// \param envNames list of names of contact surfaces in the
+	///        environment,
+	/// \param list of rules.
+	///
+	/// \note: we consider a robot with two grippers, three objects with
+	///   respectively two, one and one handles, and respectively one, two
+	///   and one contact surface.
+	/// \code
+	/// grippers = ['gripper_1', 'gripper_2']
+	/// objects = ['object_1', 'object_2', 'object_3']
+	/// handlesPerObject = [['object_1/handle_1','object_1/handle_2',]
+	///    ['object_2/handle_1',], ['object_3/handle_1',]]
+	/// contactsPerObject = [['object_1/contact_1',]
+	///    ['object_2/contact_1','object_2/contact_2',]
+	///    ['object_3/contact_1',]]
+	/// from hpp.corbaserver.manipulation import Rule
+	/// rules = [Rule('gripper_1', 'object_1/handle_2', True),
+	///          Rule('gripper_1', 'object_3/handle_1', True),]
+	/// \endcode
         intSeq autoBuild (in string graphName,
             in Names_t grippers, in Names_t objects,
-            in Namess_t handlesPerObject, in Namess_t shapesPreObject,
+            in Namess_t handlesPerObject, in Namess_t contactsPerObject,
 	    in Names_t envNames, in Rules rulesList)
           raises (Error);
 
