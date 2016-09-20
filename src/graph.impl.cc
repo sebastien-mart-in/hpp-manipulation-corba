@@ -22,6 +22,7 @@
 #include <boost/foreach.hpp>
 
 #include <hpp/util/debug.hh>
+#include <hpp/util/exception-factory.hh>
 #include <hpp/util/pointer.hh>
 
 #include <hpp/manipulation/problem.hh>
@@ -117,18 +118,14 @@ namespace hpp {
           std::list<graph::helper::ObjectDef_t> ret;
 	  // Check size of lists
 	  if (hsPO.length () != names.length ()) {
-	    std::ostringstream oss;
-	    oss << "Number of constact lists (" << hsPO.length ()
+            HPP_THROW(Error, "Number of handle lists (" << hsPO.length ()
 		<< ") does not match number of objects (" << names.length ()
-		<< ").";
-	    throw Error (oss.str ().c_str ());
+		<< ").");
 	  }
 	  if (shPO.length () != names.length ()) {
-	    std::ostringstream oss;
-	    oss << "Number of handle lists (" << shPO.length ()
+            HPP_THROW(Error, "Number of constact lists (" << shPO.length ()
 		<< ") does not match number of objects (" << names.length ()
-		<< ").";
-	    throw Error (oss.str ().c_str ());
+		<< ").");
 	  }
           for (CORBA::ULong i = 0; i < names.length(); ++i) {
             ret.push_back (ObjectDef_t());
