@@ -22,6 +22,15 @@
 
 namespace hpp {
   namespace corbaserver {
+    // TODO The version of hpp-corbaserver with pinocchio ships conversion utility
+    // functions. This can thus be removed.
+    inline std::vector<std::string> toStringVector (const Names_t& names) {
+      std::vector<std::string> ret(names.length());
+      for (CORBA::ULong i = 0; i < names.length(); ++i)
+        ret[i] = names[i];
+      return ret;
+    }
+
     inline std::list<std::string> toStringList (const Names_t& names) {
       std::list<std::string> ret;
       for (CORBA::ULong i = 0; i < names.length(); ++i)

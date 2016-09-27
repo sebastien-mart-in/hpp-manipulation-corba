@@ -53,6 +53,7 @@ namespace hpp {
       using graph::EdgePtr_t;
       using graph::LevelSetEdgePtr_t;
       using graph::WaypointEdgePtr_t;
+      using hpp::corbaserver::toStringVector;
       using hpp::corbaserver::toStringList;
       using hpp::corbaserver::toNames_t;
       using hpp::corbaserver::toIntSeq;
@@ -135,6 +136,13 @@ namespace hpp {
             od.shapes = toStringList (shPO[i]);
           }
           return ret;
+        }
+
+        void setRule (const hpp::corbaserver::manipulation::Rule& in, graph::helper::Rule& out)
+        {
+          out.grippers_ = toStringVector (in.grippers);
+          out.handles_  = toStringVector (in.handles );
+          out.link_ = in.link;
         }
       }
 
@@ -835,8 +843,7 @@ namespace hpp {
 	std::vector<graph::helper::Rule> rules(rulesList.length());
 
 	for (int i = 0; i < rulesList.length(); ++i) {
-	  rules[i] = graph::helper::Rule(rulesList[i].gripper.in(), rulesList[i].handle.in(),
-					 rulesList[i].link);
+          setRule (rulesList[i], rules[i]);
 	}
         graph_ = graph::helper::graphBuilder (
             problemSolver(),
