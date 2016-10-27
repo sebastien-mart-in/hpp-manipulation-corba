@@ -845,21 +845,25 @@ namespace hpp {
 	for (int i = 0; i < rulesList.length(); ++i) {
           setRule (rulesList[i], rules[i]);
 	}
-        graph_ = graph::helper::graphBuilder (
-            problemSolver(),
-            graphName,
-            toStringList (grippers),
-            toObjectList (objects, handlesPerObject, shapesPreObject),
-            toStringList (envNames),
-	    rules
-            );
-        problemSolver()->constraintGraph (graph_);
-        problemSolver()->problem()->constraintGraph (graph_);
+        try {
+          graph_ = graph::helper::graphBuilder (
+              problemSolver(),
+              graphName,
+              toStringList (grippers),
+              toObjectList (objects, handlesPerObject, shapesPreObject),
+              toStringList (envNames),
+              rules
+              );
+          problemSolver()->constraintGraph (graph_);
+          problemSolver()->problem()->constraintGraph (graph_);
 
-        std::vector<int> ids (2);
-        ids[0] = graph_->id();
-        ids[1] = graph_->stateSelector()->id();
-        return toIntSeq (ids.begin(), ids.end());
+          std::vector<int> ids (2);
+          ids[0] = graph_->id();
+          ids[1] = graph_->stateSelector()->id();
+          return toIntSeq (ids.begin(), ids.end());
+        } catch (const std::exception& exc) {
+          throw Error (exc.what ());
+        }
       }
 
       void Graph::setWeight (ID edgeId, const Long weight)
