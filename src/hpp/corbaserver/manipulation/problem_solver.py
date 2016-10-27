@@ -45,6 +45,57 @@ class ProblemSolver (object):
         self.client = robot.client
         self.robot = robot
 
+    ## Set random seed of random number generator
+    def setRandomSeed (self, seed):
+        return self.client.basic.problem.setRandomSeed (seed)
+
+    ## Select a problem by its name.
+    #  If no problem with this name exists, a new
+    #  hpp::manipulation::ProblemSolver is created and selected.
+    #  \param name the problem name.
+    #  \return true if a new problem was created.
+    def selectProblem (self, name):
+        return self.client.manipulation.problem.selectProblem (name)
+
+    ## Return a list of available elements of type type
+    #  \param type enter "type" to know what types I know of.
+    #              This is case insensitive.
+    def getAvailable (self, type):
+        if type.lower () == "type":
+            res = self.client.basic.problem.getAvailable (type) + \
+                  self.client.manipulation.problem.getAvailable (type)
+            return res
+        try:
+            return self.client.basic.problem.getAvailable (type)
+        except:
+            return self.client.manipulation.problem.getAvailable (type)
+
+    ## Return a list of selected elements of type type
+    #  \param type enter "type" to know what types I know of.
+    #              This is case insensitive.
+    #  \note For most of the types, the list will contain only one element.
+    def getSelected (self, type):
+        return self.client.basic.problem.getSelected (type)
+
+    ## Set a parameter
+    #  \param value the input type must be long, double, const char*
+    def setParameter (self, name, value):
+        return self.client.basic.problem.setParameter (name, value)
+
+    ## Get parameter with given name
+    #  raise an exception when the parameter is not found.
+    def getParameter (self, name):
+        return self.client.basic.problem.getParameter (name)
+
+    #  Move a path from the current problem to another problem.
+    #  \param problemName the destination problem
+    #  \param jointNames a list of joint names representing the subchain to
+    #         extract from the original path.
+    #  \todo the configuration parameter can be selected but not reorganized.
+    def movePathToProblem (self, pathId, problemName, jointNames):
+        return self.client.basic.problem.movePathToProblem \
+            (pathId, problemName, jointNames)
+
     ## \name Initial and goal configurations
     # \{
 

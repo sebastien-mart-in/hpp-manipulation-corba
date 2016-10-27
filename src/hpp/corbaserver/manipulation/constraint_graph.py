@@ -549,6 +549,7 @@ class ConstraintGraph (object):
     @staticmethod
     ## Build a graph
     # \return a Initialized ConstraintGraph object
+    # \sa hpp::corbaserver::manipulation::Graph::autoBuild
     def buildGenericGraph (robot, name, grippers, objects, handlesPerObjects, shapesPerObjects, envNames, rules = []):
         robot.client.manipulation.graph.autoBuild \
                 (name, grippers, objects, handlesPerObjects, shapesPerObjects, envNames, rules)
