@@ -138,10 +138,18 @@ namespace hpp {
         }
       }
 
-      std::vector <std::string> expandPassiveDofsNameVector (
-          const hpp::Names_t& names, const size_t& s)
+      std::vector <std::string>
+      convertPassiveDofNameVector (const hpp::Names_t& names, const size_t& s)
       {
-        assert (s >= names.length ());
+	if (names.length () != s) {
+	  std::ostringstream oss;
+	  oss << "Number of constraints (" << s
+	      << ") and number of lists of passive joints (" <<
+	    names.length () << ") should be the same."
+	      << std::endl;
+	  oss << "Use ProblemSolver.addPassiveDofs to create lists of passive joints.";
+	    throw std::runtime_error (oss.str ().c_str ());
+	}
         std::vector <std::string> ret (s, std::string ());
         for (CORBA::ULong i=0; i<names.length (); ++i)
           ret [i] = std::string (names[i]);
@@ -443,7 +451,7 @@ namespace hpp {
             edge->insertConditionConstraint (problemSolver()->PsC_t::get <LockedJointPtr_t> (name));
           }
 
-          std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+          std::vector <std::string> pdofNames = convertPassiveDofNameVector
             (paramPDOF, paramNC.length ());
           for (CORBA::ULong i=0; i<paramNC.length (); ++i) {
             std::string name (paramNC [i]);
@@ -511,7 +519,7 @@ namespace hpp {
 
         if (constraintNames.length () > 0) {
           try {
-            std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+            std::vector <std::string> pdofNames = convertPassiveDofNameVector
               (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
@@ -588,7 +596,7 @@ namespace hpp {
 
         if (constraintNames.length () > 0) {
           try {
-            std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+            std::vector <std::string> pdofNames = convertPassiveDofNameVector
               (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
