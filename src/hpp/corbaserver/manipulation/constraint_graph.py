@@ -302,7 +302,8 @@ class ConstraintGraph (object):
                 pregrasps = pregrasp
 
         nc = numConstraints [:]
-        pdofs = ["" for i in range (len(numConstraints))]
+        nopdofs = ["" for i in range (len(numConstraints))]
+        pdofs = nopdofs [::]
         pdofs [:len(passiveJoints)] = passiveJoints [:]
         if grasps is not None:
             for g in grasps:
@@ -319,15 +320,15 @@ class ConstraintGraph (object):
                     pdofs.append (pair.passiveJoints)
 
         if node is not None:
-            self.graph.setNumericalConstraints (self.nodes [node], nc, [])
+            self.graph.setNumericalConstraints (self.nodes [node], nc, nopdofs)
             self.graph.setNumericalConstraintsForPath (self.nodes [node], nc,
                                                        pdofs)
             self.graph.setLockedDofConstraints (self.nodes [node], lockDof)
         elif edge is not None:
-            self.graph.setNumericalConstraints (self.edges [edge], nc, [])
+            self.graph.setNumericalConstraints (self.edges [edge], nc, nopdofs)
             self.graph.setLockedDofConstraints (self.edges [edge], lockDof)
         elif graph:
-            self.graph.setNumericalConstraints (self.graphId, nc, [])
+            self.graph.setNumericalConstraints (self.graphId, nc, nopdofs)
             self.graph.setLockedDofConstraints (self.graphId, lockDof)
 
     ## Set the numerical constraints of a LevelSetEdge that create the foliation.

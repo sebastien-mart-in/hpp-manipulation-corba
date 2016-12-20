@@ -351,7 +351,7 @@ namespace hpp {
       {
 	try {
 	  problemSolver()->createPlacementConstraint (placName,
-              toStringList (surface1), toStringList(surface2), 1e-3);
+              toStringList(surface1), toStringList(surface2), 1e-3);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}

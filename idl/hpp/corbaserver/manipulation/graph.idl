@@ -28,8 +28,8 @@ module hpp {
 
       /// Describe a rule to link or not, a gripper and a handle.
       struct Rule {
-	string gripper;
-	string handle;
+	Names_t grippers;
+	Names_t handles;
 	boolean link;
       };
       typedef sequence<Rule> Rules;
@@ -296,8 +296,8 @@ module hpp {
 	///    ['object_2/contact_1','object_2/contact_2',]
 	///    ['object_3/contact_1',]]
 	/// from hpp.corbaserver.manipulation import Rule
-	/// rules = [Rule('gripper_1', 'object_1/handle_2', True),
-	///          Rule('gripper_1', 'object_3/handle_1', True),]
+	/// rules = [Rule(['gripper_1'], ['object_1/handle_2'], True),
+	///          Rule(['gripper_1'], ['object_3/handle_1'], True),]
 	/// \endcode
         intSeq autoBuild (in string graphName,
             in Names_t grippers, in Names_t objects,

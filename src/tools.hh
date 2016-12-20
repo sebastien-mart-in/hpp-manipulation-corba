@@ -32,6 +32,11 @@ namespace hpp {
   using manipulation::DevicePtr_t;
   using manipulation::ProblemSolverPtr_t;
 
+  inline std::vector<std::string> toStringVector (const Names_t& names) {
+    typedef std::vector<std::string> Out_t;
+    return corbaServer::toStrings<Out_t> (names);
+  }
+
   inline std::list<std::string> toStringList (const Names_t& names) {
     typedef std::list<std::string> Out_t;
     return corbaServer::toStrings<Out_t> (names);

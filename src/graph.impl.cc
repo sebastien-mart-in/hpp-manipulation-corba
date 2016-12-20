@@ -115,16 +115,28 @@ namespace hpp {
           }
           return ret;
         }
+
+        void setRule (const hpp::corbaserver::manipulation::Rule& in, graph::helper::Rule& out)
+        {
+          out.grippers_ = toStringVector (in.grippers);
+          out.handles_  = toStringVector (in.handles );
+          out.link_ = in.link;
+        }
       }
 
-      std::vector <std::string> expandPassiveDofsNameVector (
-          const hpp::Names_t& names, const size_t& s)
+      std::vector <std::string>
+      convertPassiveDofNameVector (const hpp::Names_t& names, const size_t& s)
       {
-        assert (s >= names.length ());
-        std::vector <std::string> ret =
-          corbaServer::toStrings< std::vector<std::string> > (names);
-        ret.resize (s, std::string());
-        return ret;
+	if (names.length () != s) {
+	  std::ostringstream oss;
+	  oss << "Number of constraints (" << s
+	      << ") and number of lists of passive joints (" <<
+	    names.length () << ") should be the same."
+	      << std::endl;
+	  oss << "Use ProblemSolver.addPassiveDofs to create lists of passive joints.";
+	    throw std::runtime_error (oss.str ().c_str ());
+	}
+        return toStringVector (names);
       }
 
       Graph::Graph () :
@@ -422,7 +434,7 @@ namespace hpp {
             edge->insertConditionConstraint (problemSolver()->PsC_t::get <LockedJointPtr_t> (name));
           }
 
-          std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+          std::vector <std::string> pdofNames = convertPassiveDofNameVector
             (paramPDOF, paramNC.length ());
           for (CORBA::ULong i=0; i<paramNC.length (); ++i) {
             std::string name (paramNC [i]);
@@ -490,7 +502,7 @@ namespace hpp {
 
         if (constraintNames.length () > 0) {
           try {
-            std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+            std::vector <std::string> pdofNames = convertPassiveDofNameVector
               (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
@@ -567,7 +579,7 @@ namespace hpp {
 
         if (constraintNames.length () > 0) {
           try {
-            std::vector <std::string> pdofNames = expandPassiveDofsNameVector
+            std::vector <std::string> pdofNames = convertPassiveDofNameVector
               (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
@@ -806,24 +818,27 @@ namespace hpp {
 	std::vector<graph::helper::Rule> rules(rulesList.length());
 
 	for (int i = 0; i < rulesList.length(); ++i) {
-	  rules[i] = graph::helper::Rule(rulesList[i].gripper.in(), rulesList[i].handle.in(),
-					 rulesList[i].link);
+          setRule (rulesList[i], rules[i]);
 	}
-        graph_ = graph::helper::graphBuilder (
-            problemSolver(),
-            graphName,
-            toStringList (grippers),
-            toObjectList (objects, handlesPerObject, shapesPreObject),
-            toStringList (envNames),
-	    rules
-            );
-        problemSolver()->constraintGraph (graph_);
-        problemSolver()->problem()->constraintGraph (graph_);
+        try {
+          graph_ = graph::helper::graphBuilder (
+              problemSolver(),
+              graphName,
+              toStringList (grippers),
+              toObjectList (objects, handlesPerObject, shapesPreObject),
+              toStringList (envNames),
+              rules
+              );
+          problemSolver()->constraintGraph (graph_);
+          problemSolver()->problem()->constraintGraph (graph_);
 
-        std::vector<int> ids (2);
-        ids[0] = graph_->id();
-        ids[1] = graph_->stateSelector()->id();
-        return toIntSeq (ids.begin(), ids.end());
+          std::vector<int> ids (2);
+          ids[0] = graph_->id();
+          ids[1] = graph_->stateSelector()->id();
+          return toIntSeq (ids.begin(), ids.end());
+        } catch (const std::exception& exc) {
+          throw Error (exc.what ());
+        }
       }
 
       void Graph::setWeight (ID edgeId, const Long weight)
