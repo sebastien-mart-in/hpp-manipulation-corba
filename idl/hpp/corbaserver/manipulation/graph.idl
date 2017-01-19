@@ -310,6 +310,8 @@ module hpp {
 
         long getWeight (in ID edgeID)
           raises (Error);
+
+        void getRelativeMotionMatrix (in ID edgeID, out intSeqSeq matrix);
       }; // interface Graph
     }; // module manipulation
   }; // module corbaserver

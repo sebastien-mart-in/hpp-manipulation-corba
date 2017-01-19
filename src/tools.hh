@@ -28,6 +28,7 @@ namespace hpp {
   using corbaServer::floatSeqToVector;
   using corbaServer::vectorToFloatSeq;
   using corbaServer::toIntSeq;
+  using corbaServer::matrixToIntSeqSeq;
   using corbaServer::toNames_t;
   using pinocchio::Transform3f;
   using manipulation::DevicePtr_t;

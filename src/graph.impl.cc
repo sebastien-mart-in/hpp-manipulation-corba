@@ -839,6 +839,13 @@ namespace hpp {
 	  throw Error (exc.what ());
 	}
       }
+
+      void Graph::getRelativeMotionMatrix (ID edgeId, intSeqSeq_out matrix)
+        throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
+        matrix = matrixToIntSeqSeq(edge->relativeMotion().cast<CORBA::Long>());
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

@@ -189,6 +189,9 @@ namespace hpp {
           virtual Long getWeight (ID edgeId)
             throw (hpp::Error);
 
+          virtual void getRelativeMotionMatrix (ID edgeID, intSeqSeq_out matrix)
+            throw (hpp::Error);
+
         private:
           template <typename T> boost::shared_ptr<T> getComp(ID id, bool throwIfWrongType = true);
           ProblemSolverPtr_t problemSolver();
