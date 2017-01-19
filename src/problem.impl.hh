@@ -103,7 +103,8 @@ namespace hpp {
           throw (hpp::Error);
 
       private:
-	ProblemSolverPtr_t problemSolver();
+        ProblemSolverPtr_t problemSolver();
+        graph::GraphPtr_t graph(bool throwIfNull = true);
         Server* server_;
       }; // class Problem
     } // namespace impl

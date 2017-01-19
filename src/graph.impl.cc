@@ -75,22 +75,6 @@ namespace hpp {
         template <> std::string toStr <graph::LevelSetEdge> () { return "LevelSetEdge"; }
         template <> std::string toStr <graph::WaypointEdge> () { return "WaypointEdge"; }
 
-        template <typename T> boost::shared_ptr<T> getComp (ID id, bool throwIfWrongType = true) { 
-          boost::shared_ptr <T> comp;
-          try {
-            comp = HPP_DYNAMIC_PTR_CAST(T,
-                graph::GraphComponent::get(id).lock());
-          } catch (std::out_of_range& e) {
-            throw Error (e.what());
-          }
-          if (throwIfWrongType && !comp) {
-            std::stringstream ss;
-            ss << "ID " << id << " is not a " << toStr <T>();
-            throw Error (ss.str().c_str());
-          }
-          return comp;
-        }
-
         std::list<graph::helper::ObjectDef_t> toObjectList (
             const Names_t& names, const Namess_t& hsPO, const Namess_t& shPO) {
           using graph::helper::ObjectDef_t;
@@ -140,12 +124,36 @@ namespace hpp {
       }
 
       Graph::Graph () :
-        server_ (0x0), graph_ ()
+        server_ (0x0)
       {}
 
       ProblemSolverPtr_t Graph::problemSolver ()
       {
         return server_->problemSolver();
+      }
+
+      graph::GraphPtr_t Graph::graph (bool throwIfNull)
+      {
+        graph::GraphPtr_t g = problemSolver()->constraintGraph();
+        if (throwIfNull && !g)
+          throw Error ("You should create the graph");
+        return g;
+      }
+
+      template <typename T> boost::shared_ptr<T> Graph::getComp (ID id, bool throwIfWrongType)
+      { 
+        boost::shared_ptr <T> comp;
+        try {
+          comp = HPP_DYNAMIC_PTR_CAST(T, graph()->get(id).lock());
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
+        if (throwIfWrongType && !comp) {
+          std::stringstream ss;
+          ss << "ID " << id << " is not a " << toStr <T>();
+          throw Error (ss.str().c_str());
+        }
+        return comp;
       }
 
       Long Graph::createGraph(const char* graphName)
@@ -155,24 +163,21 @@ namespace hpp {
         if (!robot) throw Error ("Build the robot first.");
 	// Create default steering method to store in edges, until we define a
 	// factory for steering methods.
-        graph_ = graph::Graph::create(graphName, robot,
+        graph::GraphPtr_t g = graph::Graph::create(graphName, robot,
             problemSolver()->problem());
-        graph_->maxIterations (problemSolver()->maxIterations ());
-        graph_->errorThreshold (problemSolver()->errorThreshold ());
-        problemSolver()->constraintGraph (graph_);
-        problemSolver()->problem()->constraintGraph (graph_);
-        return (Long) graph_->id ();
+        g->maxIterations (problemSolver()->maxIterations ());
+        g->errorThreshold (problemSolver()->errorThreshold ());
+        problemSolver()->constraintGraph (g);
+        problemSolver()->problem()->constraintGraph (g);
+        return (Long) g->id ();
       }
 
       Long Graph::createSubGraph(const char* subgraphName)
         throw (hpp::Error)
       {
-        if (!graph_)
-          throw Error ("You should create the graph"
-              " before creating subgraph.");
         graph::GuidedStateSelectorPtr_t ns = graph::GuidedStateSelector::create
           (subgraphName, problemSolver()->roadmap ());
-        graph_->stateSelector(ns);
+        graph()->stateSelector(ns);
         return (Long) ns->id ();
       }
 
@@ -250,7 +255,7 @@ namespace hpp {
       void Graph::getGraph (GraphComp_out graph_out, GraphElements_out elmts)
         throw (hpp::Error)
       {
-        if (!graph_) throw Error ("There is no graph");
+        graph::GraphPtr_t g = graph();
         GraphComps_t comp_n, comp_e;
         GraphComp comp_g, current;
 
@@ -262,13 +267,12 @@ namespace hpp {
         try {
           // Set the graph values
           graph_out = new GraphComp ();
-          graph_out->name = graph_->name ().c_str();
-          graph_out->id = (Long) graph_->id ();
+          graph_out->name = g->name ().c_str();
+          graph_out->id = (Long) g->id ();
 
-          for (std::size_t i = 0;
-	       i < graph::GraphComponent::components().size (); ++i) {
-            if (i == graph_->id ()) continue;
-            graph::GraphComponentPtr_t gcomponent = graph::GraphComponent::get(i).lock();
+          for (std::size_t i = 0; i < g->nbComponents(); ++i) {
+            if (i == g->id ()) continue;
+            graph::GraphComponentPtr_t gcomponent = g->get(i).lock();
             if (!gcomponent) continue;
             current.name = gcomponent->name ().c_str ();
             current.id   = (Long) gcomponent->id ();
@@ -304,7 +308,6 @@ namespace hpp {
       void Graph::getEdgeStat (ID edgeId, Names_t_out reasons, intSeq_out freqs)
         throw (hpp::Error)
       {
-        if (!graph_) throw Error ("You should create the graph");
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
         core::PathPlannerPtr_t p = problemSolver()->pathPlanner ();
         if (!p) throw Error ("There is no planner");
@@ -325,10 +328,9 @@ namespace hpp {
       Long Graph::getFrequencyOfNodeInRoadmap (ID nodeId, intSeq_out freqPerConnectedComponent)
         throw (hpp::Error)
       {
-        if (!graph_) throw Error ("You should create the graph");
         graph::StatePtr_t state = getComp <graph::State> (nodeId, true);
         // Long nb = graph_->nodeHistogram()->freq(graph::NodeBin(node));
-        Long nb = 0;
+        std::size_t nb = 0;
         const core::ConnectedComponents_t& ccs = problemSolver()->roadmap ()->connectedComponents();
         core::ConnectedComponents_t::const_iterator _cc;
         std::vector<std::size_t> freqs;
@@ -341,20 +343,18 @@ namespace hpp {
           nb += freqs.back();
         }
         freqPerConnectedComponent = toIntSeq(freqs.begin(), freqs.end());
-        return nb;
+        return (Long) nb;
       }
 
       bool Graph::getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
           ConfigProjStat_out path)
         throw (hpp::Error)
       {
-        if (!graph_)
-          throw Error ("You should create the graph");
         graph::StatePtr_t state = getComp <graph::State> (elmt, false);
         graph::EdgePtr_t edge = getComp <graph::Edge> (elmt, false);
         if (state) {
           ConfigProjectorPtr_t proj =
-            graph_->configConstraint (state)->configProjector ();
+            graph()->configConstraint (state)->configProjector ();
           if (proj) {
             config.success = (Long) proj->statistics().nbSuccess();
             config.error = (Long) proj->statistics().nbFailure();
@@ -366,13 +366,13 @@ namespace hpp {
           return true;
         } else if (edge) {
           ConfigProjectorPtr_t proj =
-            graph_->configConstraint (edge)->configProjector ();
+            graph()->configConstraint (edge)->configProjector ();
           if (proj) {
             config.success = (Long) proj->statistics().nbSuccess();
             config.error = (Long) proj->statistics().nbFailure();
             config.nbObs = (Long) proj->statistics().numberOfObservations();
           }
-          proj = graph_->pathConstraint (edge)->configProjector ();
+          proj = graph()->pathConstraint (edge)->configProjector ();
           if (proj) {
             path.success = (Long) proj->statistics().nbSuccess();
             path.error = (Long) proj->statistics().nbFailure();
@@ -496,9 +496,7 @@ namespace hpp {
           const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
       {
-        graph::GraphComponentPtr_t component = graph::GraphComponent::get(graphComponentId).lock();
-        if (!component)
-          throw Error ("The ID does not exist.");
+        graph::GraphComponentPtr_t component = getComp<graph::GraphComponent>(graphComponentId, true);
 
         if (constraintNames.length () > 0) {
           try {
@@ -523,14 +521,10 @@ namespace hpp {
       void Graph::getNumericalConstraints(const Long graphComponentId, hpp::Names_t_out names)
 	throw(hpp::Error)
       {
-	if (!graph_)
-	  throw Error("You should create a graph");
-	graph::GraphComponentPtr_t elmt = graph::GraphComponent::get(graphComponentId).lock();
-	if (!elmt)
-	  throw Error("The component doesn't exists");
+	graph::GraphComponentPtr_t elmt = getComp<graph::GraphComponent>(graphComponentId);
 	core::NumericalConstraints_t constraints = elmt->numericalConstraints();
 	names = new hpp::Names_t;
-	names->length(constraints.size());
+	names->length((ULong)constraints.size());
 	int i = 0;
 	for (core::NumericalConstraints_t::iterator it = constraints.begin();
 	     it != constraints.end(); ++it) {
@@ -542,14 +536,10 @@ namespace hpp {
       void Graph::getLockedJoints(const Long graphComponentId, hpp::Names_t_out names)
 	throw(hpp::Error)
       {
-	if (!graph_)
-	  throw Error("You should create a graph");
-	graph::GraphComponentPtr_t elmt = graph::GraphComponent::get(graphComponentId).lock();
-	if (!elmt)
-	  throw Error("The component doesn't exists");
+	graph::GraphComponentPtr_t elmt = getComp<graph::GraphComponent>(graphComponentId, true);
 	core::LockedJoints_t lockedJoints = elmt->lockedJoints();
 	names = new hpp::Names_t;
-	names->length(lockedJoints.size());
+	names->length((ULong)lockedJoints.size());
 	int i = 0;
 	for (core::LockedJoints_t::iterator it = lockedJoints.begin();
 	     it != lockedJoints.end(); ++it) {
@@ -560,12 +550,7 @@ namespace hpp {
 
       void Graph::resetConstraints(const Long graphComponentId) throw (hpp::Error)
       {
-	if (!graph_)
-	  throw Error("You should create a graph");
-        graph::GraphComponentPtr_t component = graph::GraphComponent::get(graphComponentId).lock();
-        if (!component)
-          throw Error ("The ID does not exist.");
-
+        graph::GraphComponentPtr_t component = getComp<graph::GraphComponent>(graphComponentId, true);
 	component->resetNumericalConstraints();
 	component->resetLockedJoints();
       }
@@ -599,9 +584,7 @@ namespace hpp {
           const hpp::Names_t& constraintNames)
         throw (hpp::Error)
       {
-        graph::GraphComponentPtr_t component = graph::GraphComponent::get(graphComponentId).lock();
-        if (!component)
-          throw Error ("The ID does not exist.");
+        graph::GraphComponentPtr_t component = getComp<graph::GraphComponent>(graphComponentId, true);
 
         if (constraintNames.length () > 0) {
           try {
@@ -619,11 +602,10 @@ namespace hpp {
       void Graph::getNode (const hpp::floatSeq& dofArray, ID_out output)
         throw (hpp::Error)
       {
-        if (!graph_) throw Error ("There is no graph");
         try {
           Configuration_t config (floatSeqToConfig (problemSolver (),
 						    dofArray));
-          graph::StatePtr_t state = graph_->getState (config);
+          graph::StatePtr_t state = graph()->getState (config);
           output = (Long) state->id();
         } catch (std::exception& e) {
           throw Error (e.what());
@@ -639,13 +621,8 @@ namespace hpp {
 	  vector_t err;
           Configuration_t config (floatSeqToConfig (problemSolver (),
 						    dofArray));
-	  bool res = graph_->getConfigErrorForState (config, state, err);
-	  floatSeq* e = new floatSeq ();
-	  e->length ((ULong) err.size ());
-	  for (std::size_t i=0; i < (std::size_t) err.size (); ++i) {
-	    (*e) [(ULong) i] = err [i];
-	  }
-	  error = e;
+	  bool res = graph()->getConfigErrorForState (config, state, err);
+	  error = vectorToFloatSeq(err);
 	  return res;
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -668,7 +645,7 @@ namespace hpp {
 	  vector_t err;
           Configuration_t config (floatSeqToConfig (problemSolver (),
 						    dofArray));
-	  bool res = graph_->getConfigErrorForEdge (config, edge, err);
+	  bool res = graph()->getConfigErrorForEdge (config, edge, err);
 	  floatSeq* e = new floatSeq ();
 	  e->length ((ULong) err.size ());
 	  for (std::size_t i=0; i < (std::size_t) err.size (); ++i) {
@@ -700,7 +677,7 @@ namespace hpp {
 							leafDofArray));
           Configuration_t config (floatSeqToConfig (problemSolver (),
 						    dofArray));
-	  bool res = graph_->getConfigErrorForEdgeLeaf
+	  bool res = graph()->getConfigErrorForEdgeLeaf
 	    (leafConfig, config, edge, err);
 	  floatSeq* e = new floatSeq ();
 	  e->length ((ULong) err.size ());
@@ -719,7 +696,7 @@ namespace hpp {
       (hpp::ID nodeId, CORBA::String_out constraints) throw (Error)
       {
 	graph::StatePtr_t state = getComp <graph::State> (nodeId);
-	ConstraintSetPtr_t cs (graph_->configConstraint (state));
+	ConstraintSetPtr_t cs (graph()->configConstraint (state));
 	std::ostringstream oss;
 	oss << (*cs);
 	constraints = oss.str ().c_str ();
@@ -729,7 +706,7 @@ namespace hpp {
       (hpp::ID edgeId, CORBA::String_out constraints) throw (Error)
       {
 	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-	ConstraintSetPtr_t cs (graph_->configConstraint (edge));
+	ConstraintSetPtr_t cs (graph()->configConstraint (edge));
 	std::ostringstream oss;
 	oss << (*cs);
 	constraints = oss.str ().c_str ();
@@ -739,7 +716,7 @@ namespace hpp {
       (hpp::ID edgeId, CORBA::String_out constraints) throw (Error)
       {
 	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-	ConstraintSetPtr_t cs (graph_->pathConstraint (edge));
+	ConstraintSetPtr_t cs (graph()->pathConstraint (edge));
 	std::ostringstream oss;
 	oss << (*cs);
 	constraints = oss.str ().c_str ();
@@ -757,10 +734,10 @@ namespace hpp {
       void Graph::display (const char* filename)
         throw (hpp::Error)
       {
-        std::cout << *graph_;
+        std::cout << *graph();
         std::ofstream dotfile;
         dotfile.open (filename);
-        graph_->dotPrint (dotfile);
+        graph()->dotPrint (dotfile);
         dotfile.close();
       }
 
@@ -775,15 +752,15 @@ namespace hpp {
           floatSeqSeq *_values = new floatSeqSeq ();
           _freq->length (hist->numberOfBins ());
           _values->length (hist->numberOfBins ());
-          size_type i = 0;
+          ULong i = 0;
           for (graph::LeafHistogram::const_iterator it = hist->begin ();
               it != hist->end (); ++it) {
-            (*_freq)[i] = it->freq ();
+            (*_freq)[i] = (CORBA::Double) it->freq ();
             floatSeq v;
             const vector_t& offset = it->value();
-            v.length (offset.size());
-            for (size_type j = 0; j < offset.size(); ++j)
-              v[j] = offset [j];
+            v.length ((ULong)offset.size());
+            for (ULong j = 0; j < offset.size(); ++j)
+              v[j] = (CORBA::Double) offset [j];
             (*_values)[i] = v;
             i++;
           }
@@ -817,11 +794,11 @@ namespace hpp {
       {
 	std::vector<graph::helper::Rule> rules(rulesList.length());
 
-	for (int i = 0; i < rulesList.length(); ++i) {
+	for (ULong i = 0; i < rulesList.length(); ++i) {
           setRule (rulesList[i], rules[i]);
 	}
         try {
-          graph_ = graph::helper::graphBuilder (
+          graph::GraphPtr_t g = graph::helper::graphBuilder (
               problemSolver(),
               graphName,
               toStringList (grippers),
@@ -829,12 +806,12 @@ namespace hpp {
               toStringList (envNames),
               rules
               );
-          problemSolver()->constraintGraph (graph_);
-          problemSolver()->problem()->constraintGraph (graph_);
+          problemSolver()->constraintGraph (g);
+          problemSolver()->problem()->constraintGraph (g);
 
-          std::vector<int> ids (2);
-          ids[0] = graph_->id();
-          ids[1] = graph_->stateSelector()->id();
+          std::vector<std::size_t> ids (2);
+          ids[0] = g->id();
+          ids[1] = g->stateSelector()->id();
           return toIntSeq (ids.begin(), ids.end());
         } catch (const std::exception& exc) {
           throw Error (exc.what ());
@@ -857,7 +834,7 @@ namespace hpp {
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
-          return edge->from ()->getWeight (edge);
+          return (Long) edge->from ()->getWeight (edge);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}

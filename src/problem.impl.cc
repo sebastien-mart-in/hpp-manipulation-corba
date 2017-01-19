@@ -96,7 +96,7 @@ namespace hpp {
           pts->length ((CORBA::ULong) nbPts);
 
           rank = 0;
-          std::size_t iJs = 0;
+          ULong iJs = 0;
           for (JointAndShapes_t::const_iterator itJs = js.begin ();
               itJs != js.end (); ++itJs) {
             for (std::size_t i = 0; i < itJs->second.size (); ++i) {
@@ -130,6 +130,14 @@ namespace hpp {
       ProblemSolverPtr_t Problem::problemSolver ()
       {
         return server_->problemSolver();
+      }
+
+      graph::GraphPtr_t Problem::graph (bool throwIfNull)
+      {
+        graph::GraphPtr_t g = problemSolver()->constraintGraph();
+        if (throwIfNull && !g)
+          throw Error ("You should create the graph");
+        return g;
       }
 
       bool Problem::selectProblem (const char* name)
@@ -206,7 +214,6 @@ namespace hpp {
 	    (handle->createGraspComplement (gripper));
 	  problemSolver()->addNumericalConstraint (graspName, constraint);
 	  problemSolver()->addNumericalConstraint (std::string(graspName) + "/complement", complement);
-          problemSolver()->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -226,7 +233,6 @@ namespace hpp {
 	  NumericalConstraintPtr_t constraint =
 	    handle->createPreGrasp (gripper, c);
 	  problemSolver()->addNumericalConstraint (name, constraint);
-          problemSolver()->addGrasp(constraint, gripper, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -409,7 +415,6 @@ namespace hpp {
           CenterOfMassComputationPtr_t com = CenterOfMassComputation::create
             (robot);
           com->add (robot->rootJoint ());
-          com->computeMass ();
           QPStaticStabilityPtr_t c = QPStaticStability::create (placName, robot,
               fds, com);
           problemSolver()->addNumericalConstraint (placName,
@@ -429,21 +434,18 @@ namespace hpp {
         /// First get the constraint.
         ConstraintSetPtr_t constraint;
         try {
-          graph::GraphComponentPtr_t comp = graph::GraphComponent::get
-	    ((size_t)id).lock ();
+          graph::GraphComponentPtr_t comp = graph()->get ((size_t)id).lock ();
           graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
           graph::StatePtr_t state = HPP_DYNAMIC_PTR_CAST(graph::State, comp);
           if (edge) {
-            constraint =
-	      problemSolver()->constraintGraph ()->configConstraint (edge);
+            constraint = graph(false)->configConstraint (edge);
             DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	    if (core::ConfigProjectorPtr_t cp =
 		constraint->configProjector ()) {
 	      cp->rightHandSideFromConfig (robot->currentConfiguration());
 	    }
           } else if (state)
-            constraint =
-	      problemSolver()->constraintGraph ()->configConstraint (state);
+            constraint = graph(false)->configConstraint (state);
           else {
             std::stringstream ss;
             ss << "ID " << id << " is neither an edge nor a state";
@@ -457,14 +459,7 @@ namespace hpp {
 	      constraint ->configProjector ()) {
 	    residualError = configProjector->residualError ();
 	  }
-	  ULong size = (ULong) config->size ();
-	  hpp::floatSeq* q_ptr = new hpp::floatSeq ();
-	  q_ptr->length (size);
-
-	  for (std::size_t i=0; i<size; ++i) {
-	    (*q_ptr) [(ULong) i] = (*config) [i];
-	  }
-	  output = q_ptr;
+	  output = vectorToFloatSeq(*config);
 	  return success;
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
@@ -481,8 +476,7 @@ namespace hpp {
         /// First get the constraint.
         graph::EdgePtr_t edge;
         try {
-          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
-                  graph::GraphComponent::get((size_t)IDedge).lock ());
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, graph()->get((size_t)IDedge).lock ());
           if (!edge) {
             std::stringstream ss;
             ss << "ID " << IDedge << " is not an edge";
@@ -532,8 +526,7 @@ namespace hpp {
         /// First get the constraint.
         graph::EdgePtr_t edge;
         try {
-          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge,
-                  graph::GraphComponent::get((size_t)IDedge).lock ());
+          edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, graph()->get((size_t)IDedge).lock ());
           if (!edge) {
             std::stringstream ss;
             ss << "ID " << IDedge << " is not an edge";
