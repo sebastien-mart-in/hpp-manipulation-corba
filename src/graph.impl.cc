@@ -55,14 +55,9 @@ namespace hpp {
       using graph::LevelSetEdgePtr_t;
       using graph::WaypointEdgePtr_t;
 
-      namespace {
-	static Configuration_t floatSeqToConfig
-	(hpp::manipulation::ProblemSolverPtr_t problemSolver,
-	 const hpp::floatSeq& dofArray)
-	{
-          return floatSeqToVector (dofArray, problemSolver->robot()->configSize());
-	}
+      using corbaServer::floatSeqToConfig;
 
+      namespace {
         typedef core::ProblemSolver CPs_t;
         typedef ProblemSolver::ThisC_t PsC_t;
 
@@ -602,9 +597,9 @@ namespace hpp {
       void Graph::getNode (const hpp::floatSeq& dofArray, ID_out output)
         throw (hpp::Error)
       {
+        DevicePtr_t robot = getRobotOrThrow (problemSolver());
         try {
-          Configuration_t config (floatSeqToConfig (problemSolver (),
-						    dofArray));
+          Configuration_t config (floatSeqToConfig (robot, dofArray, true));
           graph::StatePtr_t state = graph()->getState (config);
           output = (Long) state->id();
         } catch (std::exception& e) {
@@ -617,10 +612,10 @@ namespace hpp {
 	throw (hpp::Error)
       {
 	graph::StatePtr_t state = getComp <graph::State> (nodeId);
+        DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
 	  vector_t err;
-          Configuration_t config (floatSeqToConfig (problemSolver (),
-						    dofArray));
+          Configuration_t config (floatSeqToConfig (robot, dofArray, true));
 	  bool res = graph()->getConfigErrorForState (config, state, err);
 	  error = vectorToFloatSeq(err);
 	  return res;
@@ -633,6 +628,7 @@ namespace hpp {
       (ID edgeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
 	throw (hpp::Error)
       {
+        DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
 	  graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	  // If steering method is not completely set in the graph, create
@@ -643,8 +639,7 @@ namespace hpp {
 	    problemSolver ()->initSteeringMethod ();
 	  }
 	  vector_t err;
-          Configuration_t config (floatSeqToConfig (problemSolver (),
-						    dofArray));
+          Configuration_t config (floatSeqToConfig (robot, dofArray, true));
 	  bool res = graph()->getConfigErrorForEdge (config, edge, err);
 	  floatSeq* e = new floatSeq ();
 	  e->length ((ULong) err.size ());
@@ -663,6 +658,7 @@ namespace hpp {
        const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
 	throw (hpp::Error)
       {
+        DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
 	  graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	  // If steering method is not completely set in the graph, create
@@ -673,10 +669,8 @@ namespace hpp {
 	    problemSolver ()->initSteeringMethod ();
 	  }
 	  vector_t err;
-          Configuration_t leafConfig (floatSeqToConfig (problemSolver (),
-							leafDofArray));
-          Configuration_t config (floatSeqToConfig (problemSolver (),
-						    dofArray));
+          Configuration_t leafConfig (floatSeqToConfig (robot, leafDofArray, true));
+          Configuration_t config (floatSeqToConfig (robot, dofArray, true));
 	  bool res = graph()->getConfigErrorForEdgeLeaf
 	    (leafConfig, config, edge, err);
 	  floatSeq* e = new floatSeq ();

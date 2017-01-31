@@ -48,6 +48,7 @@ namespace hpp {
   namespace manipulation {
     namespace impl {
       namespace {
+        using corbaServer::floatSeqToConfigPtr;
         typedef core::ProblemSolver CPs_t;
         typedef ProblemSolver::ThisC_t PsC_t;
 
@@ -112,15 +113,6 @@ namespace hpp {
           }
           return jointNames;
         }
-      }
-
-      static ConfigurationPtr_t floatSeqToConfig
-      (hpp::manipulation::ProblemSolverPtr_t problemSolver,
-       const hpp::floatSeq& dofArray)
-      {
-        return ConfigurationPtr_t (new Configuration_t (
-              floatSeqToVector (dofArray, problemSolver->robot()->configSize())
-              ));
       }
 
       Problem::Problem () : server_ (0x0)
@@ -453,7 +445,8 @@ namespace hpp {
             throw Error (errmsg.c_str());
           }
 	  bool success = false;
-	  ConfigurationPtr_t config = floatSeqToConfig (problemSolver(), input);
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	  ConfigurationPtr_t config = floatSeqToConfigPtr (robot, input, true);
 	  success = constraint->apply (*config);
 	  if (hpp::core::ConfigProjectorPtr_t configProjector =
 	      constraint ->configProjector ()) {
@@ -484,9 +477,9 @@ namespace hpp {
             throw Error (errmsg.c_str());
           }
 	  bool success = false;
-	  ConfigurationPtr_t config = floatSeqToConfig (problemSolver(), input);
-	  ConfigurationPtr_t qoffset =
-	    floatSeqToConfig (problemSolver(), qnear);
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	  ConfigurationPtr_t config = floatSeqToConfigPtr (robot, input, true);
+	  ConfigurationPtr_t qoffset = floatSeqToConfigPtr (robot, qnear, true);
           value_type dist = 0;
           core::NodePtr_t nNode = problemSolver()->roadmap()->nearestNode
 	    (qoffset, dist);
@@ -541,8 +534,9 @@ namespace hpp {
 	    problemSolver ()->initSteeringMethod ();
 	  }
 	  bool success = false;
-	  ConfigurationPtr_t q1 = floatSeqToConfig (problemSolver(), qb);
-	  ConfigurationPtr_t q2 = floatSeqToConfig (problemSolver(), qe);
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	  ConfigurationPtr_t q1 = floatSeqToConfigPtr (robot, qb, true);
+	  ConfigurationPtr_t q2 = floatSeqToConfigPtr (robot, qe, true);
 	  core::PathVectorPtr_t pv;
 	  indexNotProj = -1;
 	  indexProj = -1;
