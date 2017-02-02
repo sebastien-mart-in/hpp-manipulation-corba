@@ -431,15 +431,14 @@ class ProblemSolver (object):
         return lockedJoints
 
     ## Lock degree of freedom of a planar joint
-    # \param planar base name of the joint
+    # \param jointName name of the joint
     #        (It will be completed by '_xy' and '_rz'),
-    # \param lockJointBname base name of the LockedJoint constraints
-    #        (It will be completed by '_xy' and '_rz'),
+    # \param lockJointName name of the LockedJoint constraint
     # \param values config of the locked joints (4 float)
-    def lockPlanarJoint (self, planarBname, lockJointBname, values = (0,0,1,0)):
+    def lockPlanarJoint (self, jointName, lockJointName, values = (0,0,1,0)):
         lockedJoints = list ()
-        self.createLockedJoint (lockJointBname, planarBname, values)
-        lockedJoints.append (lockJointBname)
+        self.createLockedJoint (lockJointName, jointName, values)
+        lockedJoints.append (lockJointName)
         return lockedJoints
 
     ## Lock degree of freedom with given value
