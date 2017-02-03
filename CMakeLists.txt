@@ -62,12 +62,12 @@ SET(HPP_MANIPULATION_HAS_WHOLEBODY_STEP TRUE
 
 ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
 IF (HPP_MANIPULATION_HAS_WHOLEBODY_STEP)
-  ADD_REQUIRED_DEPENDENCY ("hpp-wholebody-step-corba >= 3")
+  ADD_REQUIRED_DEPENDENCY ("hpp-wholebody-step-corba >= 4")
 ENDIF ()
 IF (NOT CLIENT_ONLY)
-  ADD_DOC_DEPENDENCY("hpp-core >= 3")
-  ADD_REQUIRED_DEPENDENCY("hpp-manipulation")
-  ADD_REQUIRED_DEPENDENCY("hpp-manipulation-urdf")
+  ADD_DOC_DEPENDENCY("hpp-core >= 4")
+  ADD_REQUIRED_DEPENDENCY("hpp-manipulation >= 4")
+  ADD_REQUIRED_DEPENDENCY("hpp-manipulation-urdf >= 4")
 ENDIF (NOT CLIENT_ONLY)
 ADD_REQUIRED_DEPENDENCY("omniORB4 >= 4.1.4")
 
