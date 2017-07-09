@@ -350,6 +350,14 @@ class ProblemSolver (object):
     def addPartialCom (self, comName, jointNames):
         return self.client.basic.robot.addPartialCom (comName, jointNames);
 
+    ## Get the position of a partial COM created with addPartialCom
+    def getPartialCom (self, comName):
+        return self.client.basic.robot.getPartialCom (comName)
+
+    ## Get the Jacobian of a partial COM created with addPartialCom
+    def getJacobianPartialCom (self, comName):
+        return self.client.basic.robot.getJacobianPartialCom (comName)
+
     ## Create a vector of passive dofs.
     #
     #  \param name name of the vector in the ProblemSolver map.
