@@ -495,6 +495,15 @@ class ConstraintGraph (object):
         return self.client.graph.getConfigErrorForNode \
           (self.nodes [nodeId], config)
 
+    ##  Get the node corresponding to the state of the configuration.
+    #  \param dofArray the configuration.
+    #  \return the name of the node
+    def getNode (self, config):
+        nodeId = self.client.graph.getNode (config)
+        for n,id in self.nodes.iteritems ():
+            if id == nodeId: return n
+        raise RuntimeError ("No node with id {0}".format (nodeId))
+
     ## Get error of a config with respect to a edge constraint
     #
     #  \param edge name of the edge.
