@@ -327,7 +327,7 @@ class ConstraintGraph (object):
         else:
             return self._setConstraints \
                 (graph = graph, node = node, edge = edge, grasps = grasps,
-                 pregrasps = pregrasps, lockDof = lockedDof,
+                 pregrasps = pregrasps, lockDof = lockDof,
                  numConstraints = numConstraints, passiveJoints = passiveJoints)
 
     def _setConstraints (self, graph = False, node = None, edge = None,
