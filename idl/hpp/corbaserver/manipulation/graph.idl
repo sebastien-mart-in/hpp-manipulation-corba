@@ -284,7 +284,7 @@ module hpp {
 	///        environment,
 	/// \param list of rules.
 	///
-	/// \note: we consider a robot with two grippers, three objects with
+	/// \note we consider a robot with two grippers, three objects with
 	///   respectively two, one and one handles, and respectively one, two
 	///   and one contact surface.
 	/// \code
@@ -299,6 +299,12 @@ module hpp {
 	/// rules = [Rule(['gripper_1'], ['object_1/handle_2'], True),
 	///          Rule(['gripper_1'], ['object_3/handle_1'], True),]
 	/// \endcode
+        ///
+        // \par allows to create two separated notes.
+        /// \par
+        /// \note In the rules, gripper and handle names are treated as
+        ///       regular expressions as defined in http://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html .
+        ///       Pay attention to the version of boost you use.
         intSeq autoBuild (in string graphName,
             in Names_t grippers, in Names_t objects,
             in Namess_t handlesPerObject, in Namess_t contactsPerObject,
