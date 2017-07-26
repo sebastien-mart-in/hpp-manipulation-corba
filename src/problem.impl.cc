@@ -54,20 +54,6 @@ namespace hpp {
         typedef core::ProblemSolver CPs_t;
         typedef ProblemSolver::ThisC_t PsC_t;
 
-        core::ComparisonTypePtr_t stringToComparisonType (const std::string& s, const value_type& thr = 0) {
-          // TODO: Comparison type DoubleInequality is omitted because the
-          // constructor requires a width parameter.
-          if (s.compare ("Equality") == 0)
-            return core::Equality::create ();
-          if (s.compare ("EqualToZero") == 0)
-            return core::EqualToZero::create ();
-          if (s.compare ("SuperiorIneq") == 0)
-            return core::SuperiorIneq::create (thr);
-          if (s.compare ("InferiorIneq") == 0)
-            return core::InferiorIneq::create (thr);
-          throw Error ((s + std::string (" is not a ComparisonType")).c_str ());
-        }
-
         Names_t* jointAndShapes (const JointAndShapes_t& js,
             intSeq_out indexes_out, floatSeqSeq_out points) {
           char** nameList = Names_t::allocbuf((ULong) js.size ());
@@ -416,6 +402,9 @@ namespace hpp {
               NumericalConstraint::create (c, core::EqualToZero::create())
               );
 #else
+          // Avoid unused-variable compilation warnings
+          (void)placName;
+          (void)shapesName;
           throw std::runtime_error
             ("Problem::createQPStabilityConstraint is not implemented");
 #endif
