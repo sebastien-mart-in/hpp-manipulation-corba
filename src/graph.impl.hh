@@ -94,11 +94,7 @@ namespace hpp {
                                           const Long nodeToId,
                                           const char* edgeName,
                                           const Long w,
-                                          const bool isInNodeFrom)
-            throw (hpp::Error);
-
-          virtual void isInNodeFrom (const Long edgeId,
-                                     const bool isInNodeFrom)
+                                          const Long isInNodeId)
             throw (hpp::Error);
 
           virtual void setContainingNode (const ID edgeId, const ID nodeId)

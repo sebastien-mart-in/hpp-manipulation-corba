@@ -393,18 +393,18 @@ namespace hpp {
         return (Long) waypoint->id ();
       }
 
-      Long Graph::createLevelSetEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const bool isInNodeFrom)
+      Long Graph::createLevelSetEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const ID isInNodeId)
         throw (hpp::Error)
       {
-        graph::StatePtr_t from = getComp <graph::State> (nodeFromId),
-                         to   = getComp <graph::State> (nodeToId  );
+        graph::StatePtr_t from      = getComp <graph::State> (nodeFromId),
+                          to        = getComp <graph::State> (nodeToId  ),
+	                  isInState = getComp <graph::State> (isInNodeId);
 
         graph::EdgePtr_t edge = from->linkTo
           (edgeName, to, (size_type)w,
            (graph::State::EdgeFactory)graph::LevelSetEdge::create);
 
-        if (isInNodeFrom) edge->state (from);
-        else edge->state (to);
+        edge->state (isInState);
 
         return (Long) edge->id ();
       }
@@ -444,17 +444,6 @@ namespace hpp {
           }
 
           edge->buildHistogram ();
-        } catch (std::exception& err) {
-          throw Error (err.what());
-        }
-      }
-
-      void Graph::isInNodeFrom (const Long edgeId, const bool isInNodeFrom)
-        throw (hpp::Error)
-      {
-        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-        try {
-          edge->isInNodeFrom (isInNodeFrom);
         } catch (std::exception& err) {
           throw Error (err.what());
         }

@@ -113,13 +113,10 @@ class ConstraintGraph (object):
             from warnings import warn
             warn ("argument isInNode should be of type string")
             if isInNode is None:
-                isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
-            else:
-                isInNodeFrom = isInNode
-            if isInNodeFrom:
-                isInNode = nodeFrom
-            else:
-                isInNode = nodeTo
+                if self.nodes[nodeFrom] > self.nodes[nodeTo]:
+                    isInNode = nodeFrom
+                else:
+                    isInNode = nodeTo
         self.edges [name] = self.graph.createEdge \
                             (self.nodes[nodeFrom], self.nodes[nodeTo],
                              self._(name), weight, self.nodes[isInNode])
@@ -167,13 +164,10 @@ class ConstraintGraph (object):
             from warnings import warn
             warn ("argument isInNode should be of type string")
             if isInNode is None:
-                isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
-            else:
-                isInNodeFrom = isInNode
-            if isInNodeFrom:
-                isInNode = nodeFrom
-            else:
-                isInNode = nodeTo
+                if self.nodes[nodeFrom] > self.nodes[nodeTo]:
+                    isInNode = nodeFrom
+                else:
+                    isInNode = nodeTo
 
         if automaticBuilder:
             n = name + "_e" + str(nb)
@@ -201,13 +195,16 @@ class ConstraintGraph (object):
             previous = n
 
     ### Create a LevelSetEdge.
-    ## \param nodeFrom, nodeTo, name, weight, isInNodeFrom see createEdge note.
+    ## \param nodeFrom, nodeTo, name, weight, isInNode see createEdge note.
     ## \note See documentation of class hpp::manipulation::graph::LevelSetEdge for more information.
-    def createLevelSetEdge (self, nodeFrom, nodeTo, name, weight = 1, isInNodeFrom = None):
-        if isInNodeFrom is None:
-            isInNodeFrom = (self.nodes[nodeFrom] > self.nodes[nodeTo])
+    def createLevelSetEdge (self, nodeFrom, nodeTo, name, weight = 1, isInNode = None):
+        if isInNode is None:
+            if self.nodes[nodeFrom] > self.nodes[nodeTo]:
+                isInNode = nodeFrom
+            else:
+                isInNode = nodeTo
         self.edges [name] =\
-            self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, isInNodeFrom)
+            self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, isInNode)
 
     ## Create grasp constraints between robot gripper and object handle
     #

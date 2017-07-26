@@ -65,15 +65,6 @@ module hpp {
 
         /// Set in which node an edge is.
         /// \param edgeId the ID of the edge,
-        /// \param isInNodeFrom whether or not a path corresponding to this edge is in the node from.
-        /// \note A finer control of the containing node can be achieve with
-        ///       setContainingNode
-        /// \deprecated
-        void isInNodeFrom (in long edgeId, in boolean isInNodeFrom)
-          raises (Error);
-
-        /// Set in which node an edge is.
-        /// \param edgeId the ID of the edge,
         /// \param nodeId the ID of the node in which the edge is.
         void setContainingNode (in ID edgeId, in ID nodeId)
           raises (Error);
@@ -130,7 +121,9 @@ module hpp {
         /// \param nodeFromId, nodeToId the ID of the ends of the new edge.
         /// \param edgeName name of the new edge.
         /// \param weight weight of the edge.
-        long createLevelSetEdge(in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in boolean isInNodeFrom)
+	/// \param isInNodeId id of the node in which paths of the edge are
+	///        included.
+        long createLevelSetEdge(in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in ID isInNodeId)
           raises (Error);
 
         /// Set the constraints of a LevelSetEdge that create the foliation.
