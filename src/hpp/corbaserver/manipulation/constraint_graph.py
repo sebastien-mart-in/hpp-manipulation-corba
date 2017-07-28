@@ -304,8 +304,7 @@ class ConstraintGraph (object):
                            resolution)
           note: Exaclty one of the parameter graph, node and edge must be set.
         """
-        if constraints is None or not grasps is None or not pregrasps is None \
-           or not lockDof is None or not numConstraints is None :
+        if constraints is None :
             from warnings import warn
             warn ("arguments grasps, pregrasps, lockDof and numConstraints " +\
                   "are deprecated. Use argument constraints instead")
@@ -594,7 +593,8 @@ class ConstraintGraph (object):
     @staticmethod
     ## Build a graph
     # \return a Initialized ConstraintGraph object
-    # \sa hpp::corbaserver::manipulation::Graph::autoBuild
+    # \sa hpp::corbaserver::manipulation::Graph::autoBuild for complete
+    #     documentation.
     def buildGenericGraph (robot, name, grippers, objects, handlesPerObjects, shapesPerObjects, envNames, rules = []):
         robot.client.manipulation.graph.autoBuild \
                 (name, grippers, objects, handlesPerObjects, shapesPerObjects, envNames, rules)

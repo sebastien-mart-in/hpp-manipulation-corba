@@ -277,7 +277,7 @@ module hpp {
 	///        environment,
 	/// \param list of rules.
 	///
-	/// \note we consider a robot with two grippers, three objects with
+	/// \note We consider a robot with two grippers, three objects with
 	///   respectively two, one and one handles, and respectively one, two
 	///   and one contact surface.
 	/// \code
@@ -298,6 +298,14 @@ module hpp {
         /// \note In the rules, gripper and handle names are treated as
         ///       regular expressions as defined in http://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html .
         ///       Pay attention to the version of boost you use.
+        /// \note When creating placement constraints for object "foo", if a
+        ///       constraint with name "place_foo" already exists, the
+        ///       constraint will be used as placement constraint. In this case,
+        ///       if defined, constraint "preplace_foo" will be used as
+        ///       preplacement constraint, if not defined, no preplacement
+        ///       waypoint will be inserted in the graph. If constraint
+        ///       "place_foo" is not defined, it will be created with selected
+        ///       environment and object contact surface.
         intSeq autoBuild (in string graphName,
             in Names_t grippers, in Names_t objects,
             in Namess_t handlesPerObject, in Namess_t contactsPerObject,
