@@ -594,6 +594,39 @@ namespace hpp {
           throw hpp::Error (exc.what ());
         }
       }
+
+      ID Problem::edgeAtParam (UShort pathId, Double param)
+        throw (Error)
+      {
+	try {
+	  if (pathId >= problemSolver()->paths ().size ()) {
+            HPP_THROW (Error, "Wrong path id: " << pathId << ", number path: "
+		<< problemSolver()->paths ().size () << ".");
+	  }
+          core::PathVectorPtr_t path = problemSolver()->paths () [pathId];
+          core::PathVectorPtr_t flat = core::PathVector::create(path->outputSize(), path->outputDerivativeSize());
+          path->flatten(flat);
+          value_type unused;
+          std::size_t r = flat->rankAtParam(param, unused);
+          PathPtr_t p = flat->pathAtRank (r);
+          manipulation::ConstraintSetPtr_t constraint = 
+            HPP_DYNAMIC_PTR_CAST (manipulation::ConstraintSet, p->constraints());
+          if (!constraint) {
+            HPP_THROW (Error, "Path constraint is not of the good type "
+                << "at id " << pathId << ", param " << param
+                << " (rank: " << r << ")");
+          }
+          if (!constraint->edge()) {
+            HPP_THROW (Error, "Path constraint does not contain edge information "
+                << "at id " << pathId << ", param " << param
+                << " (rank: " << r << ")");
+          }
+          return (ID)constraint->edge()->id();
+	}
+	catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

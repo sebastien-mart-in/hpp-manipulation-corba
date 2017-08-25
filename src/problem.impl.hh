@@ -104,6 +104,9 @@ namespace hpp {
 
         virtual void setTargetState (hpp::ID IDstate);
 
+        virtual ID edgeAtParam (UShort pathId, Double param)
+          throw (Error);
+
       private:
         ProblemSolverPtr_t problemSolver();
         graph::GraphPtr_t graph(bool throwIfNull = true);
