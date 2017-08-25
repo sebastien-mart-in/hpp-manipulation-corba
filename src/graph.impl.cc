@@ -443,7 +443,7 @@ namespace hpp {
             edge->insertParamConstraint (problemSolver()->PsC_t::get <LockedJointPtr_t> (name));
           }
 
-          edge->buildHistogram ();
+          // edge->buildHistogram ();
         } catch (std::exception& err) {
           throw Error (err.what());
         }
@@ -674,7 +674,6 @@ namespace hpp {
 	}
       }
 
-
       void Graph::displayNodeConstraints
       (hpp::ID nodeId, CORBA::String_out constraints) throw (Error)
       {
@@ -818,6 +817,16 @@ namespace hpp {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
           return (Long) edge->from ()->getWeight (edge);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      void Graph::initialize ()
+        throw (hpp::Error)
+      {
+        try {
+          problemSolver ()->initConstraintGraph ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}

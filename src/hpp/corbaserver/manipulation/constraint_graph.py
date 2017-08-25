@@ -600,6 +600,9 @@ class ConstraintGraph (object):
                 (name, grippers, objects, handlesPerObjects, shapesPerObjects, envNames, rules)
         return ConstraintGraph (robot, name, makeGraph = False);
 
+    def initialize (self):
+        self.graph.initialize()
+
     ##
     # \}
 

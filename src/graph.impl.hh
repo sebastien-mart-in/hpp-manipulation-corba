@@ -185,6 +185,9 @@ namespace hpp {
           virtual Long getWeight (ID edgeId)
             throw (hpp::Error);
 
+          virtual void initialize ()
+            throw (hpp::Error);
+
           virtual void getRelativeMotionMatrix (ID edgeID, intSeqSeq_out matrix)
             throw (hpp::Error);
 
