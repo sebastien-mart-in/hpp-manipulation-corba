@@ -607,6 +607,10 @@ class ProblemSolver (object):
     def getWaypoints (self, pathId):
         return self.client.basic.problem.getWaypoints (pathId)
 
+    ## Delete a path
+    def erasePath (self, pathId):
+        return self.client.basic.problem.erasePath (pathId)
+
     ## \name Interruption of a path planning request
     #  \{
 
