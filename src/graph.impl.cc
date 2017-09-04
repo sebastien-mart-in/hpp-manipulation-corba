@@ -764,6 +764,17 @@ namespace hpp {
 	}
       }
 
+      bool Graph::isShort (ID edgeId)
+        throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+        try {
+          return edge->isShort ();
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       intSeq* Graph::autoBuild (
           const char* graphName,
           const Names_t& grippers,

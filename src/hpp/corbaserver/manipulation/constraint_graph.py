@@ -148,6 +148,9 @@ class ConstraintGraph (object):
     def setShort (self, edge, isShort) :
       return self.client.graph.setShort (self.edges [edge], isShort)
 
+    def isShort (self, edge) :
+      return self.client.graph.isShort (self.edges [edge])
+
     ### Create a WaypointEdge.
     ## \param nodeFrom, nodeTo, name, weight, isInNode see createEdge note,
     ## \param nb number of waypoints,

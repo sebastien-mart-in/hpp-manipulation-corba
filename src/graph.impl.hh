@@ -173,6 +173,9 @@ namespace hpp {
           virtual void setShort (ID edgeId, CORBA::Boolean isShort)
             throw (hpp::Error);
 
+          virtual bool isShort (ID edgeId)
+            throw (hpp::Error);
+
           virtual intSeq* autoBuild (const char* graphName,
               const Names_t& grippers, const Names_t& objects,
               const Namess_t& handlesPerObject, const Namess_t& shapesPreObject,

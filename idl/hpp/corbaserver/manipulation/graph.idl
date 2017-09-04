@@ -264,6 +264,9 @@ module hpp {
         void setShort (in ID edgeId, in boolean isShort)
           raises (Error);
 
+        boolean isShort (in ID edgeId)
+          raises (Error);
+
 	/// Automatically build a constraint graph
 	///
 	/// \param graphName name of the graph,
