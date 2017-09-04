@@ -174,26 +174,9 @@ namespace hpp {
 				 const char* handleName)
 	throw (hpp::Error)
       {
-	DevicePtr_t robot = getRobotOrThrow (problemSolver());
-	hppDout (info, *robot);
 	try {
-          GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
-	  if (!gripper) {
-	    std::string msg (std::string ("No gripper with name ") +
-			     std::string (gripperName) + std::string ("."));
-	    throw std::runtime_error (msg.c_str ());
-	  }
-          HandlePtr_t handle = robot->get <HandlePtr_t> (handleName);
-	  if (!handle) {
-	    std::string msg (std::string ("No handle with name ") +
-			     std::string (handleName) + std::string ("."));
-	    throw std::runtime_error (msg.c_str ());
-	  }
-	  NumericalConstraintPtr_t constraint (handle->createGrasp (gripper));
-	  NumericalConstraintPtr_t complement
-	    (handle->createGraspComplement (gripper));
-	  problemSolver()->addNumericalConstraint (graspName, constraint);
-	  problemSolver()->addNumericalConstraint (std::string(graspName) + "/complement", complement);
+          problemSolver()->createGraspConstraint
+            (graspName, gripperName, handleName);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -204,15 +187,9 @@ namespace hpp {
                                     const char* handleName)
 	throw (hpp::Error)
       {
-        DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
-          const GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
-          const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
-          std::string name (graspName);
-          value_type c = handle->clearance () + gripper->clearance ();
-	  NumericalConstraintPtr_t constraint =
-	    handle->createPreGrasp (gripper, c);
-	  problemSolver()->addNumericalConstraint (name, constraint);
+          problemSolver()->createPreGraspConstraint
+            (graspName, gripperName, handleName);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
