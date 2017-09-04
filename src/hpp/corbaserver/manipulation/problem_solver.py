@@ -611,6 +611,13 @@ class ProblemSolver (object):
     def erasePath (self, pathId):
         return self.client.basic.problem.erasePath (pathId)
 
+    ## Concatenate two paths
+    # The function appends the second path to the first one
+    # and remove the second path.
+    def concatenatePath (self, pathId1, pathId2):
+        return self.client.basic.problem.concatenatePath (pathId1, pathId2)
+
+
     ## \name Interruption of a path planning request
     #  \{
 
