@@ -148,7 +148,7 @@ namespace hpp {
           ret = boost::assign::list_of ("Gripper") ("Handle") ("RobotContact")
             ("EnvContact");
         } else {
-          throw Error ("Type not known");
+          throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
         }
 
         char** nameList = Names_t::allocbuf((CORBA::Long) ret.size());
