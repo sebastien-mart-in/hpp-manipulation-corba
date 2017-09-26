@@ -265,12 +265,12 @@ namespace hpp {
         try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
-          if (!robot->has<FrameIndexes_t> (n))
+          if (!robot->has<FrameIndices_t> (n))
             throw hpp::Error
               ("Root of subtree with the provided prefix not found");
           const se3::Model& model = robot->model();
           const se3::Frame& rf = model.frames[
-            robot->get<FrameIndexes_t>(n)[0]
+            robot->get<FrameIndices_t>(n)[0]
             ];
           double* res = new Transform_;
           if (rf.type == se3::JOINT)
