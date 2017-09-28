@@ -25,6 +25,7 @@
 #include <hpp/pinocchio/gripper.hh>
 #include <hpp/pinocchio/joint.hh>
 #include <hpp/pinocchio/collision-object.hh>
+#include <hpp/pinocchio/urdf/util.hh>
 #include <hpp/manipulation/srdf/util.hh>
 #include <hpp/manipulation/device.hh>
 #include <hpp/manipulation/handle.hh>
@@ -150,6 +151,27 @@ namespace hpp {
 	}
       }
 
+      void Robot::insertRobotModelFromString (const char* robotName,
+              const char* rootJointType,
+              const char* urdfString,
+              const char* srdfString)
+	throw (Error)
+      {
+	try {
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+          if (robot->has<FrameIndexes_t> (robotName))
+            HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
+
+          pinocchio::urdf::loadModelFromString (robot, 0, robotName,
+              rootJointType, urdfString, srdfString);
+	  srdf::loadModelFromXML (robot, robotName, srdfString);
+          robot->didInsertRobot (robotName);
+          problemSolver()->resetProblem ();
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       void Robot::insertRobotSRDFModel (const char* robotName,
           const char* packageName, const char* modelName,
           const char* srdfSuffix)
@@ -264,6 +286,58 @@ namespace hpp {
 	}
       }
 
+      void Robot::loadEnvironmentModelFromString (const char* urdfString,
+          const char* srdfString, const char* prefix)
+	throw (hpp::Error)
+      {
+	try {
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+
+          std::string p (prefix);
+          DevicePtr_t object = Device::create (p);
+          // TODO replace "" by p and remove `p +` in what follows
+          pinocchio::urdf::loadModelFromString (object, 0, "",
+              "anchor", urdfString, srdfString);
+          srdf::loadModelFromXML (object, "", srdfString);
+          object->controlComputation(Device::JOINT_POSITION);
+          object->computeForwardKinematics();
+          object->updateGeometryPlacements();
+
+	  // Detach objects from joints
+          using pinocchio::DeviceObjectVector;
+          DeviceObjectVector& objects = object->objectVector();
+          for (DeviceObjectVector::iterator itObj = objects.begin();
+              itObj != objects.end(); ++itObj) {
+            problemSolver()->addObstacle (
+                p + (*itObj)->name (),
+                *(*itObj)->fcl (),
+                true, true);
+	    hppDout (info, "Adding obstacle " << obj->name ());
+	  }
+          typedef CPs_t::traits<JointAndShapes_t>::Map_t ShapeMap;
+          const ShapeMap& m = object->map <JointAndShapes_t> ();
+          for (ShapeMap::const_iterator it = m.begin ();
+              it != m.end (); it++) {
+            JointAndShapes_t shapes;
+            for (JointAndShapes_t::const_iterator itT = it->second.begin ();
+                itT != it->second.end(); ++itT) {
+              const Transform3f& M = itT->first->currentTransformation ();
+              Shape_t newShape (itT->second.size());
+              for (std::size_t i = 0; i < newShape.size (); ++i)
+                newShape [i] = M.act (itT->second[i]);
+              shapes.push_back (JointAndShape_t (JointPtr_t(), newShape));
+            }
+            problemSolver()->add (p + it->first, shapes);
+          }
+
+          copy<HandlePtr_t > (object, robot, p);
+          copy<GripperPtr_t> (object, robot, p);
+          robot->didInsertRobot (p.substr(0, p.size() - 1));
+          problemSolver()->resetProblem ();
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
 
       Transform__slice* Robot::getRootJointPosition (const char* robotName)
         throw (Error)
