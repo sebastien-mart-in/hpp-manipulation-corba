@@ -20,6 +20,7 @@
 #include <pinocchio/multibody/model.hpp>
 
 #include <hpp/util/debug.hh>
+#include <hpp/util/exception-factory.hh>
 #include <hpp/pinocchio/humanoid-robot.hh>
 #include <hpp/pinocchio/gripper.hh>
 #include <hpp/pinocchio/joint.hh>
@@ -136,11 +137,12 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          // robot->prepareInsertRobot ();
-	  srdf::loadRobotModel (robot, 0,
-              std::string (robotName), std::string (rootJointType),
-              std::string (packageName), std::string (modelName),
-              std::string (urdfSuffix), std::string (srdfSuffix));
+          if (robot->has<FrameIndexes_t> (robotName))
+            HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
+          pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
+              packageName, modelName, urdfSuffix, srdfSuffix);
+	  srdf::loadModelFromFile (robot, robotName,
+              packageName, modelName, srdfSuffix);
           robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
@@ -173,11 +175,12 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          // robot->prepareInsertRobot ();
-          srdf::loadObjectModel (robot, 0,
-              std::string (objectName), std::string (rootJointType),
-              std::string (packageName), std::string (modelName),
-              std::string (urdfSuffix), std::string (srdfSuffix));
+          if (robot->has<FrameIndexes_t> (objectName))
+            HPP_THROW(std::invalid_argument, "A robot named " << objectName << " already exists");
+          pinocchio::urdf::loadRobotModel (robot, 0, objectName, rootJointType,
+              packageName, modelName, urdfSuffix, srdfSuffix);
+          srdf::loadModelFromFile (robot, objectName,
+              packageName, modelName, srdfSuffix);
           robot->didInsertRobot (objectName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
@@ -193,11 +196,12 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          // robot->prepareInsertRobot ();
-	  srdf::loadHumanoidModel (robot, 0,
-              std::string (robotName), std::string (rootJointType),
-              std::string (packageName), std::string (modelName),
-              std::string (urdfSuffix), std::string (srdfSuffix));
+          if (robot->has<FrameIndexes_t> (robotName))
+            HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
+          pinocchio::urdf::loadHumanoidModel (robot, 0, robotName, rootJointType,
+              packageName, modelName, urdfSuffix, srdfSuffix);
+          srdf::loadModelFromFile (robot, robotName,
+              packageName, modelName, srdfSuffix);
           robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
@@ -213,10 +217,12 @@ namespace hpp {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
 
-          DevicePtr_t object = Device::create (std::string (envModelName));
-          srdf::loadEnvironmentModel (object,
-              std::string (package), std::string (envModelName),
-              std::string (urdfSuffix), std::string (srdfSuffix));
+          std::string modelName (envModelName); 
+          DevicePtr_t object = Device::create (modelName);
+          pinocchio::urdf::loadUrdfModel (object, "anchor",
+              package, modelName + std::string(urdfSuffix));
+          srdf::loadModelFromFile (object, "",
+              package, envModelName, srdfSuffix);
           std::string p (prefix);
           object->controlComputation(Device::JOINT_POSITION);
           object->computeForwardKinematics();
@@ -228,7 +234,7 @@ namespace hpp {
           for (DeviceObjectVector::iterator itObj = objects.begin();
               itObj != objects.end(); ++itObj) {
             problemSolver()->addObstacle (
-                std::string (prefix) + (*itObj)->name (),
+                p + (*itObj)->name (),
                 *(*itObj)->fcl (),
                 true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
