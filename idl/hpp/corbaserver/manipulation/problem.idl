@@ -34,6 +34,9 @@ module hpp {
         /// \return true if a new problem was created.
         boolean selectProblem (in string name) raises (Error);
 
+        /// Reset the current problem.
+        void resetProblem () raises (Error);
+
         /// Return a list of available elements of type type
         /// \param type enter "type" to know what types I know of.
         ///             This is case insensitive.

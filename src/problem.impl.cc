@@ -129,6 +129,13 @@ namespace hpp {
         return !has;
       }
 
+      void Problem::resetProblem () throw (hpp::Error)
+      {
+        corbaServer::ProblemSolverMapPtr_t psMap (server_->problemSolverMap());
+        psMap->map_ [ psMap->selected_ ]
+          = manipulation::ProblemSolver::create ();
+      }
+
       Names_t* Problem::getAvailable (const char* what) throw (hpp::Error)
       {
         std::string w (what);
