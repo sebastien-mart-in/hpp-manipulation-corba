@@ -231,6 +231,27 @@ namespace hpp {
 	}
       }
 
+      void Robot::insertHumanoidModelFromString (const char* robotName,
+          const char* rootJointType,
+          const char* urdfString,
+          const char* srdfString)
+	throw (Error)
+      {
+	try {
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+          if (robot->has<FrameIndexes_t> (robotName))
+            HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
+          pinocchio::urdf::loadModelFromString (robot, 0, robotName,
+              rootJointType, urdfString, srdfString);
+          pinocchio::urdf::setupHumanoidRobot (robot, robotName);
+	  srdf::loadModelFromXML (robot, robotName, srdfString);
+          robot->didInsertRobot (robotName);
+          problemSolver()->resetProblem ();
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       void Robot::loadEnvironmentModel (const char* package,
           const char* envModelName, const char* urdfSuffix,
           const char* srdfSuffix, const char* prefix)
