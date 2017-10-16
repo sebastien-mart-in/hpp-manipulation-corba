@@ -601,7 +601,9 @@ class ConstraintGraph (object):
     def buildGenericGraph (robot, name, grippers, objects, handlesPerObjects, shapesPerObjects, envNames, rules = []):
         robot.client.manipulation.graph.autoBuild \
                 (name, grippers, objects, handlesPerObjects, shapesPerObjects, envNames, rules)
-        return ConstraintGraph (robot, name, makeGraph = False);
+        graph = ConstraintGraph (robot, name, makeGraph = False); 
+        graph.initialize()
+        return graph
 
     def initialize (self):
         self.graph.initialize()
