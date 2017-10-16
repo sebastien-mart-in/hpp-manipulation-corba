@@ -23,6 +23,11 @@ except ImportError:
     hpp=None
     pass
 
+def newProblem ():
+    from hpp.corbaserver.manipulation import Client
+    cl = Client()
+    cl.problem.resetProblem()
+
 ## Definition of a manipulation planning problem
 #
 #  This class wraps the Corba client to the server implemented by
