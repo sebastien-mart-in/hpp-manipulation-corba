@@ -394,6 +394,7 @@ namespace hpp {
           Transform3f T;
           hppTransformToTransform3f (position, T);
           robot->setRobotRootPosition(n, T);
+          robot->computeForwardKinematics();
         } catch (const std::exception& exc) {
           throw Error (exc.what ());
         }
