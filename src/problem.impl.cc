@@ -132,6 +132,7 @@ namespace hpp {
       void Problem::resetProblem () throw (hpp::Error)
       {
         corbaServer::ProblemSolverMapPtr_t psMap (server_->problemSolverMap());
+        delete psMap->map_ [ psMap->selected_ ];
         psMap->map_ [ psMap->selected_ ]
           = manipulation::ProblemSolver::create ();
       }
