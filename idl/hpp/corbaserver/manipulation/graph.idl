@@ -51,7 +51,10 @@ module hpp {
         /// \param subGraphId is the ID of the subgraph to which the node should be added.
         /// \param nodeName the name of the new node.
         /// \param waypoint true when the node is a waypoint
-        long createNode (in long subGraphId, in string nodeName, in boolean waypoint)
+        /// \param priority integer used to order the states. If two states have
+        ///                 the same priority, then the order is the order of
+        ///                 creation.
+        long createNode (in long subGraphId, in string nodeName, in boolean waypoint, in long priority)
           raises (Error);
 
         /// Add an edge between two nodes of the graph.

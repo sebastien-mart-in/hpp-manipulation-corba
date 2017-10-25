@@ -90,13 +90,19 @@ class ConstraintGraph (object):
     ### Create one or several node
     ## \param node name (resp. list of names) of the node(s) to be created.
     ## \param waypoint set to True when creating waypoint nodes.
+    ## \param priority integer (resp. list of) used to order the states. If two states have
+    ##                 the same priority, then the order is the order of creation.
     ## \note The order is important. The first should be the most restrictive one as a configuration
     ## will be in the first node for which the constraint are satisfied.
-    def createNode (self, node, waypoint = False):
+    def createNode (self, node, waypoint = False, priority = None):
         if type (node) is str:
             node = [node]
-        for n in node:
-            self.nodes [n] = self.graph.createNode (self.subGraphId, self._(n), waypoint)
+        if priority is None:
+            priority = [ 0, ] * len(node)
+        elif isintance(priority, int):
+            priority = [priority]
+        for n, p in zip(node, priority):
+            self.nodes [n] = self.graph.createNode (self.subGraphId, self._(n), waypoint, p)
 
     ### Create an edge
     ## \param nodeFrom, nodeTo the extremities of the edge,

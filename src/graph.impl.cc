@@ -190,12 +190,12 @@ namespace hpp {
       }
 
       Long Graph::createNode(const Long subgraphId, const char* nodeName,
-          const bool waypoint)
+          const bool waypoint, const Long priority)
         throw (hpp::Error)
       {
         graph::StateSelectorPtr_t ns = getComp <graph::StateSelector> (subgraphId);
 
-        graph::StatePtr_t state = ns->createState (nodeName, waypoint);
+        graph::StatePtr_t state = ns->createState (nodeName, waypoint, priority);
         return (Long) state->id ();
       }
 

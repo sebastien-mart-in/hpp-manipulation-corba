@@ -50,7 +50,8 @@ namespace hpp {
 
           virtual Long createNode (const Long subGraphId,
                                    const char* nodeName,
-                                   const bool waypoint)
+                                   const bool waypoint,
+                                   const Long priority)
             throw (hpp::Error);
 
           virtual Long createEdge (const Long nodeFromId,
