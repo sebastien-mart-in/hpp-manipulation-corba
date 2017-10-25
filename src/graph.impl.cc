@@ -241,7 +241,7 @@ namespace hpp {
         EdgePtr_t edge = getComp <Edge> (edgeId);
         graph::StatePtr_t state = getComp <graph::State> (nodeId);
 
-        if (index < 0 || (std::size_t)index >= we->nbWaypoints ())
+        if (index < 0 || (std::size_t)index > we->nbWaypoints ())
           throw Error ("Invalid index");
         we->setWaypoint (index, edge, state);
       }
@@ -281,7 +281,7 @@ namespace hpp {
               graph::WaypointEdgePtr_t we = HPP_DYNAMIC_PTR_CAST (
                   graph::WaypointEdge, e);
               if (we) {
-                current.start = (Long)we->waypoint<graph::Edge>(we->nbWaypoints()-1)->to ()->id ();
+                current.start = (Long) e->from ()->id ();
                 current.end = (Long) e->to ()->id ();
               } else {
                 current.start = (Long) e->from ()->id ();
@@ -385,7 +385,7 @@ namespace hpp {
       {
         graph::WaypointEdgePtr_t edge = getComp <graph::WaypointEdge> (edgeId);
 
-        if (index < 0 || (std::size_t)index >= edge->nbWaypoints ())
+        if (index < 0 || (std::size_t)index > edge->nbWaypoints ())
           throw Error ("Invalid index");
         graph::EdgePtr_t waypoint = edge->waypoint <graph::Edge> (index);
         nodeId = (Long) waypoint->to ()->id ();
