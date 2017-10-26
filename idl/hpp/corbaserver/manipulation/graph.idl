@@ -129,26 +129,34 @@ module hpp {
         long createLevelSetEdge(in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in ID isInNodeId)
           raises (Error);
 
-        /// Set the constraints of a LevelSetEdge that create the foliation.
+        /// \deprecated use addLevelSetFoliation
+        void setLevelSetFoliation (in long edgeId, in Names_t condNC, in Names_t condLJ, in Names_t paramNC, in Names_t paramPassiveJoints, in Names_t paramLJ)
+          raises (Error);
+
+        /// Add the constraints to a LevelSetEdge that create the foliation.
         /// \param edgeId if of a LevelSetEdge of the graph.
         /// \param condNC, condLJ numerical constraints and locked joints that define the foliated manifold
         /// \param paramNC, paramPassiveJoints, paramLJ numerical constraints and locked joints that parametrize the foliation
         /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
         ///       which corresponds to an empty vector of passive dofs.
-        void setLevelSetFoliation (in long edgeId, in Names_t condNC, in Names_t condLJ, in Names_t paramNC, in Names_t paramPassiveJoints, in Names_t paramLJ)
+        void addLevelSetFoliation (in long edgeId, in Names_t condNC, in Names_t condLJ, in Names_t paramNC, in Names_t paramPassiveJoints, in Names_t paramLJ)
           raises (Error);
 
 	/// Reset the numerical constraints and the locked joints of a component.
         /// \param graphComponentId ID of the component.
 	void resetConstraints(in long graphComponentId) raises (Error);
 
-        /// Set the numerical constraints of a component.
+        /// \deprecated use addNumericalConstraints
+        void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames, in Names_t passiveDofsNames)
+          raises (Error);
+
+        /// Add the numerical constraints to a component.
         /// \param graphComponentId ID of the component.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
         /// \param passiveDofsNames array of names of vector of passive dofs in the ProblemSolver map.
         /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
         ///       which corresponds to an empty vector of passive dofs.
-        void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames, in Names_t passiveDofsNames)
+        void addNumericalConstraints (in long graphComponentId, in Names_t constraintNames, in Names_t passiveDofsNames)
           raises (Error);
 
 	/// Get the list of numerical constraints applied to a component.
@@ -163,19 +171,27 @@ module hpp {
 	void getLockedJoints (in long graphComponentId, out Names_t constraintNames)
 	  raises (Error);
 
-        /// Set the numerical constraints for path of a node.
+        /// \deprecated use addNumericalConstraintsForPath
+        void setNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames, in Names_t passiveDofsNames)
+          raises (Error);
+
+        /// Add the numerical constraints for path to a node.
         /// \param nodeId ID of the node.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
         /// \param passiveDofsNames array of names of vector of passive dofs in the ProblemSolver map.
         /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
         ///       which corresponds to an empty vector of passive dofs.
-        void setNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames, in Names_t passiveDofsNames)
+        void addNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames, in Names_t passiveDofsNames)
           raises (Error);
 
-        /// Set the LockedDof constraints of a component.
+        /// \deprecated use addLockedDofConstraints
+        void setLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
+          raises (Error);
+
+        /// Add the LockedDof constraints to a component.
         /// \param graphComponentId ID of the component.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
-        void setLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
+        void addLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
           raises (Error);
 
         /// Get the node corresponding to the state of the configuration.

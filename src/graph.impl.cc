@@ -410,7 +410,7 @@ namespace hpp {
         return (Long) edge->id ();
       }
 
-      void Graph::setLevelSetFoliation (const Long edgeId,
+      void Graph::addLevelSetFoliation (const Long edgeId,
           const hpp::Names_t& condNC, const hpp::Names_t& condLJ,
           const hpp::Names_t& paramNC, const hpp::Names_t& paramPDOF,
           const hpp::Names_t& paramLJ)
@@ -478,7 +478,7 @@ namespace hpp {
         }
       }
 
-      void Graph::setNumericalConstraints (const Long graphComponentId,
+      void Graph::addNumericalConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames,
           const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
@@ -543,7 +543,7 @@ namespace hpp {
 	component->resetLockedJoints();
       }
 
-      void Graph::setNumericalConstraintsForPath (const Long nodeId,
+      void Graph::addNumericalConstraintsForPath (const Long nodeId,
           const hpp::Names_t& constraintNames,
           const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
@@ -568,7 +568,7 @@ namespace hpp {
         }
       }
 
-      void Graph::setLockedDofConstraints (const Long graphComponentId,
+      void Graph::addLockedDofConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames)
         throw (hpp::Error)
       {

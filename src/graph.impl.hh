@@ -110,9 +110,28 @@ namespace hpp {
                                              const hpp::Names_t& paramNC,
                                              const hpp::Names_t& paramPDOF,
                                              const hpp::Names_t& paramLJ)
+            throw (hpp::Error)
+          {
+            addLevelSetFoliation (edgeId, condNC, condLJ,
+                paramNC, paramPDOF, paramLJ);
+          }
+          virtual void addLevelSetFoliation (const Long edgeId,
+                                             const hpp::Names_t& condNC,
+                                             const hpp::Names_t& condLJ,
+                                             const hpp::Names_t& paramNC,
+                                             const hpp::Names_t& paramPDOF,
+                                             const hpp::Names_t& paramLJ)
             throw (hpp::Error);
 
           virtual void setNumericalConstraints (const Long graphComponentId,
+                                       const hpp::Names_t& constraintNames,
+                                       const hpp::Names_t& passiveDofsNames)
+            throw (hpp::Error)
+          {
+            addNumericalConstraints(graphComponentId,
+                constraintNames, passiveDofsNames);
+          }
+          virtual void addNumericalConstraints (const Long graphComponentId,
                                        const hpp::Names_t& constraintNames,
                                        const hpp::Names_t& passiveDofsNames)
             throw (hpp::Error);
@@ -129,9 +148,23 @@ namespace hpp {
           virtual void setNumericalConstraintsForPath (const Long nodeId,
               const hpp::Names_t& constraintNames,
               const hpp::Names_t& passiveDofsNames)
+            throw (hpp::Error)
+          {
+            addNumericalConstraintsForPath(nodeId,
+                constraintNames, passiveDofsNames);
+          }
+          virtual void addNumericalConstraintsForPath (const Long nodeId,
+              const hpp::Names_t& constraintNames,
+              const hpp::Names_t& passiveDofsNames)
             throw (hpp::Error);
 
           virtual void setLockedDofConstraints (const Long graphComponentId,
+                                       const hpp::Names_t& constraintNames)
+            throw (hpp::Error)
+          {
+            addLockedDofConstraints (graphComponentId, constraintNames);
+          }
+          virtual void addLockedDofConstraints (const Long graphComponentId,
                                        const hpp::Names_t& constraintNames)
             throw (hpp::Error);
 
