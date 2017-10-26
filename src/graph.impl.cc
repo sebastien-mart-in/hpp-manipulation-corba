@@ -280,7 +280,11 @@ namespace hpp {
               comp_e.length (len_edges + 1);
               graph::WaypointEdgePtr_t we = HPP_DYNAMIC_PTR_CAST (
                   graph::WaypointEdge, e);
-              current.hasWaypoints = (bool)we;
+              if (we) {
+                current.waypoints.length(we->nbWaypoints());
+                for (std::size_t i = 0; i < we->nbWaypoints(); ++i)
+                  current.waypoints[i] = we->waypoint<graph::Edge>(i)->to()->id();
+              }
               current.start = (Long) e->from ()->id ();
               current.end = (Long) e->to ()->id ();
               comp_e[len_edges] = current;

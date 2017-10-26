@@ -32,7 +32,7 @@ module hpp {
     string name;
     long id;
     long start, end;
-    boolean hasWaypoints;
+    IDseq waypoints;
   };
   typedef sequence <GraphComp> GraphComps_t;
   struct GraphElements {
