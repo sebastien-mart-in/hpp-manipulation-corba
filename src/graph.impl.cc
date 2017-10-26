@@ -84,7 +84,7 @@ namespace hpp {
 		<< ") does not match number of objects (" << names.length ()
 		<< ").");
 	  }
-          for (CORBA::ULong i = 0; i < names.length(); ++i) {
+          for (ULong i = 0; i < names.length(); ++i) {
             ret.push_back (ObjectDef_t());
             ObjectDef_t& od = ret.back ();
             od.name = names[i];
@@ -256,8 +256,8 @@ namespace hpp {
         graph::StatePtr_t n;
         graph::EdgePtr_t e;
 
-        CORBA::ULong len_edges = 0;
-        CORBA::ULong len_nodes = 0;
+        ULong len_edges = 0;
+        ULong len_nodes = 0;
         try {
           // Set the graph values
           graph_out = new GraphComp ();
@@ -281,9 +281,11 @@ namespace hpp {
               graph::WaypointEdgePtr_t we = HPP_DYNAMIC_PTR_CAST (
                   graph::WaypointEdge, e);
               if (we) {
-                current.waypoints.length(we->nbWaypoints());
+                current.waypoints.length((ULong)we->nbWaypoints());
                 for (std::size_t i = 0; i < we->nbWaypoints(); ++i)
-                  current.waypoints[i] = we->waypoint(i)->to()->id();
+                  current.waypoints[(ULong)i] = (ID)we->waypoint(i)->to()->id();
+              } else {
+                current.waypoints.length(0);
               }
               current.start = (Long) e->from ()->id ();
               current.end = (Long) e->to ()->id ();
