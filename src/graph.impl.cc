@@ -283,7 +283,7 @@ namespace hpp {
               if (we) {
                 current.waypoints.length(we->nbWaypoints());
                 for (std::size_t i = 0; i < we->nbWaypoints(); ++i)
-                  current.waypoints[i] = we->waypoint<graph::Edge>(i)->to()->id();
+                  current.waypoints[i] = we->waypoint(i)->to()->id();
               }
               current.start = (Long) e->from ()->id ();
               current.end = (Long) e->to ()->id ();
@@ -387,7 +387,7 @@ namespace hpp {
 
         if (index < 0 || (std::size_t)index > edge->nbWaypoints ())
           throw Error ("Invalid index");
-        graph::EdgePtr_t waypoint = edge->waypoint <graph::Edge> (index);
+        graph::EdgePtr_t waypoint = edge->waypoint (index);
         nodeId = (Long) waypoint->to ()->id ();
         return (Long) waypoint->id ();
       }
