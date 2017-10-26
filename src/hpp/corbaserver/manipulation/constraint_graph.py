@@ -276,9 +276,13 @@ class ConstraintGraph (object):
         self.pregrasps [name] = \
             (_ConstraintAndPassiveJoints (self._(name), passiveJoints),)
 
-    ## Set the constraints of an edge, a node or the whole graph
+    # \deprecated use addConstraints
+    def setConstraints (self, *args, **kwargs)
+        return self.addConstraints (*args, **kwargs)
+
+    ## Add the constraints to an edge, a node or the whole graph
     #
-    # This method sets the constraints of an element of the graph and handles
+    # This method adds the constraints to an element of the graph and handles
     # the special cases of grasp and pregrasp constraints.
     #
     # \param graph set to true if you are defining constraints for every nodes,
@@ -293,14 +297,14 @@ class ConstraintGraph (object):
     # \param passiveJoints passive joints (not modified by constraint
     #                      resolution)
     # \note Exaclty one of the parameter graph, node and edge must be set.
-    def setConstraints (self, graph = False, node = None, edge = None,
+    def addConstraints (self, graph = False, node = None, edge = None,
                         constraints = None,
                         grasps = None, pregrasps = None, lockDof = [],
                         numConstraints = [], passiveJoints = []):
         """
-        Set the constraints of an edge, a node or the whole graph
+        Add the constraints to an edge, a node or the whole graph
 
-          This method sets the constraints of an element of the graph and
+          This method adds the constraints to an element of the graph and
           handles the special cases of grasp and pregrasp constraints.
 
           input
@@ -322,7 +326,7 @@ class ConstraintGraph (object):
                 raise TypeError \
                     ("argument constraints should be of type Constraints")
 
-            return self._setConstraints \
+            return self._addConstraints \
                 (graph = graph, node = node, edge = edge,
                  grasps = constraints.grasps,
                  pregrasps = constraints.pregrasps,
@@ -330,16 +334,16 @@ class ConstraintGraph (object):
                  numConstraints = constraints.numConstraints,
                  passiveJoints = passiveJoints)
         else:
-            return self._setConstraints \
+            return self._addConstraints \
                 (graph = graph, node = node, edge = edge, grasps = grasps,
                  pregrasps = pregrasps, lockDof = lockDof,
                  numConstraints = numConstraints, passiveJoints = passiveJoints)
 
-    def _setConstraints (self, graph = False, node = None, edge = None,
+    def _addConstraints (self, graph = False, node = None, edge = None,
                          grasps = None, pregrasps = None, lockDof = [],
                          numConstraints = [], passiveJoints = []):
         if not type (graph) is bool:
-            raise TypeError ("ConstraintGraph.setConstraints: " +\
+            raise TypeError ("ConstraintGraph.addConstraints: " +\
                              "graph argument should be a boolean, got " + \
                              repr (graph))
         nc = numConstraints [:]
@@ -363,18 +367,21 @@ class ConstraintGraph (object):
                     pdofs.append (pair.passiveJoints)
 
         if node is not None:
-            self.graph.setNumericalConstraints (self.nodes [node], nc, nopdofs)
-            self.graph.setNumericalConstraintsForPath (self.nodes [node], nc,
+            self.graph.addNumericalConstraints (self.nodes [node], nc, nopdofs)
+            self.graph.addNumericalConstraintsForPath (self.nodes [node], nc,
                                                        pdofs)
-            self.graph.setLockedDofConstraints (self.nodes [node], lockDof)
+            self.graph.addLockedDofConstraints (self.nodes [node], lockDof)
         elif edge is not None:
-            self.graph.setNumericalConstraints (self.edges [edge], nc, nopdofs)
-            self.graph.setLockedDofConstraints (self.edges [edge], lockDof)
+            self.graph.addNumericalConstraints (self.edges [edge], nc, nopdofs)
+            self.graph.addLockedDofConstraints (self.edges [edge], lockDof)
         elif graph:
-            self.graph.setNumericalConstraints (self.graphId, nc, nopdofs)
-            self.graph.setLockedDofConstraints (self.graphId, lockDof)
+            self.graph.addNumericalConstraints (self.graphId, nc, nopdofs)
+            self.graph.addLockedDofConstraints (self.graphId, lockDof)
 
-    ## Set the numerical constraints of a LevelSetEdge that create the foliation.
+    def setLevelSetFoliation (self, *args, **kwargs):
+        return self.addLevelSetFoliation (*args, **kwargs)
+
+    ## Add the numerical constraints to a LevelSetEdge that create the foliation.
     #  \param edge name of a LevelSetEdge of the graph.
     #  \param condGrasps, condPregrasps name, or list of names, of grasp or pregrasp that define the foliated manifold
     #  \param condNC, condLJ numerical constraints and locked joints that define the foliated manifold
@@ -382,7 +389,7 @@ class ConstraintGraph (object):
     #  \param paramNC, paramPassiveJoints, paramLJ numerical constraints and locked joints that parametrize the foliation
     #  \note If passiveDofsNames is a shorter list than numConstraints, passiveDofsNames is extended with an empty string,
     #        which corresponds to an empty vector of passive dofs.
-    def setLevelSetFoliation (self, edge,
+    def addLevelSetFoliation (self, edge,
             condGrasps = None, condPregrasps = None, condNC = [], condLJ = [],
             paramGrasps = None, paramPregrasps = None, paramNC = [], paramPassiveJoints = [], paramLJ = []):
 
@@ -410,7 +417,7 @@ class ConstraintGraph (object):
                     param_nc.extend (pair.constraint)
                     pdofs.extend (pair.passiveJoints)
 
-        self.graph.setLevelSetFoliation (self.edges [edge], cond_nc, condLJ, param_nc, pdofs, paramLJ)
+        self.graph.addLevelSetFoliation (self.edges [edge], cond_nc, condLJ, param_nc, pdofs, paramLJ)
 
     ## Get weight of an edge
     #
