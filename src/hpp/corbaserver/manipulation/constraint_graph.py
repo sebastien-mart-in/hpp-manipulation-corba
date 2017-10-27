@@ -99,7 +99,7 @@ class ConstraintGraph (object):
             node = [node]
         if priority is None:
             priority = [ 0, ] * len(node)
-        elif isintance(priority, int):
+        elif isinstance(priority, int):
             priority = [priority]
         for n, p in zip(node, priority):
             self.nodes [n] = self.graph.createNode (self.subGraphId, self._(n), waypoint, p)
@@ -277,7 +277,7 @@ class ConstraintGraph (object):
             (_ConstraintAndPassiveJoints (self._(name), passiveJoints),)
 
     # \deprecated use addConstraints
-    def setConstraints (self, *args, **kwargs)
+    def setConstraints (self, *args, **kwargs):
         return self.addConstraints (*args, **kwargs)
 
     ## Add the constraints to an edge, a node or the whole graph
