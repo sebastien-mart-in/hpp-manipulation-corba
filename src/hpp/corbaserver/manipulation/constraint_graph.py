@@ -60,7 +60,9 @@ class ConstraintGraph (object):
         self.name = graphName
         self.grasps = dict ()
         self.pregrasps = dict ()
+        ## A dictionnary mapping the node names to their ID
         self.nodes = dict ()
+        ## A dictionnary mapping the edge names to their ID
         self.edges = dict ()
         if makeGraph:
             self.graphId = self.graph.createGraph (graphName)
@@ -86,6 +88,7 @@ class ConstraintGraph (object):
 
     ##
     # \name Building the constraint graph
+    # \{
 
     ### Create one or several node
     ## \param node name (resp. list of names) of the node(s) to be created.
@@ -432,6 +435,8 @@ class ConstraintGraph (object):
                                 '". Perhaps it is a waypoint edge ?')
         return self.client.graph.setWeight (self.edges [edge], weight)
 
+    ## \}
+
     ## Add entry to the local dictionnary
     # \param text plain text
     # \param tex its latex translation
@@ -449,10 +454,8 @@ class ConstraintGraph (object):
         self.textToTex = textToTex
 
     ##
-    # \}
-
-    ##
     # \name Working with the constraint graph
+    # \{
 
     ### Display the current graph.
     ## The graph is printed in DOT format. Command dot must be
@@ -606,6 +609,7 @@ class ConstraintGraph (object):
 
     ##
     # \name Automatic building
+    # \{
     @staticmethod
     ## Build a graph
     # \return a Initialized ConstraintGraph object
