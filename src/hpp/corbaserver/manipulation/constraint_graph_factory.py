@@ -177,6 +177,14 @@ class ConstraintGraphFactory(object):
         pn = "preplace_" + o
         width = 0.05
         io = self.objects.index(o)
+        if len(self.contactsPerObjects[io]) == 0 or len(self.envContacts) == 0:
+            ljs = []
+            for n in self.graph.clientBasic.robot.getJointNames():
+                if n.startswith(o + "/"):
+                    ljs.append(n)
+                    q = self.graph.clientBasic.robot.getJointConfig(n)
+                    self.graph.clientBasic.problem.createLockedJoint(n, n, q)
+            return (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)
         self.graph.client.problem.createPlacementConstraint (n, self.contactsPerObjects[io], self.envContacts)
         self.graph.client.problem.createPrePlacementConstraint (pn, self.contactsPerObjects[io], self.envContacts, width)
         return (Constraints (numConstraints = [ n, ]),
@@ -191,13 +199,15 @@ class ConstraintGraphFactory(object):
         pn = "preplace_" + o
         width = 0.05
         io = self.objects.index(o)
-        self.graph.client.problem.createPlacementConstraint (n, self.contactsPerObjects[io], self.envContacts)
         ljs = []
         for n in self.graph.clientBasic.robot.getJointNames():
             if n.startswith(o + "/"):
                 ljs.append(n)
                 q = self.graph.clientBasic.robot.getJointConfig(n)
                 self.graph.clientBasic.problem.createLockedJoint(n, n, q)
+        if len(self.contactsPerObjects[io]) == 0 or len(self.envContacts) == 0:
+            return (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)
+        self.graph.client.problem.createPlacementConstraint (n, self.contactsPerObjects[io], self.envContacts)
         self.graph.client.problem.createPrePlacementConstraint (pn, self.contactsPerObjects[io], self.envContacts, width)
         return (Constraints (numConstraints = [ n, ]),
                 Constraints (lockedJoints = ljs),
