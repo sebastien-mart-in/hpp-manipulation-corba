@@ -54,6 +54,29 @@ class Rules(object):
             if apply: return s
         return self.defaultAcceptation
 
+## This class is used to build constraint graph from semantic information.
+#
+# The minimal usage is the following:
+# \code
+# graph = ConstraintGraph (robot, "graph")
+#
+# # Required calls
+# factory = ConstraintGraphFactory (graph)
+# factory.setGrippers (["gripper1", ... ])
+# factory.setObjects (["object1", ], [ [ "object1/handle1", ... ] ], [ [] ])
+#
+# # Optionally
+# factory.environmentContacts (["contact1", ... ])
+# factory.setRules ([ Rule (["gripper1", ..], ["handle1", ...], True), ... ])
+#
+# factory.generate ()
+# # graph is initialized
+# \endcode
+#
+# The behaviour can be tuned by setting the functions:
+# - ConstraintGraphFactory.graspIsAllowed (redundant with ConstraintGraphFactory.setRules)
+# - ConstraintGraphFactory.buildGraspConstraints
+# - ConstraintGraphFactory.buildPlacementConstraints
 class ConstraintGraphFactory(object):
     class StateAndManifold:
         def __init__ (self, factory, grasps, id, name):
@@ -69,32 +92,77 @@ class ConstraintGraphFactory(object):
                     self.foliation += factory.graspComplementConstraints(ig, ih)
             # Add the placement constraints
             for io, object in zip_idx(factory.objects):
-                if not factory.isObjectGrasped(grasps, io):
+                if not factory._isObjectGrasped(grasps, io):
                     self.manifold += factory.placementConstraints(object)
                     self.foliation += factory.placementComplementConstraints(object)
 
+    ## \param graph an instance of ConstraintGraph
     def __init__(self, graph):
-        self.graspIsAllowed = self._defaultGraspIsAllowed
-        self.states = dict()
-        self.transitions = set()
-        self.graph = graph
+        ## \name Behaviour tuning
+        # \{
 
-        self.buildGraspConstraints = self._defaultBuildGraspConstraints
+        ## Reduces the problem combinatorial.
+        # Function called to check whether a grasps is allowed.
+        # It takes as input a list of handle indices (or None) such
+        # that i-th ConstraintGraphFactory.grippers grasps grasps[i]-th ConstraintGraphFactory.handles.
+        # It must return a boolean
+        #
+        # It defaults to a lambda function returning True
+        self.graspIsAllowed = lambda x : True
+        ## Function called to create grasp constraints.
+        # Must return a tuple of Constraints objects as:
+        # - constraint that validates the grasp
+        # - constraint that parameterizes the graph
+        # - constraint that validates the pre-grasp
+        # It defaults to ConstraintGraphFactory.defaultBuildGraspConstraints
+        self.buildGraspConstraints = self.defaultBuildGraspConstraints
         self._graspConstraints = dict()
-        self.buildPlacementConstraints = self._defaultBuildPlacementConstraints
+        ## Function called to create placement constraints.
+        # Must return a tuple of Constraints objects as:
+        # - constraint that validates the placement
+        # - constraint that parameterizes the  placement
+        # - constraint that validates the pre-placement
+        # It defaults to ConstraintGraphFactory.defaultBuildPlacementConstraints
+        self.buildPlacementConstraints = self.defaultBuildPlacementConstraints
         self._placementConstraints = dict()
 
+        ## \}
+
+        ## \name Internal variables
+        # \{
+
+        self.states = dict()
+        self.transitions = set()
+        ## The ConstraintGraph object to build
+        self.graph = graph
+        ## the handle names
         self.handles = tuple() # strings
+        ## the gripper names
         self.grippers = tuple() # strings
+        ## the names of contact on the environment
         self.envContacts = tuple () # strings
+        ## the object names
         self.objects = tuple () # strings
+        ## See ConstraintGraphFactory.setObjects
         self.handlesPerObjects = tuple () # object index to handle indixes
+        ## See ConstraintGraphFactory.setObjects
         self.objectFromHandle = tuple ()  # handle index to object index
+        ## See ConstraintGraphFactory.setObjects
         self.contactsPerObjects = tuple ()# object index to contact names
 
+        ## \}
+
+    ## \name Main API
+    # \{
+
+    ## \param grippers list of gripper names to be considered
     def setGrippers(self, grippers):
         self.grippers = tuple(grippers)
 
+    ## \param objects list of object names to be considered
+    ## \param handlesPerObjects a list of list of handle names.
+    ## \param contactsPerObjects a list of list of contact names.
+    ##  handlesPerObjects and contactsPerObjects must have one list for each object, in the same order.
     def setObjects(self, objects, handlesPerObjects, contactsPerObjects):
         self.objects = tuple(objects)
         handles = []
@@ -112,18 +180,25 @@ class ConstraintGraphFactory(object):
         self.objectFromHandle = tuple(ofh)
         self.contactsPerObjects = tuple(cpo)
 
+    ## \param envContacts contact on the environment to be considered.
     def environmentContacts (self, envContacts):
         self.envContacts = tuple(envContacts)
 
+    ## Set the function ConstraintGraphFactory.graspIsAllowed
+    ## \param rules a list of Rule objects
     def setRules (self, rules):
         self.graspIsAllowed = Rules(self.grippers, self.handles, rules)
 
-    def isObjectGrasped(self, grasps, object):
-        for h in self.handlesPerObjects[object]:
-            if h in grasps:
-                return True
-        return False
+    ## Go through the combinatorial defined by the grippers and handles
+    # and create the states and transitions.
+    def generate(self):
+        grasps = ( None, ) * len(self.grippers)
+        self._recurse(self.grippers, self.handles, grasps, 0)
 
+    ## \}
+
+    ## \name Accessors to the different elementary constraints
+    # \{
     def _getGraspConstraints(self, gripper, handle):
         if isinstance(gripper, str): ig = self.grippers.index(gripper)
         else: ig = gripper
@@ -159,8 +234,15 @@ class ConstraintGraphFactory(object):
 
     def prePlacementConstraints(self, object):
         return self._getPlacementConstraints(object)[2]
+    ## \}
 
-    def _defaultBuildGraspConstraints (self, g, h):
+    ## \name Default functions
+    # \{
+
+    ## Calls ConstraintGraph.createGraph and ConstraintGraph.createPreGrasp
+    ## \param g gripper string
+    ## \param h handle  string
+    def defaultBuildGraspConstraints (self, g, h):
         n = g + " grasps " + h
         pn = g + " pregrasps " + h
         self.graph.createGrasp (n, g, h)
@@ -169,10 +251,11 @@ class ConstraintGraphFactory(object):
                 Constraints (numConstraints = [ n + "/complement", ]),
                 Constraints (numConstraints = [ pn, ]),)
 
-    # This implements strict placement manifolds,
-    # where the parameterization constraints is the complement
-    # of the placement constraint.
-    def _defaultBuildPlacementConstraints (self, o):
+    ## This implements strict placement manifolds,
+    ## where the parameterization constraints is the complement
+    ## of the placement constraint.
+    ## \param o string
+    def defaultBuildPlacementConstraints (self, o):
         n = "place_" + o
         pn = "preplace_" + o
         width = 0.05
@@ -191,10 +274,11 @@ class ConstraintGraphFactory(object):
                 Constraints (numConstraints = [ n + "/complement", ]),
                 Constraints (numConstraints = [ pn, ]),)
 
-    # This implements relaxed placement manifolds,
-    # where the parameterization constraints is the LockedJoint of
-    # the object root joint
-    def _defaultBuildRelaxedPlacementConstraints (self, o):
+    ## This implements relaxed placement manifolds,
+    ## where the parameterization constraints is the LockedJoint of
+    ## the object root joint
+    ## \param o string
+    def defaultBuildRelaxedPlacementConstraints (self, o):
         n = "place_" + o
         pn = "preplace_" + o
         width = 0.05
@@ -213,25 +297,13 @@ class ConstraintGraphFactory(object):
                 Constraints (lockedJoints = ljs),
                 Constraints (numConstraints = [ pn, ]),)
 
-    def _defaultGraspIsAllowed (self, grasps):
+    def defaultGraspIsAllowed (self, grasps):
         return True
 
-    def _stateName (self, grasps, abbrev = False):
-        sepGH = "-" if abbrev else " grasps "
-        sep = ":" if abbrev else " : "
-        name = sep.join([ (str(ig) if abbrev else self.grippers[ig]) + sepGH + (str(ih) if abbrev else self.handles[ih]) for ig,ih in zip_idx(grasps) if ih is not None ])
-        if len(name) == 0: return "f" if abbrev else "free"
-        return name
+    ## \}
 
-    def _transitionNames (self, sFrom, sTo, ig):
-        g = self.grippers[ig]
-        h = self.handles[sTo.grasps[ig]]
-        sep = " | "
-        return (g + " > " + h + sep + self._stateName(sFrom.grasps, True),
-                g + " < " + h + sep + self._stateName(sTo.grasps, True),)
-
-    def _loopTransitionName (self, grasps):
-        return "Loop | " + self._stateName(grasps, True)
+    ## \name Algorithm main steps
+    # \{
 
     def makeState(self, grasps, priority):
         if not self.states.has_key(grasps):
@@ -262,7 +334,7 @@ class ConstraintGraphFactory(object):
 
         iobj = self.objectFromHandle [nGrasps[ig]]
         obj = self.objects[iobj]
-        noPlace = self.isObjectGrasped (grasps, iobj)
+        noPlace = self._isObjectGrasped (grasps, iobj)
 
         gc = self.graspConstraints (ig, nGrasps[ig])
         gcc = self.graspComplementConstraints (ig, nGrasps[ig])
@@ -347,6 +419,31 @@ class ConstraintGraphFactory(object):
 
         self.transitions.add(names)
 
+    ## \}
+
+    def _isObjectGrasped(self, grasps, object):
+        for h in self.handlesPerObjects[object]:
+            if h in grasps:
+                return True
+        return False
+
+    def _stateName (self, grasps, abbrev = False):
+        sepGH = "-" if abbrev else " grasps "
+        sep = ":" if abbrev else " : "
+        name = sep.join([ (str(ig) if abbrev else self.grippers[ig]) + sepGH + (str(ih) if abbrev else self.handles[ih]) for ig,ih in zip_idx(grasps) if ih is not None ])
+        if len(name) == 0: return "f" if abbrev else "free"
+        return name
+
+    def _transitionNames (self, sFrom, sTo, ig):
+        g = self.grippers[ig]
+        h = self.handles[sTo.grasps[ig]]
+        sep = " | "
+        return (g + " > " + h + sep + self._stateName(sFrom.grasps, True),
+                g + " < " + h + sep + self._stateName(sTo.grasps, True),)
+
+    def _loopTransitionName (self, grasps):
+        return "Loop | " + self._stateName(grasps, True)
+
     def _recurse(self, grippers, handles, grasps, depth):
         if len(grippers) == 0 or len(handles) == 0: return
 
@@ -368,7 +465,3 @@ class ConstraintGraphFactory(object):
                     self.makeTransition (grasps, nGrasps, ig, depth)
 
                 self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
-
-    def generate(self):
-        grasps = ( None, ) * len(self.grippers)
-        self._recurse(self.grippers, self.handles, grasps, 0)
