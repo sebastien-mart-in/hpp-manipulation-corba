@@ -129,6 +129,14 @@ namespace hpp {
         return !has;
       }
 
+      void Problem::resetProblem () throw (hpp::Error)
+      {
+        corbaServer::ProblemSolverMapPtr_t psMap (server_->problemSolverMap());
+        delete psMap->map_ [ psMap->selected_ ];
+        psMap->map_ [ psMap->selected_ ]
+          = manipulation::ProblemSolver::create ();
+      }
+
       Names_t* Problem::getAvailable (const char* what) throw (hpp::Error)
       {
         std::string w (what);
@@ -148,7 +156,7 @@ namespace hpp {
           ret = boost::assign::list_of ("Gripper") ("Handle") ("RobotContact")
             ("EnvContact");
         } else {
-          throw Error ("Type not known");
+          throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
         }
 
         char** nameList = Names_t::allocbuf((CORBA::Long) ret.size());
@@ -170,26 +178,9 @@ namespace hpp {
 				 const char* handleName)
 	throw (hpp::Error)
       {
-	DevicePtr_t robot = getRobotOrThrow (problemSolver());
-	hppDout (info, *robot);
 	try {
-          GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
-	  if (!gripper) {
-	    std::string msg (std::string ("No gripper with name ") +
-			     std::string (gripperName) + std::string ("."));
-	    throw std::runtime_error (msg.c_str ());
-	  }
-          HandlePtr_t handle = robot->get <HandlePtr_t> (handleName);
-	  if (!handle) {
-	    std::string msg (std::string ("No handle with name ") +
-			     std::string (handleName) + std::string ("."));
-	    throw std::runtime_error (msg.c_str ());
-	  }
-	  NumericalConstraintPtr_t constraint (handle->createGrasp (gripper));
-	  NumericalConstraintPtr_t complement
-	    (handle->createGraspComplement (gripper));
-	  problemSolver()->addNumericalConstraint (graspName, constraint);
-	  problemSolver()->addNumericalConstraint (std::string(graspName) + "/complement", complement);
+          problemSolver()->createGraspConstraint
+            (graspName, gripperName, handleName);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -200,15 +191,9 @@ namespace hpp {
                                     const char* handleName)
 	throw (hpp::Error)
       {
-        DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
-          const GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
-          const HandlePtr_t& handle = robot->get <HandlePtr_t> (handleName);
-          std::string name (graspName);
-          value_type c = handle->clearance () + gripper->clearance ();
-	  NumericalConstraintPtr_t constraint =
-	    handle->createPreGrasp (gripper, c);
-	  problemSolver()->addNumericalConstraint (name, constraint);
+          problemSolver()->createPreGraspConstraint
+            (graspName, gripperName, handleName);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -554,6 +539,39 @@ namespace hpp {
         } catch (const std::exception& exc) {
           throw hpp::Error (exc.what ());
         }
+      }
+
+      ID Problem::edgeAtParam (UShort pathId, Double param)
+        throw (Error)
+      {
+	try {
+	  if (pathId >= problemSolver()->paths ().size ()) {
+            HPP_THROW (Error, "Wrong path id: " << pathId << ", number path: "
+		<< problemSolver()->paths ().size () << ".");
+	  }
+          core::PathVectorPtr_t path = problemSolver()->paths () [pathId];
+          core::PathVectorPtr_t flat = core::PathVector::create(path->outputSize(), path->outputDerivativeSize());
+          path->flatten(flat);
+          value_type unused;
+          std::size_t r = flat->rankAtParam(param, unused);
+          PathPtr_t p = flat->pathAtRank (r);
+          manipulation::ConstraintSetPtr_t constraint = 
+            HPP_DYNAMIC_PTR_CAST (manipulation::ConstraintSet, p->constraints());
+          if (!constraint) {
+            HPP_THROW (Error, "Path constraint is not of the good type "
+                << "at id " << pathId << ", param " << param
+                << " (rank: " << r << ")");
+          }
+          if (!constraint->edge()) {
+            HPP_THROW (Error, "Path constraint does not contain edge information "
+                << "at id " << pathId << ", param " << param
+                << " (rank: " << r << ")");
+          }
+          return (ID)constraint->edge()->id();
+	}
+	catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
       }
     } // namespace impl
   } // namespace manipulation

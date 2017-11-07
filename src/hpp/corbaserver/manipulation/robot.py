@@ -50,12 +50,16 @@ class Robot (object):
     # \param load whether to actually load urdf files. Set to no if you only
     #        want to initialize a corba client to an already initialized
     #        problem.
-    def __init__ (self, compositeName, robotName, rootJointType, load = True):
+    def __init__ (self, compositeName = None, robotName = None, rootJointType = None, load = True):
         self.tf_root = "base_link"
         self.rootJointType = dict()
-        self.name = compositeName
-        self.displayName = robotName
         self.client = CorbaClient ()
+        if compositeName is None:
+            self.name = self.client.basic.robot.getRobotName()
+            load = False
+        else:
+            self.name = compositeName
+        self.displayName = robotName
         self.load = load
         self.loadModel (robotName, rootJointType)
 
@@ -178,10 +182,6 @@ class Robot (object):
     ## Rebuild inner variables rankInConfiguration and rankInVelocity
     def rebuildRanks (self):
         self.jointNames = self.client.basic.robot.getJointNames ()
-        self.__setattr__ (self.displayName + 'JointNames',
-                          map (lambda n : n [len(self.displayName)+1:],
-                               filter (lambda n: n[:len (self.displayName)]
-                                       == self.displayName, self.jointNames)))
         self.rankInConfiguration = dict ()
         self.rankInVelocity = dict ()
         rankInConfiguration = rankInVelocity = 0
@@ -253,17 +253,6 @@ class Robot (object):
     ##        initial configuration.
     def setRootJointPosition (self, robotName, position):
         return self.client.manipulation.robot.setRootJointPosition (robotName, position)
-
-    ## Set bounds on the translation part of the freeflyer joint.
-    #
-    #  Valid only if the robot has a freeflyer joint.
-    def setTranslationBounds (self, xmin, xmax, ymin, ymax, zmin, zmax):
-        self.client.basic.robot.setJointBounds \
-            (self.displayName + "base_joint_x", [xmin, xmax])
-        self.client.basic.robot.setJointBounds \
-            (self.displayName + "base_joint_y", [ymin, ymax])
-        self.client.basic.robot.setJointBounds \
-            (self.displayName + "base_joint_z", [zmin, zmax])
 
     ## Get link position in joint frame
     #

@@ -84,7 +84,7 @@ namespace hpp {
 		<< ") does not match number of objects (" << names.length ()
 		<< ").");
 	  }
-          for (CORBA::ULong i = 0; i < names.length(); ++i) {
+          for (ULong i = 0; i < names.length(); ++i) {
             ret.push_back (ObjectDef_t());
             ObjectDef_t& od = ret.back ();
             od.name = names[i];
@@ -190,12 +190,12 @@ namespace hpp {
       }
 
       Long Graph::createNode(const Long subgraphId, const char* nodeName,
-          const bool waypoint)
+          const bool waypoint, const Long priority)
         throw (hpp::Error)
       {
         graph::StateSelectorPtr_t ns = getComp <graph::StateSelector> (subgraphId);
 
-        graph::StatePtr_t state = ns->createState (nodeName, waypoint);
+        graph::StatePtr_t state = ns->createState (nodeName, waypoint, priority);
         return (Long) state->id ();
       }
 
@@ -241,7 +241,7 @@ namespace hpp {
         EdgePtr_t edge = getComp <Edge> (edgeId);
         graph::StatePtr_t state = getComp <graph::State> (nodeId);
 
-        if (index < 0 || (std::size_t)index >= we->nbWaypoints ())
+        if (index < 0 || (std::size_t)index > we->nbWaypoints ())
           throw Error ("Invalid index");
         we->setWaypoint (index, edge, state);
       }
@@ -256,8 +256,8 @@ namespace hpp {
         graph::StatePtr_t n;
         graph::EdgePtr_t e;
 
-        CORBA::ULong len_edges = 0;
-        CORBA::ULong len_nodes = 0;
+        ULong len_edges = 0;
+        ULong len_nodes = 0;
         try {
           // Set the graph values
           graph_out = new GraphComp ();
@@ -281,12 +281,14 @@ namespace hpp {
               graph::WaypointEdgePtr_t we = HPP_DYNAMIC_PTR_CAST (
                   graph::WaypointEdge, e);
               if (we) {
-                current.start = (Long)we->waypoint<graph::Edge>(we->nbWaypoints()-1)->to ()->id ();
-                current.end = (Long) e->to ()->id ();
+                current.waypoints.length((ULong)we->nbWaypoints());
+                for (std::size_t i = 0; i < we->nbWaypoints(); ++i)
+                  current.waypoints[(ULong)i] = (ID)we->waypoint(i)->to()->id();
               } else {
-                current.start = (Long) e->from ()->id ();
-                current.end = (Long) e->to ()->id ();
+                current.waypoints.length(0);
               }
+              current.start = (Long) e->from ()->id ();
+              current.end = (Long) e->to ()->id ();
               comp_e[len_edges] = current;
               len_edges++;
             }
@@ -385,9 +387,9 @@ namespace hpp {
       {
         graph::WaypointEdgePtr_t edge = getComp <graph::WaypointEdge> (edgeId);
 
-        if (index < 0 || (std::size_t)index >= edge->nbWaypoints ())
+        if (index < 0 || (std::size_t)index > edge->nbWaypoints ())
           throw Error ("Invalid index");
-        graph::EdgePtr_t waypoint = edge->waypoint <graph::Edge> (index);
+        graph::EdgePtr_t waypoint = edge->waypoint (index);
         nodeId = (Long) waypoint->to ()->id ();
         return (Long) waypoint->id ();
       }
@@ -408,7 +410,7 @@ namespace hpp {
         return (Long) edge->id ();
       }
 
-      void Graph::setLevelSetFoliation (const Long edgeId,
+      void Graph::addLevelSetFoliation (const Long edgeId,
           const hpp::Names_t& condNC, const hpp::Names_t& condLJ,
           const hpp::Names_t& paramNC, const hpp::Names_t& paramPDOF,
           const hpp::Names_t& paramLJ)
@@ -444,7 +446,7 @@ namespace hpp {
               (problemSolver()->get <LockedJointPtr_t> (name));
           }
 
-          edge->buildHistogram ();
+          // edge->buildHistogram ();
         } catch (std::exception& err) {
           throw Error (err.what());
         }
@@ -476,7 +478,7 @@ namespace hpp {
         }
       }
 
-      void Graph::setNumericalConstraints (const Long graphComponentId,
+      void Graph::addNumericalConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames,
           const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
@@ -541,7 +543,7 @@ namespace hpp {
 	component->resetLockedJoints();
       }
 
-      void Graph::setNumericalConstraintsForPath (const Long nodeId,
+      void Graph::addNumericalConstraintsForPath (const Long nodeId,
           const hpp::Names_t& constraintNames,
           const hpp::Names_t& passiveDofsNames)
         throw (hpp::Error)
@@ -566,7 +568,7 @@ namespace hpp {
         }
       }
 
-      void Graph::setLockedDofConstraints (const Long graphComponentId,
+      void Graph::addLockedDofConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames)
         throw (hpp::Error)
       {
@@ -676,7 +678,6 @@ namespace hpp {
 	}
       }
 
-
       void Graph::displayNodeConstraints
       (hpp::ID nodeId, CORBA::String_out constraints) throw (Error)
       {
@@ -767,6 +768,17 @@ namespace hpp {
 	}
       }
 
+      bool Graph::isShort (ID edgeId)
+        throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+        try {
+          return edge->isShort ();
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       intSeq* Graph::autoBuild (
           const char* graphName,
           const Names_t& grippers,
@@ -820,6 +832,16 @@ namespace hpp {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
           return (Long) edge->from ()->getWeight (edge);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      void Graph::initialize ()
+        throw (hpp::Error)
+      {
+        try {
+          problemSolver ()->initConstraintGraph ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}

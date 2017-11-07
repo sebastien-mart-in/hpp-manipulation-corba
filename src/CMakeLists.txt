@@ -132,5 +132,6 @@ INSTALL(
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/robot.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/constraints.py
   ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/constraint_graph.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/constraint_graph_factory.py
   DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
   )

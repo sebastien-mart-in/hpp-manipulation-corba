@@ -50,7 +50,8 @@ namespace hpp {
 
           virtual Long createNode (const Long subGraphId,
                                    const char* nodeName,
-                                   const bool waypoint)
+                                   const bool waypoint,
+                                   const Long priority)
             throw (hpp::Error);
 
           virtual Long createEdge (const Long nodeFromId,
@@ -109,9 +110,28 @@ namespace hpp {
                                              const hpp::Names_t& paramNC,
                                              const hpp::Names_t& paramPDOF,
                                              const hpp::Names_t& paramLJ)
+            throw (hpp::Error)
+          {
+            addLevelSetFoliation (edgeId, condNC, condLJ,
+                paramNC, paramPDOF, paramLJ);
+          }
+          virtual void addLevelSetFoliation (const Long edgeId,
+                                             const hpp::Names_t& condNC,
+                                             const hpp::Names_t& condLJ,
+                                             const hpp::Names_t& paramNC,
+                                             const hpp::Names_t& paramPDOF,
+                                             const hpp::Names_t& paramLJ)
             throw (hpp::Error);
 
           virtual void setNumericalConstraints (const Long graphComponentId,
+                                       const hpp::Names_t& constraintNames,
+                                       const hpp::Names_t& passiveDofsNames)
+            throw (hpp::Error)
+          {
+            addNumericalConstraints(graphComponentId,
+                constraintNames, passiveDofsNames);
+          }
+          virtual void addNumericalConstraints (const Long graphComponentId,
                                        const hpp::Names_t& constraintNames,
                                        const hpp::Names_t& passiveDofsNames)
             throw (hpp::Error);
@@ -128,9 +148,23 @@ namespace hpp {
           virtual void setNumericalConstraintsForPath (const Long nodeId,
               const hpp::Names_t& constraintNames,
               const hpp::Names_t& passiveDofsNames)
+            throw (hpp::Error)
+          {
+            addNumericalConstraintsForPath(nodeId,
+                constraintNames, passiveDofsNames);
+          }
+          virtual void addNumericalConstraintsForPath (const Long nodeId,
+              const hpp::Names_t& constraintNames,
+              const hpp::Names_t& passiveDofsNames)
             throw (hpp::Error);
 
           virtual void setLockedDofConstraints (const Long graphComponentId,
+                                       const hpp::Names_t& constraintNames)
+            throw (hpp::Error)
+          {
+            addLockedDofConstraints (graphComponentId, constraintNames);
+          }
+          virtual void addLockedDofConstraints (const Long graphComponentId,
                                        const hpp::Names_t& constraintNames)
             throw (hpp::Error);
 
@@ -173,6 +207,9 @@ namespace hpp {
           virtual void setShort (ID edgeId, CORBA::Boolean isShort)
             throw (hpp::Error);
 
+          virtual bool isShort (ID edgeId)
+            throw (hpp::Error);
+
           virtual intSeq* autoBuild (const char* graphName,
               const Names_t& grippers, const Names_t& objects,
               const Namess_t& handlesPerObject, const Namess_t& shapesPreObject,
@@ -183,6 +220,9 @@ namespace hpp {
             throw (hpp::Error);
 
           virtual Long getWeight (ID edgeId)
+            throw (hpp::Error);
+
+          virtual void initialize ()
             throw (hpp::Error);
 
           virtual void getRelativeMotionMatrix (ID edgeID, intSeqSeq_out matrix)

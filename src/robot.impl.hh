@@ -46,6 +46,12 @@ namespace hpp {
               const char* srdfSuffix)
             throw (hpp::Error);
 
+          virtual void insertRobotModelFromString (const char* robotName,
+              const char* rootJointType,
+              const char* urdfString,
+              const char* srdfString)
+            throw (hpp::Error);
+
           virtual void insertRobotSRDFModel (const char* robotName,
               const char* packageName, const char* modelName,
               const char* srdfSuffix)
@@ -63,9 +69,19 @@ namespace hpp {
               const char* srdfSuffix)
             throw (hpp::Error);
 
+          virtual void insertHumanoidModelFromString (const char* robotName,
+              const char* rootJointType,
+              const char* urdfString,
+              const char* srdfString)
+            throw (hpp::Error);
+
           virtual void loadEnvironmentModel (const char* package,
               const char* envModelName, const char* urdfSuffix,
               const char* srdfSuffix, const char* prefix)
+            throw (hpp::Error);
+
+          virtual void loadEnvironmentModelFromString (const char* urdfString,
+              const char* srdfString, const char* prefix)
             throw (hpp::Error);
 
           virtual Transform__slice* getRootJointPosition (const char* robotName)

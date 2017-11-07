@@ -23,6 +23,11 @@ except ImportError:
     hpp=None
     pass
 
+def newProblem ():
+    from hpp.corbaserver.manipulation import Client
+    cl = Client()
+    cl.problem.resetProblem()
+
 ## Definition of a manipulation planning problem
 #
 #  This class wraps the Corba client to the server implemented by
@@ -574,6 +579,21 @@ class ProblemSolver (object):
         return self.client.basic.problem.selectPathProjector \
             (pathProjectorType, tolerance)
 
+    ##  Select distance type
+    #   \param Name of the distance type, either
+    #      "WeighedDistance" or any type added by method
+    #      core::ProblemSolver::addDistanceType
+    def selectDistance (self, distanceType):
+        return self.client.basic.problem.selectDistance (distanceType)
+
+
+    ##  Select steering method type
+    #   \param Name of the steering method type, either
+    #      "SteeringMethodStraight" or any type added by method
+    #      core::ProblemSolver::addSteeringMethodType
+    def selectSteeringMethod (self, steeringMethodType):
+        return self.client.basic.problem.selectSteeringMethod (steeringMethodType)
+
     def prepareSolveStepByStep (self):
         return self.client.basic.problem.prepareSolveStepByStep ()
 
@@ -597,6 +617,12 @@ class ProblemSolver (object):
     def directPath (self, startConfig, endConfig, validate):
         return self.client.basic.problem.directPath (startConfig, endConfig,
                                                      validate)
+
+    ## Project path using the path projector.
+    # \return True in case of success, False otherwise.
+    def projectPath (self, pathId):
+        return self.client.basic.problem.projectPath (pathId)
+
 
     ## Get Number of paths
     def numberPaths (self):
@@ -629,6 +655,13 @@ class ProblemSolver (object):
     ## Delete a path
     def erasePath (self, pathId):
         return self.client.basic.problem.erasePath (pathId)
+
+    ## Concatenate two paths
+    # The function appends the second path to the first one
+    # and remove the second path.
+    def concatenatePath (self, pathId1, pathId2):
+        return self.client.basic.problem.concatenatePath (pathId1, pathId2)
+
 
     ## \name Interruption of a path planning request
     #  \{

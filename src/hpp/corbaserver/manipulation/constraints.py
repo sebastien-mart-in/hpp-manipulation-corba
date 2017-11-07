@@ -45,13 +45,12 @@ class Constraints (object):
         self._lockedJoints = set (lockedJoints)
 
     def __add__ (self, other):
-        res = Constraints (grasps = self._grasps.union (other._grasps),
-                           pregrasps = self._pregrasps.union \
-                           (other._pregrasps),
-                           numConstraints = self._numConstraints.union \
-                           (other._numConstraints),
-                           lockedJoints = self._lockedJoints.union \
-                           (other._lockedJoints))
+        res = Constraints (grasps = self._grasps | other._grasps,
+                           pregrasps = self._pregrasps |  other._pregrasps,
+                           numConstraints =
+                           self._numConstraints | other._numConstraints,
+                           lockedJoints =
+                           self._lockedJoints | other._lockedJoints)
         return res
 
     def __sub__ (self, other):
@@ -62,6 +61,25 @@ class Constraints (object):
                            lockedJoints = self._lockedJoints - \
                            other._lockedJoints)
         return res
+
+    def __iadd__ (self, other):
+        self._grasps |= other._grasps
+        self._pregrasps |= other._pregrasps
+        self._numConstraints |= other._numConstraints
+        self._lockedJoints |= other._lockedJoints
+        return self
+
+    def __isub__ (self, other):
+        self._grasps -= other._grasps
+        self._pregrasps -= other._pregrasps
+        self._numConstraints -= other._numConstraints
+        self._lockedJoints -= other._lockedJoints
+        return self
+
+    def empty (self):
+        for s in [ self._grasps, self._pregrasps, self._numConstraints, self._lockedJoints ]:
+            if len(s) > 0: return False
+        return True
 
     @property
     def grasps (self):

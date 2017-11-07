@@ -20,10 +20,12 @@
 #include <pinocchio/multibody/model.hpp>
 
 #include <hpp/util/debug.hh>
+#include <hpp/util/exception-factory.hh>
 #include <hpp/pinocchio/humanoid-robot.hh>
 #include <hpp/pinocchio/gripper.hh>
 #include <hpp/pinocchio/joint.hh>
 #include <hpp/pinocchio/collision-object.hh>
+#include <hpp/pinocchio/urdf/util.hh>
 #include <hpp/manipulation/srdf/util.hh>
 #include <hpp/manipulation/device.hh>
 #include <hpp/manipulation/handle.hh>
@@ -136,11 +138,33 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          // robot->prepareInsertRobot ();
-	  srdf::loadRobotModel (robot, 0,
-              std::string (robotName), std::string (rootJointType),
-              std::string (packageName), std::string (modelName),
-              std::string (urdfSuffix), std::string (srdfSuffix));
+          if (robot->has<FrameIndexes_t> (robotName))
+            HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
+          pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
+              packageName, modelName, urdfSuffix, srdfSuffix);
+	  srdf::loadModelFromFile (robot, robotName,
+              packageName, modelName, srdfSuffix);
+          robot->didInsertRobot (robotName);
+          problemSolver()->resetProblem ();
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      void Robot::insertRobotModelFromString (const char* robotName,
+              const char* rootJointType,
+              const char* urdfString,
+              const char* srdfString)
+	throw (Error)
+      {
+	try {
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+          if (robot->has<FrameIndexes_t> (robotName))
+            HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
+
+          pinocchio::urdf::loadModelFromString (robot, 0, robotName,
+              rootJointType, urdfString, srdfString);
+	  srdf::loadModelFromXML (robot, robotName, srdfString);
           robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
@@ -173,11 +197,12 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          // robot->prepareInsertRobot ();
-          srdf::loadObjectModel (robot, 0,
-              std::string (objectName), std::string (rootJointType),
-              std::string (packageName), std::string (modelName),
-              std::string (urdfSuffix), std::string (srdfSuffix));
+          if (robot->has<FrameIndexes_t> (objectName))
+            HPP_THROW(std::invalid_argument, "A robot named " << objectName << " already exists");
+          pinocchio::urdf::loadRobotModel (robot, 0, objectName, rootJointType,
+              packageName, modelName, urdfSuffix, srdfSuffix);
+          srdf::loadModelFromFile (robot, objectName,
+              packageName, modelName, srdfSuffix);
           robot->didInsertRobot (objectName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
@@ -193,11 +218,33 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          // robot->prepareInsertRobot ();
-	  srdf::loadHumanoidModel (robot, 0,
-              std::string (robotName), std::string (rootJointType),
-              std::string (packageName), std::string (modelName),
-              std::string (urdfSuffix), std::string (srdfSuffix));
+          if (robot->has<FrameIndexes_t> (robotName))
+            HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
+          pinocchio::urdf::loadHumanoidModel (robot, 0, robotName, rootJointType,
+              packageName, modelName, urdfSuffix, srdfSuffix);
+          srdf::loadModelFromFile (robot, robotName,
+              packageName, modelName, srdfSuffix);
+          robot->didInsertRobot (robotName);
+          problemSolver()->resetProblem ();
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      void Robot::insertHumanoidModelFromString (const char* robotName,
+          const char* rootJointType,
+          const char* urdfString,
+          const char* srdfString)
+	throw (Error)
+      {
+	try {
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+          if (robot->has<FrameIndexes_t> (robotName))
+            HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
+          pinocchio::urdf::loadModelFromString (robot, 0, robotName,
+              rootJointType, urdfString, srdfString);
+          pinocchio::urdf::setupHumanoidRobot (robot, robotName);
+	  srdf::loadModelFromXML (robot, robotName, srdfString);
           robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
@@ -213,10 +260,12 @@ namespace hpp {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
 
-          DevicePtr_t object = Device::create (std::string (envModelName));
-          srdf::loadEnvironmentModel (object,
-              std::string (package), std::string (envModelName),
-              std::string (urdfSuffix), std::string (srdfSuffix));
+          std::string modelName (envModelName); 
+          DevicePtr_t object = Device::create (modelName);
+          pinocchio::urdf::loadUrdfModel (object, "anchor",
+              package, modelName + std::string(urdfSuffix));
+          srdf::loadModelFromFile (object, "",
+              package, envModelName, srdfSuffix);
           std::string p (prefix);
           object->controlComputation(Device::JOINT_POSITION);
           object->computeForwardKinematics();
@@ -228,7 +277,7 @@ namespace hpp {
           for (DeviceObjectVector::iterator itObj = objects.begin();
               itObj != objects.end(); ++itObj) {
             problemSolver()->addObstacle (
-                std::string (prefix) + (*itObj)->name (),
+                p + (*itObj)->name (),
                 *(*itObj)->fcl (),
                 true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
@@ -258,6 +307,58 @@ namespace hpp {
 	}
       }
 
+      void Robot::loadEnvironmentModelFromString (const char* urdfString,
+          const char* srdfString, const char* prefix)
+	throw (hpp::Error)
+      {
+	try {
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+
+          std::string p (prefix);
+          DevicePtr_t object = Device::create (p);
+          // TODO replace "" by p and remove `p +` in what follows
+          pinocchio::urdf::loadModelFromString (object, 0, "",
+              "anchor", urdfString, srdfString);
+          srdf::loadModelFromXML (object, "", srdfString);
+          object->controlComputation(Device::JOINT_POSITION);
+          object->computeForwardKinematics();
+          object->updateGeometryPlacements();
+
+	  // Detach objects from joints
+          using pinocchio::DeviceObjectVector;
+          DeviceObjectVector& objects = object->objectVector();
+          for (DeviceObjectVector::iterator itObj = objects.begin();
+              itObj != objects.end(); ++itObj) {
+            problemSolver()->addObstacle (
+                p + (*itObj)->name (),
+                *(*itObj)->fcl (),
+                true, true);
+	    hppDout (info, "Adding obstacle " << obj->name ());
+	  }
+          typedef CPs_t::traits<JointAndShapes_t>::Map_t ShapeMap;
+          const ShapeMap& m = object->map <JointAndShapes_t> ();
+          for (ShapeMap::const_iterator it = m.begin ();
+              it != m.end (); it++) {
+            JointAndShapes_t shapes;
+            for (JointAndShapes_t::const_iterator itT = it->second.begin ();
+                itT != it->second.end(); ++itT) {
+              const Transform3f& M = itT->first->currentTransformation ();
+              Shape_t newShape (itT->second.size());
+              for (std::size_t i = 0; i < newShape.size (); ++i)
+                newShape [i] = M.act (itT->second[i]);
+              shapes.push_back (JointAndShape_t (JointPtr_t(), newShape));
+            }
+            problemSolver()->add (p + it->first, shapes);
+          }
+
+          copy<HandlePtr_t > (object, robot, p);
+          copy<GripperPtr_t> (object, robot, p);
+          robot->didInsertRobot (p.substr(0, p.size() - 1));
+          problemSolver()->resetProblem ();
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
 
       Transform__slice* Robot::getRootJointPosition (const char* robotName)
         throw (Error)
@@ -293,6 +394,7 @@ namespace hpp {
           Transform3f T;
           hppTransformToTransform3f (position, T);
           robot->setRobotRootPosition(n, T);
+          robot->computeForwardKinematics();
         } catch (const std::exception& exc) {
           throw Error (exc.what ());
         }
