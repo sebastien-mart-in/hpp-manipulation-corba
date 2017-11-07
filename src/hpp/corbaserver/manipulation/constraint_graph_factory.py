@@ -76,10 +76,12 @@ class Rules(object):
 # # graph is initialized
 # \endcode
 #
-# The behaviour can be tuned by setting the functions:
-# - ConstraintGraphFactory.graspIsAllowed (redundant with ConstraintGraphFactory.setRules)
-# - ConstraintGraphFactory.buildGraspConstraints
-# - ConstraintGraphFactory.buildPlacementConstraints
+# The behaviour can be tuned by setting the callback functions:
+# - \ref constraint_graph_factory_behaviour_tuning "Behaviour tuning"
+#   - \ref graspIsAllowed (redundant with \ref setRules)
+#   - \ref buildGraspConstraints
+#   - \ref buildPlacementConstraints
+# - \ref constraint_graph_factory_algo_callbacks "Algorithm callbacks"
 class ConstraintGraphFactory(object):
     class StateAndManifold:
         def __init__ (self, factory, grasps, id, name):
@@ -101,33 +103,61 @@ class ConstraintGraphFactory(object):
 
     ## \param graph an instance of ConstraintGraph
     def __init__(self, graph):
+
         ## \name Behaviour tuning
+        #  \anchor constraint_graph_factory_behaviour_tuning
         # \{
 
         ## Reduces the problem combinatorial.
         # Function called to check whether a grasps is allowed.
         # It takes as input a list of handle indices (or None) such
-        # that i-th ConstraintGraphFactory.grippers grasps grasps[i]-th ConstraintGraphFactory.handles.
+        # that i-th \ref grippers grasps `grasps[i]`-th \ref handles.
         # It must return a boolean
         #
-        # It defaults to a lambda function returning True
+        # It defaults to: \code lambda x : True
         self.graspIsAllowed = lambda x : True
         ## Function called to create grasp constraints.
         # Must return a tuple of Constraints objects as:
         # - constraint that validates the grasp
         # - constraint that parameterizes the graph
         # - constraint that validates the pre-grasp
-        # It defaults to ConstraintGraphFactory.defaultBuildGraspConstraints
+        # It defaults to \ref defaultBuildGraspConstraints
         self.buildGraspConstraints = self.defaultBuildGraspConstraints
         self._graspConstraints = dict()
         ## Function called to create placement constraints.
         # Must return a tuple of Constraints objects as:
-        # - constraint that validates the placement
-        # - constraint that parameterizes the  placement
-        # - constraint that validates the pre-placement
-        # It defaults to ConstraintGraphFactory.defaultBuildPlacementConstraints
+        # - constraint that validates placement
+        # - constraint that parameterizes placement
+        # - constraint that validates pre-placement
+        # It defaults to \ref defaultBuildPlacementConstraints
         self.buildPlacementConstraints = self.defaultBuildPlacementConstraints
         self._placementConstraints = dict()
+
+        ## \}
+
+        ## \name Default callbacks of the algorithm main steps
+        #  \anchor constraint_graph_factory_algo_callbacks
+        # \{
+
+        ## Create a new state.
+        # Arguments are:
+        # - grasps: a handle index for each gripper, as in \ref graspIsAllowed.
+        # - priority: the state priority.
+        self.makeState = self.defaultMakeState
+        ## Create a loop transition.
+        # Arguments are:
+        # - state: an instance of \ref StateAndManifold which represent the state
+        self.makeLoopTransition = self.defaultMakeLoopTransition
+        ## Create two transitions between two different states.
+        # Arguments are:
+        # - grasps: same as grasps in \ref makeState (the state *from*)
+        # - nGrasps: same as grasps in \ref makeState (the state *to*)
+        # - ig: index if the grasp that changes, i.e. such that
+        #   - \f$ grasps[i_g] \neq nGrasps[i_g] \f$
+        #   - \f$ \forall i \neq i_g, grasps[i] = nGrasps[i] \f$
+        # - priority:
+        # \todo argument `priority` could be removed
+        self.makeTransition = self.defaultMakeTransition
 
         ## \}
 
@@ -146,11 +176,11 @@ class ConstraintGraphFactory(object):
         self.envContacts = tuple () # strings
         ## the object names
         self.objects = tuple () # strings
-        ## See ConstraintGraphFactory.setObjects
+        ## See \ref setObjects
         self.handlesPerObjects = tuple () # object index to handle indixes
-        ## See ConstraintGraphFactory.setObjects
+        ## See \ref setObjects
         self.objectFromHandle = tuple ()  # handle index to object index
-        ## See ConstraintGraphFactory.setObjects
+        ## See \ref setObjects
         self.contactsPerObjects = tuple ()# object index to contact names
 
         ## \}
@@ -188,7 +218,7 @@ class ConstraintGraphFactory(object):
     def environmentContacts (self, envContacts):
         self.envContacts = tuple(envContacts)
 
-    ## Set the function ConstraintGraphFactory.graspIsAllowed
+    ## Set the function \ref graspIsAllowed
     ## \param rules a list of Rule objects
     def setRules (self, rules):
         self.graspIsAllowed = Rules(self.grippers, self.handles, rules)
@@ -304,12 +334,7 @@ class ConstraintGraphFactory(object):
     def defaultGraspIsAllowed (self, grasps):
         return True
 
-    ## \}
-
-    ## \name Algorithm main steps
-    # \{
-
-    def makeState(self, grasps, priority):
+    def defaultMakeState(self, grasps, priority):
         if not self.states.has_key(grasps):
             # Create state
             name = self._stateName (grasps)
@@ -324,12 +349,12 @@ class ConstraintGraphFactory(object):
             self.graph.addConstraints (node = name, constraints = state.manifold)
         return self.states[grasps]
 
-    def makeLoopTransition(self, state):
+    def defaultMakeLoopTransition(self, state):
         n = self._loopTransitionName (state.grasps)
         self.graph.createEdge (state.name, state.name, n, weight = 0, isInNode = state.name)
         self.graph.addConstraints (edge = n, constraints = state.foliation)
 
-    def makeTransition(self, grasps, nGrasps, ig, priority):
+    def defaultMakeTransition(self, grasps, nGrasps, ig, priority):
         sf = self.makeState(grasps , priority)
         st = self.makeState(nGrasps, priority)
         names = self._transitionNames(sf, st, ig)

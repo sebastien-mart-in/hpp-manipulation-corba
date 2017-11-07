@@ -72,8 +72,10 @@
 ///       robot, containing a humanoid robot at first place,
 ///   \li manipulation.problem_solver.ProblemSolver to set and solve a
 ///       manipulation planning problem.
-///   \li manipulation.constraint_graph.ConstraintGraph to initialize the
+///   \li manipulation.constraint_graph.ConstraintGraph to manipulate the
 ///       graph of constraint.
+///   \li manipulation.constraint_graph_factory.ConstraintGraphFactory to
+///       create a graph of constraints
 ///
 /// \section hpp_manipulation_corba_how_to_embed \
 /// How to embed a server in an application
