@@ -352,7 +352,7 @@ class ConstraintGraphFactory(object):
 
         # The different cases:
         pregrasp = not pgc.empty()
-        intersec = (not gc.empty()) or (not pc.empty())
+        intersec = (not gc.empty()) and (not pc.empty())
         preplace = not ppc.empty()
 
         nWaypoints = pregrasp + intersec + preplace
