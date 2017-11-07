@@ -23,6 +23,9 @@ from constraints import Constraints
 
 def zip_idx (a): return zip(range(len(a)), a)
 
+def _removeEmptyConstraints (problem, constraints):
+    return [ n for n in constraints if problem.getConstraintDimensions(n)[2] > 0 ]
+
 class Rules(object):
     def __init__ (self, grippers, handles, rules):
         rs = []
@@ -248,9 +251,9 @@ class ConstraintGraphFactory(object):
         pn = g + " pregrasps " + h
         self.graph.createGrasp (n, g, h)
         self.graph.createPreGrasp (pn, g, h)
-        return (Constraints (numConstraints = [ n, ]),
-                Constraints (numConstraints = [ n + "/complement", ]),
-                Constraints (numConstraints = [ pn, ]),)
+        return (Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
+                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
+                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
 
     ## This implements strict placement manifolds,
     ## where the parameterization constraints is the complement
@@ -271,9 +274,9 @@ class ConstraintGraphFactory(object):
             return (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)
         self.graph.client.problem.createPlacementConstraint (n, self.contactsPerObjects[io], self.envContacts)
         self.graph.client.problem.createPrePlacementConstraint (pn, self.contactsPerObjects[io], self.envContacts, width)
-        return (Constraints (numConstraints = [ n, ]),
-                Constraints (numConstraints = [ n + "/complement", ]),
-                Constraints (numConstraints = [ pn, ]),)
+        return (Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
+                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
+                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
 
     ## This implements relaxed placement manifolds,
     ## where the parameterization constraints is the LockedJoint of
@@ -294,9 +297,9 @@ class ConstraintGraphFactory(object):
             return (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)
         self.graph.client.problem.createPlacementConstraint (n, self.contactsPerObjects[io], self.envContacts)
         self.graph.client.problem.createPrePlacementConstraint (pn, self.contactsPerObjects[io], self.envContacts, width)
-        return (Constraints (numConstraints = [ n, ]),
+        return (Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
                 Constraints (lockedJoints = ljs),
-                Constraints (numConstraints = [ pn, ]),)
+                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
 
     def defaultGraspIsAllowed (self, grasps):
         return True
@@ -465,6 +468,6 @@ class ConstraintGraphFactory(object):
                 if nextIsAllowed: self.makeState (nGrasps, depth + 1)
 
                 if isAllowed and nextIsAllowed:
-                    self.makeTransition (grasps, nGrasps, ig, depth)
+                    self.makeTransition (grasps, nGrasps, isg, depth)
 
                 self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
