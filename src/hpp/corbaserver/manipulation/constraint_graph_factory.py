@@ -47,7 +47,7 @@ class Rules(object):
         for r, s in zip(self.rules, self.status):
             apply = True
             for i, h in zip_idx(r):
-                if h is not None and not h.match(self.handles[i]):
+                if h is not None and not h.match("" if grasps[i] is None else self.handles[grasps[i]]):
                     # This rule does not apply
                     apply = False
                     break
@@ -157,6 +157,7 @@ class ConstraintGraphFactory(object):
 
     ## \param grippers list of gripper names to be considered
     def setGrippers(self, grippers):
+        assert isinstance (grippers, (list, tuple))
         self.grippers = tuple(grippers)
 
     ## \param objects list of object names to be considered
@@ -409,8 +410,8 @@ class ConstraintGraphFactory(object):
 
             # Set all to short except first one.
             for i in range(nTransitions - 1):
-                self.graph.setShort (wTransitions[i    ][0], True)
-                self.graph.setShort (wTransitions[i + 1][1], True)
+                self.graph.setShort (wTransitions[i + 1][0], True)
+                self.graph.setShort (wTransitions[i    ][1], True)
         else:
             #TODO This case will likely never happen
             raise NotImplementedError("This case has not been implemented")
@@ -453,10 +454,12 @@ class ConstraintGraphFactory(object):
         for ig, g in zip_idx(grippers):
             ngrippers = grippers[:ig] + grippers[ig+1:]
 
+            isg = self.grippers.index(g)
             for ih, h in zip_idx(handles):
                 nhandles = handles[:ih] + handles[ih+1:]
 
-                nGrasps = grasps[:ig] + (ih, ) + grasps[ig+1:]
+                ish = self.handles.index(h)
+                nGrasps = grasps[:isg] + (ish, ) + grasps[isg+1:]
 
                 nextIsAllowed = self.graspIsAllowed (nGrasps)
                 if nextIsAllowed: self.makeState (nGrasps, depth + 1)
