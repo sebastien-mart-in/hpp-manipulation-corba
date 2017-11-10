@@ -138,7 +138,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndexes_t> (robotName))
+          if (robot->has<FrameIndices_t> (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
@@ -159,7 +159,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndexes_t> (robotName))
+          if (robot->has<FrameIndices_t> (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
 
           pinocchio::urdf::loadModelFromString (robot, 0, robotName,
@@ -197,7 +197,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndexes_t> (objectName))
+          if (robot->has<FrameIndices_t> (objectName))
             HPP_THROW(std::invalid_argument, "A robot named " << objectName << " already exists");
           pinocchio::urdf::loadRobotModel (robot, 0, objectName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
@@ -218,7 +218,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndexes_t> (robotName))
+          if (robot->has<FrameIndices_t> (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadHumanoidModel (robot, 0, robotName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
@@ -239,7 +239,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndexes_t> (robotName))
+          if (robot->has<FrameIndices_t> (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadModelFromString (robot, 0, robotName,
               rootJointType, urdfString, srdfString);
