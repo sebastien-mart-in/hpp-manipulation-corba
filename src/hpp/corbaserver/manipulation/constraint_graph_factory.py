@@ -17,7 +17,7 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-import re
+import re, abc
 from robot import CorbaClient
 from constraints import Constraints
 
@@ -57,52 +57,10 @@ class Rules(object):
             if apply: return s
         return self.defaultAcceptation
 
-## This class is used to build constraint graph from semantic information.
-#
-# The minimal usage is the following:
-# \code
-# graph = ConstraintGraph (robot, "graph")
-#
-# # Required calls
-# factory = ConstraintGraphFactory (graph)
-# factory.setGrippers (["gripper1", ... ])
-# factory.setObjects (["object1", ], [ [ "object1/handle1", ... ] ], [ [] ])
-#
-# # Optionally
-# factory.environmentContacts (["contact1", ... ])
-# factory.setRules ([ Rule (["gripper1", ..], ["handle1", ...], True), ... ])
-#
-# factory.generate ()
-# # graph is initialized
-# \endcode
-#
-# The behaviour can be tuned by setting the callback functions:
-# - \ref constraint_graph_factory_behaviour_tuning "Behaviour tuning"
-#   - \ref graspIsAllowed (redundant with \ref setRules)
-#   - \ref buildGraspConstraints
-#   - \ref buildPlacementConstraints
-# - \ref constraint_graph_factory_algo_callbacks "Algorithm callbacks"
-class ConstraintGraphFactory(object):
-    class StateAndManifold:
-        def __init__ (self, factory, grasps, id, name):
-            self.grasps = grasps
-            self.id = id
-            self.name = name
-            self.manifold = Constraints()
-            self.foliation = Constraints()
-            # Add the grasps
-            for ig, ih in zip_idx(grasps):
-                if ih is not None:
-                    self.manifold += factory.graspConstraints(ig, ih)
-                    self.foliation += factory.graspComplementConstraints(ig, ih)
-            # Add the placement constraints
-            for io, object in zip_idx(factory.objects):
-                if not factory._isObjectGrasped(grasps, io):
-                    self.manifold += factory.placementConstraints(object)
-                    self.foliation += factory.placementComplementConstraints(object)
+class GraphFactoryAbstract:
+    __metaclass__ = abc.ABCMeta
 
-    ## \param graph an instance of ConstraintGraph
-    def __init__(self, graph):
+    def __init__(self):
 
         ## \name Behaviour tuning
         #  \anchor constraint_graph_factory_behaviour_tuning
@@ -116,48 +74,6 @@ class ConstraintGraphFactory(object):
         #
         # It defaults to: \code lambda x : True
         self.graspIsAllowed = lambda x : True
-        ## Function called to create grasp constraints.
-        # Must return a tuple of Constraints objects as:
-        # - constraint that validates the grasp
-        # - constraint that parameterizes the graph
-        # - constraint that validates the pre-grasp
-        # It defaults to \ref defaultBuildGraspConstraints
-        self.buildGraspConstraints = self.defaultBuildGraspConstraints
-        self._graspConstraints = dict()
-        ## Function called to create placement constraints.
-        # Must return a tuple of Constraints objects as:
-        # - constraint that validates placement
-        # - constraint that parameterizes placement
-        # - constraint that validates pre-placement
-        # It defaults to \ref defaultBuildPlacementConstraints
-        self.buildPlacementConstraints = self.defaultBuildPlacementConstraints
-        self._placementConstraints = dict()
-
-        ## \}
-
-        ## \name Default callbacks of the algorithm main steps
-        #  \anchor constraint_graph_factory_algo_callbacks
-        # \{
-
-        ## Create a new state.
-        # Arguments are:
-        # - grasps: a handle index for each gripper, as in \ref graspIsAllowed.
-        # - priority: the state priority.
-        self.makeState = self.defaultMakeState
-        ## Create a loop transition.
-        # Arguments are:
-        # - state: an instance of \ref StateAndManifold which represent the state
-        self.makeLoopTransition = self.defaultMakeLoopTransition
-        ## Create two transitions between two different states.
-        # Arguments are:
-        # - grasps: same as grasps in \ref makeState (the state *from*)
-        # - nGrasps: same as grasps in \ref makeState (the state *to*)
-        # - ig: index if the grasp that changes, i.e. such that
-        #   - \f$ grasps[i_g] \neq nGrasps[i_g] \f$
-        #   - \f$ \forall i \neq i_g, grasps[i] = nGrasps[i] \f$
-        # - priority:
-        # \todo argument `priority` could be removed
-        self.makeTransition = self.defaultMakeTransition
 
         ## \}
 
@@ -166,8 +82,6 @@ class ConstraintGraphFactory(object):
 
         self.states = dict()
         self.transitions = set()
-        ## The ConstraintGraph object to build
-        self.graph = graph
         ## the handle names
         self.handles = tuple() # strings
         ## the gripper names
@@ -182,7 +96,6 @@ class ConstraintGraphFactory(object):
         self.objectFromHandle = tuple ()  # handle index to object index
         ## See \ref setObjects
         self.contactsPerObjects = tuple ()# object index to contact names
-
         ## \}
 
     ## \name Main API
@@ -231,52 +144,149 @@ class ConstraintGraphFactory(object):
 
     ## \}
 
-    ## \name Accessors to the different elementary constraints
+    ## \name Default callbacks of the algorithm main steps
+    #  \anchor constraint_graph_factory_algo_callbacks
     # \{
-    def _getGraspConstraints(self, gripper, handle):
-        if isinstance(gripper, str): ig = self.grippers.index(gripper)
-        else: ig = gripper
-        if isinstance(handle, str): ih = self.handles.index(handle)
-        else: ih = handle
-        k = (ig, ih)
-        if not self._graspConstraints.has_key(k):
-            self._graspConstraints[k] = self.buildGraspConstraints(self.grippers[ig], self.handles[ih])
-        return self._graspConstraints[k]
 
-    def graspConstraints(self, gripper, handle):
-        return self._getGraspConstraints(gripper, handle)[0]
+    ## Create a new state.
+    # \param grasps a handle index for each gripper, as in GraphFactoryAbstract.graspIsAllowed.
+    # \param priority the state priority.
+    # \return an object representing the state.
+    @abc.abstractmethod
+    def makeState(self, grasps, priority): return grasps
 
-    def graspComplementConstraints(self, gripper, handle):
-        return self._getGraspConstraints(gripper, handle)[1]
+    ## Create a loop transition.
+    # \param state: an object returned by \ref makeState which represent the state
+    @abc.abstractmethod
+    def makeLoopTransition(self, state): pass
 
-    def pregraspConstraints(self, gripper, handle):
-        return self._getGraspConstraints(gripper, handle)[2]
+    ## Create two transitions between two different states.
+    # \param grasps: same as grasps in \ref makeState (the state *from*)
+    # \param nGrasps: same as grasps in \ref makeState (the state *to*)
+    # \param ig: index if the grasp that changes, i.e. such that
+    #   - \f$ grasps[i_g] \neq nGrasps[i_g] \f$
+    #   - \f$ \forall i \neq i_g, grasps[i] = nGrasps[i] \f$
+    # \param priority:
+    # \todo argument `priority` could be removed
+    @abc.abstractmethod
+    def makeTransition(self, grasps, nGrasps, ig, priority): pass
 
-    def _getPlacementConstraints(self, object):
-        if isinstance(object, str): io = self.objects.index(object)
-        else: io = object
-        k = io
-        if not self._placementConstraints.has_key(k):
-            self._placementConstraints[k] = self.buildPlacementConstraints(self.objects[io])
-        return self._placementConstraints[k]
-
-    def placementConstraints(self, object):
-        return self._getPlacementConstraints(object)[0]
-
-    def placementComplementConstraints(self, object):
-        return self._getPlacementConstraints(object)[1]
-
-    def prePlacementConstraints(self, object):
-        return self._getPlacementConstraints(object)[2]
     ## \}
 
-    ## \name Default functions
+    def _makeState(self, grasps, priority):
+        if not self.states.has_key(grasps):
+            state = self.makeState (grasps, priority)
+            self.states[grasps] = state
+
+            # Create loop transition
+            self.makeLoopTransition (state)
+        else:
+            state = self.states [grasps]
+        return state
+
+    def _recurse(self, grippers, handles, grasps, depth):
+        if len(grippers) == 0 or len(handles) == 0: return
+
+        isAllowed = self.graspIsAllowed (grasps)
+        if isAllowed: self._makeState (grasps, depth)
+
+        for ig, g in zip_idx(grippers):
+            ngrippers = grippers[:ig] + grippers[ig+1:]
+
+            isg = self.grippers.index(g)
+            for ih, h in zip_idx(handles):
+                nhandles = handles[:ih] + handles[ih+1:]
+
+                ish = self.handles.index(h)
+                nGrasps = grasps[:isg] + (ish, ) + grasps[isg+1:]
+
+                nextIsAllowed = self.graspIsAllowed (nGrasps)
+                if nextIsAllowed: self._makeState (nGrasps, depth + 1)
+
+                if isAllowed and nextIsAllowed:
+                    self.makeTransition (grasps, nGrasps, isg, depth)
+
+                self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
+
+class ConstraintFactoryAbstract:
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, graphfactory):
+        self._grasp = dict()
+        self._placement = dict()
+
+        self.graphfactory = graphfactory
+
+    ## \name Accessors to the different elementary constraints
     # \{
+    def _getGrasp(self, gripper, handle):
+        if isinstance(gripper, str): ig = self.graphfactory.grippers.index(gripper)
+        else: ig = gripper
+        if isinstance(handle, str): ih = self.graphfactory.handles.index(handle)
+        else: ih = handle
+        k = (ig, ih)
+        if not self._grasp.has_key(k):
+            self._grasp[k] = self.buildGrasp(self.graphfactory.grippers[ig], self.graphfactory.handles[ih])
+        return self._grasp[k]
+
+    def grasp(self, gripper, handle):
+        return self._getGrasp(gripper, handle)[0]
+
+    def graspComplement(self, gripper, handle):
+        return self._getGrasp(gripper, handle)[1]
+
+    def pregrasp(self, gripper, handle):
+        return self._getGrasp(gripper, handle)[2]
+
+    def _getPlacement(self, object):
+        if isinstance(object, str): io = self.graphfactory.objects.index(object)
+        else: io = object
+        k = io
+        if not self._placement.has_key(k):
+            self._placement[k] = self.buildPlacement(self.graphfactory.objects[io])
+        return self._placement[k]
+
+    def placement(self, object):
+        return self._getPlacement(object)[0]
+
+    def placementComplement(self, object):
+        return self._getPlacement(object)[1]
+
+    def prePlacement(self, object):
+        return self._getPlacement(object)[2]
+    ## \}
+
+    ## Function called to create grasp constraints.
+    # Must return a tuple of Constraints objects as:
+    # - constraint that validates the grasp
+    # - constraint that parameterizes the graph
+    # - constraint that validates the pre-grasp
+    # \param g gripper string
+    # \param h handle  string
+    @abc.abstractmethod
+    def buildGrasp (self, g, h):
+        return (None, None, None,)
+
+    ## Function called to create placement constraints.
+    # Must return a tuple of Constraints objects as:
+    # - constraint that validates placement
+    # - constraint that parameterizes placement
+    # - constraint that validates pre-placement
+    # \param o string
+    @abc.abstractmethod
+    def buildPlacement (self, o):
+        return (None, None, None,)
+
+class ConstraintFactory(ConstraintFactoryAbstract):
+    def __init__ (self, graphfactory, graph):
+        super (ConstraintFactory, self).__init__(graphfactory)
+        self.graph = graph
+        self.strict = False
 
     ## Calls ConstraintGraph.createGraph and ConstraintGraph.createPreGrasp
     ## \param g gripper string
     ## \param h handle  string
-    def defaultBuildGraspConstraints (self, g, h):
+    def buildGrasp (self, g, h):
         n = g + " grasps " + h
         pn = g + " pregrasps " + h
         self.graph.createGrasp (n, g, h)
@@ -285,16 +295,22 @@ class ConstraintGraphFactory(object):
                 Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
                 Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
 
+    def buildPlacement (self, o):
+        if self.strict:
+            return self.buildStrictPlacement (o)
+        else:
+            return self.buildRelaxedPlacement (o)
+
     ## This implements strict placement manifolds,
     ## where the parameterization constraints is the complement
     ## of the placement constraint.
     ## \param o string
-    def defaultBuildPlacementConstraints (self, o):
+    def buildStrictPlacement (self, o):
         n = "place_" + o
         pn = "preplace_" + o
         width = 0.05
-        io = self.objects.index(o)
-        if len(self.contactsPerObjects[io]) == 0 or len(self.envContacts) == 0:
+        io = self.graphfactory.objects.index(o)
+        if len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0:
             ljs = []
             for n in self.graph.clientBasic.robot.getJointNames():
                 if n.startswith(o + "/"):
@@ -302,8 +318,8 @@ class ConstraintGraphFactory(object):
                     q = self.graph.clientBasic.robot.getJointConfig(n)
                     self.graph.clientBasic.problem.createLockedJoint(n, n, q)
             return (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)
-        self.graph.client.problem.createPlacementConstraint (n, self.contactsPerObjects[io], self.envContacts)
-        self.graph.client.problem.createPrePlacementConstraint (pn, self.contactsPerObjects[io], self.envContacts, width)
+        self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
+        self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
         return (Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
                 Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
                 Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
@@ -312,48 +328,98 @@ class ConstraintGraphFactory(object):
     ## where the parameterization constraints is the LockedJoint of
     ## the object root joint
     ## \param o string
-    def defaultBuildRelaxedPlacementConstraints (self, o):
+    def buildRelaxedPlacement (self, o):
         n = "place_" + o
         pn = "preplace_" + o
         width = 0.05
-        io = self.objects.index(o)
+        io = self.graphfactory.objects.index(o)
         ljs = []
         for n in self.graph.clientBasic.robot.getJointNames():
             if n.startswith(o + "/"):
                 ljs.append(n)
                 q = self.graph.clientBasic.robot.getJointConfig(n)
                 self.graph.clientBasic.problem.createLockedJoint(n, n, q)
-        if len(self.contactsPerObjects[io]) == 0 or len(self.envContacts) == 0:
+        if len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0:
             return (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)
-        self.graph.client.problem.createPlacementConstraint (n, self.contactsPerObjects[io], self.envContacts)
-        self.graph.client.problem.createPrePlacementConstraint (pn, self.contactsPerObjects[io], self.envContacts, width)
+        self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
+        self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
         return (Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
                 Constraints (lockedJoints = ljs),
                 Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
 
-    def defaultMakeState(self, grasps, priority):
-        if not self.states.has_key(grasps):
-            # Create state
-            name = self._stateName (grasps)
-            nid = self.graph.createNode (name, False, priority)
-            state = ConstraintGraphFactory.StateAndManifold (self, grasps, nid, name)
-            self.states[grasps] = state
+## This class is used to build constraint graph from semantic information.
+#
+# The minimal usage is the following:
+# \code
+# graph = ConstraintGraph (robot, "graph")
+#
+# # Required calls
+# factory = ConstraintGraphFactory (graph)
+# factory.setGrippers (["gripper1", ... ])
+# factory.setObjects (["object1", ], [ [ "object1/handle1", ... ] ], [ [] ])
+#
+# # Optionally
+# factory.environmentContacts (["contact1", ... ])
+# factory.setRules ([ Rule (["gripper1", ..], ["handle1", ...], True), ... ])
+#
+# factory.generate ()
+# # graph is initialized
+# \endcode
+#
+# The behaviour can be tuned by setting the callback functions:
+# - \ref constraint_graph_factory_behaviour_tuning "Behaviour tuning"
+#   - \ref graspIsAllowed (redundant with \ref setRules)
+#   - \ref buildGrasp
+#   - \ref buildPlacement
+# - \ref constraint_graph_factory_algo_callbacks "Algorithm callbacks"
+class ConstraintGraphFactory(GraphFactoryAbstract):
+    class StateAndManifold:
+        def __init__ (self, factory, grasps, id, name):
+            self.grasps = grasps
+            self.id = id
+            self.name = name
+            self.manifold = Constraints()
+            self.foliation = Constraints()
+            # Add the grasps
+            for ig, ih in zip_idx(grasps):
+                if ih is not None:
+                    self.manifold += factory.constraints.grasp(ig, ih)
+                    self.foliation += factory.constraints.graspComplement(ig, ih)
+            # Add the placement constraints
+            for io, object in zip_idx(factory.objects):
+                if not factory._isObjectGrasped(grasps, io):
+                    self.manifold += factory.constraints.placement(object)
+                    self.foliation += factory.constraints.placementComplement(object)
 
-            # Create loop transition
-            self.makeLoopTransition (state)
+    ## \param graph an instance of ConstraintGraph
+    def __init__(self, graph):
+        super (ConstraintGraphFactory, self).__init__()
 
-            # Add the constraints
-            self.graph.addConstraints (node = name, constraints = state.manifold)
-        return self.states[grasps]
+        self.constraints = ConstraintFactory (self, graph)
 
-    def defaultMakeLoopTransition(self, state):
+        self.graph = graph
+
+    ## \name Default functions
+    # \{
+
+    def makeState(self, grasps, priority):
+        # Create state
+        name = self._stateName (grasps)
+        nid = self.graph.createNode (name, False, priority)
+        state = ConstraintGraphFactory.StateAndManifold (self, grasps, nid, name)
+
+        # Add the constraints
+        self.graph.addConstraints (node = name, constraints = state.manifold)
+        return state
+
+    def makeLoopTransition(self, state):
         n = self._loopTransitionName (state.grasps)
         self.graph.createEdge (state.name, state.name, n, weight = 0, isInNode = state.name)
         self.graph.addConstraints (edge = n, constraints = state.foliation)
 
-    def defaultMakeTransition(self, grasps, nGrasps, ig, priority):
-        sf = self.makeState(grasps , priority)
-        st = self.makeState(nGrasps, priority)
+    def makeTransition(self, grasps, nGrasps, ig, priority):
+        sf = self.states[grasps]
+        st = self.states[nGrasps]
         names = self._transitionNames(sf, st, ig)
         if names in self.transitions:
             return
@@ -362,17 +428,17 @@ class ConstraintGraphFactory(object):
         obj = self.objects[iobj]
         noPlace = self._isObjectGrasped (grasps, iobj)
 
-        gc = self.graspConstraints (ig, nGrasps[ig])
-        gcc = self.graspComplementConstraints (ig, nGrasps[ig])
-        pgc = self.pregraspConstraints (ig, nGrasps[ig])
+        gc = self.constraints.grasp (ig, nGrasps[ig])
+        gcc = self.constraints.graspComplement (ig, nGrasps[ig])
+        pgc = self.constraints.pregrasp (ig, nGrasps[ig])
         if noPlace:
             pc = Constraints()
             pcc = Constraints()
             ppc = Constraints()
         else:
-            pc = self.placementConstraints (self.objectFromHandle[nGrasps[ig]])
-            pcc = self.placementComplementConstraints (self.objectFromHandle[nGrasps[ig]])
-            ppc = self.prePlacementConstraints (self.objectFromHandle[nGrasps[ig]])
+            pc = self.constraints.placement (self.objectFromHandle[nGrasps[ig]])
+            pcc = self.constraints.placementComplement (self.objectFromHandle[nGrasps[ig]])
+            ppc = self.constraints.prePlacement (self.objectFromHandle[nGrasps[ig]])
         manifold = sf.manifold - pc
 
         # The different cases:
@@ -469,27 +535,3 @@ class ConstraintGraphFactory(object):
 
     def _loopTransitionName (self, grasps):
         return "Loop | " + self._stateName(grasps, True)
-
-    def _recurse(self, grippers, handles, grasps, depth):
-        if len(grippers) == 0 or len(handles) == 0: return
-
-        isAllowed = self.graspIsAllowed (grasps)
-        if isAllowed: self.makeState (grasps, depth)
-
-        for ig, g in zip_idx(grippers):
-            ngrippers = grippers[:ig] + grippers[ig+1:]
-
-            isg = self.grippers.index(g)
-            for ih, h in zip_idx(handles):
-                nhandles = handles[:ih] + handles[ih+1:]
-
-                ish = self.handles.index(h)
-                nGrasps = grasps[:isg] + (ish, ) + grasps[isg+1:]
-
-                nextIsAllowed = self.graspIsAllowed (nGrasps)
-                if nextIsAllowed: self.makeState (nGrasps, depth + 1)
-
-                if isAllowed and nextIsAllowed:
-                    self.makeTransition (grasps, nGrasps, isg, depth)
-
-                self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
