@@ -181,6 +181,29 @@ class GraphFactoryAbstract:
             state = self.states [grasps]
         return state
 
+    def _isObjectGrasped(self, grasps, object):
+        for h in self.handlesPerObjects[object]:
+            if h in grasps:
+                return True
+        return False
+
+    def _stateName (self, grasps, abbrev = False):
+        sepGH = "-" if abbrev else " grasps "
+        sep = ":" if abbrev else " : "
+        name = sep.join([ (str(ig) if abbrev else self.grippers[ig]) + sepGH + (str(ih) if abbrev else self.handles[ih]) for ig,ih in zip_idx(grasps) if ih is not None ])
+        if len(name) == 0: return "f" if abbrev else "free"
+        return name
+
+    def _transitionNames (self, sFrom, sTo, ig):
+        g = self.grippers[ig]
+        h = self.handles[sTo.grasps[ig]]
+        sep = " | "
+        return (g + " > " + h + sep + self._stateName(sFrom.grasps, True),
+                g + " < " + h + sep + self._stateName(sTo.grasps, True),)
+
+    def _loopTransitionName (self, grasps):
+        return "Loop | " + self._stateName(grasps, True)
+
     def _recurse(self, grippers, handles, grasps, depth):
         if len(grippers) == 0 or len(handles) == 0: return
 
@@ -513,26 +536,3 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         self.transitions.add(names)
 
     ## \}
-
-    def _isObjectGrasped(self, grasps, object):
-        for h in self.handlesPerObjects[object]:
-            if h in grasps:
-                return True
-        return False
-
-    def _stateName (self, grasps, abbrev = False):
-        sepGH = "-" if abbrev else " grasps "
-        sep = ":" if abbrev else " : "
-        name = sep.join([ (str(ig) if abbrev else self.grippers[ig]) + sepGH + (str(ih) if abbrev else self.handles[ih]) for ig,ih in zip_idx(grasps) if ih is not None ])
-        if len(name) == 0: return "f" if abbrev else "free"
-        return name
-
-    def _transitionNames (self, sFrom, sTo, ig):
-        g = self.grippers[ig]
-        h = self.handles[sTo.grasps[ig]]
-        sep = " | "
-        return (g + " > " + h + sep + self._stateName(sFrom.grasps, True),
-                g + " < " + h + sep + self._stateName(sTo.grasps, True),)
-
-    def _loopTransitionName (self, grasps):
-        return "Loop | " + self._stateName(grasps, True)
