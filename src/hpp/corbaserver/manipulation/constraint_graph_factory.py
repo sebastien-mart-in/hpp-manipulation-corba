@@ -161,15 +161,15 @@ class GraphFactoryAbstract:
     def makeLoopTransition(self, state): pass
 
     ## Create two transitions between two different states.
-    # \param grasps: same as grasps in \ref makeState (the state *from*)
-    # \param nGrasps: same as grasps in \ref makeState (the state *to*)
-    # \param ig: index if the grasp that changes, i.e. such that
-    #   - \f$ grasps[i_g] \neq nGrasps[i_g] \f$
-    #   - \f$ \forall i \neq i_g, grasps[i] = nGrasps[i] \f$
+    # \param stateFrom: same as grasps in \ref makeState
+    # \param stateTo: same as grasps in \ref makeState
+    # \param ig: index if the grasp vector that changes, i.e. such that
+    #   - \f$ stateFrom.grasps[i_g] \neq stateTo.grasps[i_g] \f$
+    #   - \f$ \forall i \neq i_g, stateFrom.grasps[i] = stateTo.grasps[i] \f$
     # \param priority:
     # \todo argument `priority` could be removed
     @abc.abstractmethod
-    def makeTransition(self, grasps, nGrasps, ig, priority): pass
+    def makeTransition(self, stateFrom, stateTo, ig, priority): pass
 
     ## \}
 
@@ -188,7 +188,7 @@ class GraphFactoryAbstract:
         if len(grippers) == 0 or len(handles) == 0: return
 
         isAllowed = self.graspIsAllowed (grasps)
-        if isAllowed: self._makeState (grasps, depth)
+        if isAllowed: current = self._makeState (grasps, depth)
 
         for ig, g in zip_idx(grippers):
             ngrippers = grippers[:ig] + grippers[ig+1:]
@@ -201,10 +201,10 @@ class GraphFactoryAbstract:
                 nGrasps = grasps[:isg] + (ish, ) + grasps[isg+1:]
 
                 nextIsAllowed = self.graspIsAllowed (nGrasps)
-                if nextIsAllowed: self._makeState (nGrasps, depth + 1)
+                if nextIsAllowed: next = self._makeState (nGrasps, depth + 1)
 
                 if isAllowed and nextIsAllowed:
-                    self.makeTransition (grasps, nGrasps, isg, depth)
+                    self.makeTransition (current, next, isg, depth)
 
                 self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
 
@@ -417,28 +417,30 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         self.graph.createEdge (state.name, state.name, n, weight = 0, isInNode = state.name)
         self.graph.addConstraints (edge = n, constraints = state.foliation)
 
-    def makeTransition(self, grasps, nGrasps, ig, priority):
-        sf = self.states[grasps]
-        st = self.states[nGrasps]
+    def makeTransition(self, stateFrom, stateTo, ig, priority):
+        sf = stateFrom
+        st = stateTo
+        grasps  = sf.grasps
+        nGrasps = st.grasps
         names = self._transitionNames(sf, st, ig)
         if names in self.transitions:
             return
 
-        iobj = self.objectFromHandle [nGrasps[ig]]
+        iobj = self.objectFromHandle [st.grasps[ig]]
         obj = self.objects[iobj]
-        noPlace = self._isObjectGrasped (grasps, iobj)
+        noPlace = self._isObjectGrasped (sf.grasps, iobj)
 
-        gc = self.constraints.grasp (ig, nGrasps[ig])
-        gcc = self.constraints.graspComplement (ig, nGrasps[ig])
-        pgc = self.constraints.pregrasp (ig, nGrasps[ig])
+        gc = self.constraints.grasp (ig, st.grasps[ig])
+        gcc = self.constraints.graspComplement (ig, st.grasps[ig])
+        pgc = self.constraints.pregrasp (ig, st.grasps[ig])
         if noPlace:
             pc = Constraints()
             pcc = Constraints()
             ppc = Constraints()
         else:
-            pc = self.constraints.placement (self.objectFromHandle[nGrasps[ig]])
-            pcc = self.constraints.placementComplement (self.objectFromHandle[nGrasps[ig]])
-            ppc = self.constraints.prePlacement (self.objectFromHandle[nGrasps[ig]])
+            pc = self.constraints.placement (self.objectFromHandle[st.grasps[ig]])
+            pcc = self.constraints.placementComplement (self.objectFromHandle[st.grasps[ig]])
+            ppc = self.constraints.prePlacement (self.objectFromHandle[st.grasps[ig]])
         manifold = sf.manifold - pc
 
         # The different cases:
