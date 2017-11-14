@@ -57,14 +57,15 @@ class Rules(object):
             if apply: return s
         return self.defaultAcceptation
 
+## An abstract class which is loops over the different (gripper, handle) associations.
+#
+# The behaviour can be tuned by setting the callback functions:
+# - \ref graspIsAllowed (redundant with \ref setRules)
+# - \ref constraint_graph_factory_algo_callbacks "Algorithm steps"
 class GraphFactoryAbstract:
     __metaclass__ = abc.ABCMeta
 
     def __init__(self):
-
-        ## \name Behaviour tuning
-        #  \anchor constraint_graph_factory_behaviour_tuning
-        # \{
 
         ## Reduces the problem combinatorial.
         # Function called to check whether a grasps is allowed.
@@ -74,8 +75,6 @@ class GraphFactoryAbstract:
         #
         # It defaults to: \code lambda x : True
         self.graspIsAllowed = lambda x : True
-
-        ## \}
 
         ## \name Internal variables
         # \{
@@ -144,7 +143,7 @@ class GraphFactoryAbstract:
 
     ## \}
 
-    ## \name Default callbacks of the algorithm main steps
+    ## \name Abstract methods of the algorithm
     #  \anchor constraint_graph_factory_algo_callbacks
     # \{
 
@@ -206,6 +205,11 @@ class GraphFactoryAbstract:
 
                 self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
 
+## An abstract class which stores the constraints.
+#
+# Child classes are responsible for building them.
+# - \ref buildGrasp
+# - \ref buildPlacement
 class ConstraintFactoryAbstract:
     __metaclass__ = abc.ABCMeta
 
@@ -275,10 +279,13 @@ class ConstraintFactoryAbstract:
     def buildPlacement (self, o):
         return (None, None, None,)
 
+## Default implementation of ConstraintFactoryAbstract
 class ConstraintFactory(ConstraintFactoryAbstract):
     def __init__ (self, graphfactory, graph):
         super (ConstraintFactory, self).__init__(graphfactory)
         self.graph = graph
+        ## Select whether placement should be strict or relaxed.
+        # \sa buildStrictPlacement, buildRelaxedPlacement
         self.strict = False
 
     ## Calls ConstraintGraph.createGraph and ConstraintGraph.createPreGrasp
@@ -345,7 +352,7 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                 Constraints (lockedJoints = ljs),
                 Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
 
-## This class is used to build constraint graph from semantic information.
+## Default implementation of ConstraintGraphFactory
 #
 # The minimal usage is the following:
 # \code
@@ -363,13 +370,6 @@ class ConstraintFactory(ConstraintFactoryAbstract):
 # factory.generate ()
 # # graph is initialized
 # \endcode
-#
-# The behaviour can be tuned by setting the callback functions:
-# - \ref constraint_graph_factory_behaviour_tuning "Behaviour tuning"
-#   - \ref graspIsAllowed (redundant with \ref setRules)
-#   - \ref buildGrasp
-#   - \ref buildPlacement
-# - \ref constraint_graph_factory_algo_callbacks "Algorithm callbacks"
 class ConstraintGraphFactory(GraphFactoryAbstract):
     class StateAndManifold:
         def __init__ (self, factory, grasps, id, name):
@@ -393,6 +393,7 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
     def __init__(self, graph):
         super (ConstraintGraphFactory, self).__init__()
 
+        ## Stores the constraints in a child class of ConstraintFactoryAbstract
         self.constraints = ConstraintFactory (self, graph)
 
         self.graph = graph
