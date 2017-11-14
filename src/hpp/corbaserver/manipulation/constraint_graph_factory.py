@@ -331,9 +331,6 @@ class ConstraintGraphFactory(object):
                 Constraints (lockedJoints = ljs),
                 Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
 
-    def defaultGraspIsAllowed (self, grasps):
-        return True
-
     def defaultMakeState(self, grasps, priority):
         if not self.states.has_key(grasps):
             # Create state
