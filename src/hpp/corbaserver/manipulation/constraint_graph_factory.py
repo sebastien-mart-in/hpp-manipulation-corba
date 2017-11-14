@@ -221,7 +221,7 @@ class ConstraintFactoryAbstract:
 
     ## \name Accessors to the different elementary constraints
     # \{
-    def _getGrasp(self, gripper, handle):
+    def getGrasp(self, gripper, handle):
         if isinstance(gripper, str): ig = self.graphfactory.grippers.index(gripper)
         else: ig = gripper
         if isinstance(handle, str): ih = self.graphfactory.handles.index(handle)
@@ -232,15 +232,15 @@ class ConstraintFactoryAbstract:
         return self._grasp[k]
 
     def grasp(self, gripper, handle):
-        return self._getGrasp(gripper, handle)[0]
+        return self.getGrasp(gripper, handle)[0]
 
     def graspComplement(self, gripper, handle):
-        return self._getGrasp(gripper, handle)[1]
+        return self.getGrasp(gripper, handle)[1]
 
     def pregrasp(self, gripper, handle):
-        return self._getGrasp(gripper, handle)[2]
+        return self.getGrasp(gripper, handle)[2]
 
-    def _getPlacement(self, object):
+    def getPlacement(self, object):
         if isinstance(object, str): io = self.graphfactory.objects.index(object)
         else: io = object
         k = io
@@ -249,13 +249,13 @@ class ConstraintFactoryAbstract:
         return self._placement[k]
 
     def placement(self, object):
-        return self._getPlacement(object)[0]
+        return self.getPlacement(object)[0]
 
     def placementComplement(self, object):
-        return self._getPlacement(object)[1]
+        return self.getPlacement(object)[1]
 
     def prePlacement(self, object):
-        return self._getPlacement(object)[2]
+        return self.getPlacement(object)[2]
     ## \}
 
     ## Function called to create grasp constraints.
