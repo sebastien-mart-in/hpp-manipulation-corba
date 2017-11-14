@@ -166,10 +166,8 @@ class GraphFactoryAbstract:
     # \param ig: index if the grasp vector that changes, i.e. such that
     #   - \f$ stateFrom.grasps[i_g] \neq stateTo.grasps[i_g] \f$
     #   - \f$ \forall i \neq i_g, stateFrom.grasps[i] = stateTo.grasps[i] \f$
-    # \param priority:
-    # \todo argument `priority` could be removed
     @abc.abstractmethod
-    def makeTransition(self, stateFrom, stateTo, ig, priority): pass
+    def makeTransition(self, stateFrom, stateTo, ig): pass
 
     ## \}
 
@@ -204,7 +202,7 @@ class GraphFactoryAbstract:
                 if nextIsAllowed: next = self._makeState (nGrasps, depth + 1)
 
                 if isAllowed and nextIsAllowed:
-                    self.makeTransition (current, next, isg, depth)
+                    self.makeTransition (current, next, isg)
 
                 self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
 
@@ -417,7 +415,7 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         self.graph.createEdge (state.name, state.name, n, weight = 0, isInNode = state.name)
         self.graph.addConstraints (edge = n, constraints = state.foliation)
 
-    def makeTransition(self, stateFrom, stateTo, ig, priority):
+    def makeTransition(self, stateFrom, stateTo, ig):
         sf = stateFrom
         st = stateTo
         grasps  = sf.grasps
