@@ -252,16 +252,11 @@ class ConstraintFactoryAbstract:
         k = (ig, ih)
         if not self._grasp.has_key(k):
             self._grasp[k] = self.buildGrasp(self.graphfactory.grippers[ig], self.graphfactory.handles[ih])
+            assert isinstance (self._grasp[k], dict)
         return self._grasp[k]
 
-    def grasp(self, gripper, handle):
-        return self.getGrasp(gripper, handle)[0]
-
-    def graspComplement(self, gripper, handle):
-        return self.getGrasp(gripper, handle)[1]
-
-    def pregrasp(self, gripper, handle):
-        return self.getGrasp(gripper, handle)[2]
+    def g (self, gripper, handle, what):
+        return self.getGrasp(gripper, handle)[what]
 
     def getPlacement(self, object):
         if isinstance(object, str): io = self.graphfactory.objects.index(object)
@@ -271,14 +266,8 @@ class ConstraintFactoryAbstract:
             self._placement[k] = self.buildPlacement(self.graphfactory.objects[io])
         return self._placement[k]
 
-    def placement(self, object):
-        return self.getPlacement(object)[0]
-
-    def placementComplement(self, object):
-        return self.getPlacement(object)[1]
-
-    def prePlacement(self, object):
-        return self.getPlacement(object)[2]
+    def p (self, object, what):
+        return self.getPlacement(object)[what]
     ## \}
 
     ## Function called to create grasp constraints.
@@ -304,6 +293,9 @@ class ConstraintFactoryAbstract:
 
 ## Default implementation of ConstraintFactoryAbstract
 class ConstraintFactory(ConstraintFactoryAbstract):
+    gfields = ('grasp', 'graspComplement', 'preGrasp')
+    pfields = ('placement', 'placementComplement', 'prePlacement')
+
     def __init__ (self, graphfactory, graph):
         super (ConstraintFactory, self).__init__(graphfactory)
         self.graph = graph
@@ -319,9 +311,11 @@ class ConstraintFactory(ConstraintFactoryAbstract):
         pn = g + " pregrasps " + h
         self.graph.createGrasp (n, g, h)
         self.graph.createPreGrasp (pn, g, h)
-        return (Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
-                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
-                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
+        return dict ( zip (self.gfields, (
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),
+            )))
 
     def buildPlacement (self, o):
         if self.strict:
@@ -345,12 +339,14 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                     ljs.append(n)
                     q = self.graph.clientBasic.robot.getJointConfig(n)
                     self.graph.clientBasic.problem.createLockedJoint(n, n, q)
-            return (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)
+            return dict ( zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)))
         self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
         self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
-        return (Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
-                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
-                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
+        return dict ( zip (self.pfields, (
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),
+            )))
 
     ## This implements relaxed placement manifolds,
     ## where the parameterization constraints is the LockedJoint of
@@ -368,12 +364,13 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                 q = self.graph.clientBasic.robot.getJointConfig(n)
                 self.graph.clientBasic.problem.createLockedJoint(n, n, q)
         if len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0:
-            return (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)
+            return dict ( zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)))
         self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
         self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
-        return (Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
-                Constraints (lockedJoints = ljs),
-                Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)
+        return dict ( zip (self.pfields, (
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
+            Constraints (lockedJoints = ljs),
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)))
 
 ## Default implementation of ConstraintGraphFactory
 #
@@ -404,13 +401,13 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
             # Add the grasps
             for ig, ih in zip_idx(grasps):
                 if ih is not None:
-                    self.manifold += factory.constraints.grasp(ig, ih)
-                    self.foliation += factory.constraints.graspComplement(ig, ih)
+                    self.manifold += factory.constraints.g (ig, ih, 'grasp')
+                    self.foliation += factory.constraints.g (ig, ih, 'graspComplement')
             # Add the placement constraints
             for io, object in zip_idx(factory.objects):
                 if not factory._isObjectGrasped(grasps, io):
-                    self.manifold += factory.constraints.placement(object)
-                    self.foliation += factory.constraints.placementComplement(object)
+                    self.manifold += factory.constraints.p (object, 'placement')
+                    self.foliation += factory.constraints.p (object, 'placementComplement')
 
     ## \param graph an instance of ConstraintGraph
     def __init__(self, graph):
@@ -452,17 +449,17 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         obj = self.objects[iobj]
         noPlace = self._isObjectGrasped (sf.grasps, iobj)
 
-        gc = self.constraints.grasp (ig, st.grasps[ig])
-        gcc = self.constraints.graspComplement (ig, st.grasps[ig])
-        pgc = self.constraints.pregrasp (ig, st.grasps[ig])
+        gc  = self.constraints.g (ig, st.grasps[ig], 'grasp')
+        gcc = self.constraints.g (ig, st.grasps[ig], 'graspComplement')
+        pgc = self.constraints.g (ig, st.grasps[ig], 'preGrasp')
         if noPlace:
             pc = Constraints()
             pcc = Constraints()
             ppc = Constraints()
         else:
-            pc = self.constraints.placement (self.objectFromHandle[st.grasps[ig]])
-            pcc = self.constraints.placementComplement (self.objectFromHandle[st.grasps[ig]])
-            ppc = self.constraints.prePlacement (self.objectFromHandle[st.grasps[ig]])
+            pc  = self.constraints.p (self.objectFromHandle[st.grasps[ig]], 'placement')
+            pcc = self.constraints.p (self.objectFromHandle[st.grasps[ig]], 'placementComplement')
+            ppc = self.constraints.p (self.objectFromHandle[st.grasps[ig]], 'prePlacement')
         manifold = sf.manifold - pc
 
         # The different cases:
