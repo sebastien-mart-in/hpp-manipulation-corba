@@ -251,7 +251,7 @@ class ConstraintFactoryAbstract:
         else: ih = handle
         k = (ig, ih)
         if not self._grasp.has_key(k):
-            self._grasp[k] = self.buildGrasp(self.graphfactory.grippers[ig], self.graphfactory.handles[ih])
+            self._grasp[k] = self.buildGrasp(self.graphfactory.grippers[ig], None if ih is None else self.graphfactory.handles[ih])
             assert isinstance (self._grasp[k], dict)
         return self._grasp[k]
 
