@@ -205,11 +205,10 @@ class GraphFactoryAbstract:
         return "Loop | " + self._stateName(grasps, True)
 
     def _recurse(self, grippers, handles, grasps, depth):
-        if len(grippers) == 0 or len(handles) == 0: return
-
         isAllowed = self.graspIsAllowed (grasps)
         if isAllowed: current = self._makeState (grasps, depth)
 
+        if len(grippers) == 0 or len(handles) == 0: return
         for ig, g in zip_idx(grippers):
             ngrippers = grippers[:ig] + grippers[ig+1:]
 
