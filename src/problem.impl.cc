@@ -25,7 +25,6 @@
 #include <hpp/util/debug.hh>
 #include <hpp/core/roadmap.hh>
 #include <hpp/core/distance.hh>
-#include <hpp/core/comparison-type.hh>
 #include <hpp/core/config-projector.hh>
 #include <hpp/core/path-projector.hh>
 #include <hpp/core/path-vector.hh>
