@@ -33,6 +33,10 @@ module hpp
     void create (in string robotName)
       raises (Error);
 
+    /// \param robotName the name of the robot.
+    void finishedRobot (in string robotName)
+      raises (Error);
+
     ///  Insert robot model as a child of the root joint of the Device
     ///
     /// \param robotName key of the robot in ProblemSolver object map

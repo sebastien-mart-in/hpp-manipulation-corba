@@ -57,6 +57,7 @@ class Robot (object):
         if compositeName is None:
             self.name = self.client.basic.robot.getRobotName()
             load = False
+            self.rebuildRanks()
         else:
             self.name = compositeName
         self.displayName = robotName

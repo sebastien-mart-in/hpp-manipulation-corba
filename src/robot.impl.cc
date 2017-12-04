@@ -130,6 +130,16 @@ namespace hpp {
 	}
       }
 
+      void Robot::finishedRobot (const char* name)
+	throw (Error)
+      {
+	try {
+          problemSolver()->robot ()->didInsertRobot(std::string (name));
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       void Robot::insertRobotModel (const char* robotName,
           const char* rootJointType, const char* packageName,
           const char* modelName, const char* urdfSuffix,

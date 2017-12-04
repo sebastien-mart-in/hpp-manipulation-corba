@@ -40,6 +40,9 @@ namespace hpp {
           virtual void create (const char* robotName)
             throw (hpp::Error);
 
+          virtual void finishedRobot (const char* robotName)
+            throw (hpp::Error);
+
           virtual void insertRobotModel (const char* robotName,
               const char* rootJointType, const char* packageName,
               const char* modelName, const char* urdfSuffix,
