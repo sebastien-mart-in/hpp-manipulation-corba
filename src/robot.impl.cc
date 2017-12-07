@@ -29,7 +29,6 @@
 #include <hpp/manipulation/srdf/util.hh>
 #include <hpp/manipulation/device.hh>
 #include <hpp/manipulation/handle.hh>
-#include <hpp/manipulation/axial-handle.hh>
 
 #include <hpp/corbaserver/manipulation/server.hh>
 
@@ -460,7 +459,9 @@ namespace hpp {
             getJointByBodyNameOrThrow (problemSolver(), linkName);
           Transform3f T;
           hppTransformToTransform3f(localPosition, T);
-	  HandlePtr_t handle = AxialHandle::create (handleName, T, joint);
+	  HandlePtr_t handle = Handle::create (handleName, T, joint);
+          std::vector <bool> mask (6, true); mask [5] = false;
+          handle->mask (mask);
 	  robot->add (handleName, handle);
           hppDout (info, "add Handle: " << *handle); 
 	} catch (const std::exception& exc) {
