@@ -357,11 +357,11 @@ class ConstraintFactory(ConstraintFactoryAbstract):
         width = 0.05
         io = self.graphfactory.objects.index(o)
         ljs = []
-        for n in self.graph.clientBasic.robot.getJointNames():
-            if n.startswith(o + "/"):
-                ljs.append(n)
-                q = self.graph.clientBasic.robot.getJointConfig(n)
-                self.graph.clientBasic.problem.createLockedJoint(n, n, q)
+        for jn in self.graph.clientBasic.robot.getJointNames():
+            if jn.startswith(o + "/"):
+                ljs.append(jn)
+                q = self.graph.clientBasic.robot.getJointConfig(jn)
+                self.graph.clientBasic.problem.createLockedJoint(jn, jn, q)
         if len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0:
             return dict ( zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)))
         self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
