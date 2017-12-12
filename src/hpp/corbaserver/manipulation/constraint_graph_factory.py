@@ -32,9 +32,9 @@ class Rules(object):
         status = []
         for r in rules:
             handlesRegex = [ None ] * len(grippers)
-            for j, gr in zip(range(len(r.grippers)), r.grippers):
+            for j, gr in zip_idx (r.grippers):
                 grc = re.compile (gr)
-                for i, g in zip(range(len(grippers)), grippers):
+                for i, g in zip_idx (grippers):
                     if grc.match (g):
                         assert handlesRegex[i] is None
                         handlesRegex[i] = re.compile(r.handles[j])
@@ -331,7 +331,8 @@ class ConstraintFactory(ConstraintFactoryAbstract):
         pn = "preplace_" + o
         width = 0.05
         io = self.graphfactory.objects.index(o)
-        if len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0:
+        placeAlreadyCreated = n in self.graph.clientBasic.problem.getAvailable ("numericalconstraint")
+        if (len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0) and not placeAlreadyCreated:
             ljs = []
             for n in self.graph.clientBasic.robot.getJointNames():
                 if n.startswith(o + "/"):
@@ -339,8 +340,10 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                     q = self.graph.clientBasic.robot.getJointConfig(n)
                     self.graph.clientBasic.problem.createLockedJoint(n, n, q)
             return dict ( zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)))
-        self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
-        self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
+        if not placeAlreadyCreated:
+            self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
+        if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
+            self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
         return dict ( zip (self.pfields, (
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
@@ -362,10 +365,13 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                 ljs.append(jn)
                 q = self.graph.clientBasic.robot.getJointConfig(jn)
                 self.graph.clientBasic.problem.createLockedJoint(jn, jn, q)
-        if len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0:
+        placeAlreadyCreated = n in self.graph.clientBasic.problem.getAvailable ("numericalconstraint")
+        if (len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0) and not placeAlreadyCreated:
             return dict ( zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)))
-        self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
-        self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
+        if not placeAlreadyCreated:
+            self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
+        if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
+            self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
         return dict ( zip (self.pfields, (
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
             Constraints (lockedJoints = ljs),
