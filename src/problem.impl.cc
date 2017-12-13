@@ -18,6 +18,7 @@
 #include "problem.impl.hh"
 
 #include <hpp/corbaserver/manipulation/server.hh>
+#include <hpp/corbaserver/conversions.hh>
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
@@ -158,18 +159,7 @@ namespace hpp {
           throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
         }
 
-        char** nameList = Names_t::allocbuf((CORBA::Long) ret.size());
-        Names_t *names = new Names_t ((CORBA::Long) ret.size(),
-				      (CORBA::Long) ret.size(),
-				      nameList);
-        std::size_t i = 0;
-        for (Ret_t::const_iterator it = ret.begin (); it != ret.end(); ++it) {
-          nameList [i] =
-            (char*) malloc (sizeof(char)*(it->length ()+1));
-            strcpy (nameList [i], it->c_str ());
-            ++i;
-        }
-        return names;
+        return toNames_t (ret.begin(), ret.end());
       }
 
       void Problem::createGrasp (const char* graspName,
