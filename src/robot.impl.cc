@@ -41,22 +41,18 @@ namespace hpp {
         using pinocchio::Gripper;
         typedef core::ProblemSolver CPs_t;
 
-        DevicePtr_t createRobot (const std::string& name) {
-          DevicePtr_t r = Device::create (name);
-          return r;
-        }
-
-        DevicePtr_t getOrCreateRobot (ProblemSolver* p,
+        DevicePtr_t getOrCreateRobot (ProblemSolverPtr_t p,
             const std::string& name = "Robot")
         {
           DevicePtr_t r = p->robot ();
           if (r) return r;
-          r = createRobot (name);
-          p->robot (r);
-          return r;
+          pinocchio::DevicePtr_t robot (p->createRobot (name));
+          assert (HPP_DYNAMIC_PTR_CAST (Device, robot));
+          p->robot (robot);
+          return HPP_STATIC_PTR_CAST (Device, robot);
         }
 
-        JointPtr_t getJointByBodyNameOrThrow (ProblemSolver* p,
+        JointPtr_t getJointByBodyNameOrThrow (ProblemSolverPtr_t p,
             const std::string& n)
         {
           DevicePtr_t r = getRobotOrThrow (p);
@@ -123,7 +119,9 @@ namespace hpp {
 	throw (Error)
       {
 	try {
-          problemSolver()->robot (createRobot (std::string (name)));
+          pinocchio::DevicePtr_t robot
+            (problemSolver()->createRobot (std::string (name)));
+          problemSolver ()->robot (robot);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
