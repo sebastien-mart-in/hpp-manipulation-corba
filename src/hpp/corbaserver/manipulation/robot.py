@@ -333,6 +333,15 @@ class Robot (object):
         return self.client.basic.obstacle.removeObstacleFromJoint \
             (objectName, jointName, collision, distance)
 
+    ## Return the joint name in which a gripper is and the position relatively
+    #  to the joint
+    def getGripperPositionInJoint (self, gripperName):
+        return self.client.manipulation.robot.getGripperPositionInJoint (gripperName)
+
+    ## Return the joint name in which a handle is and the position relatively
+    #  to the joint
+    def getHandlePositionInJoint (self, handleName):
+        return self.client.manipulation.robot.getHandlePositionInJoint (handleName)
 
     ## \}
 
