@@ -414,9 +414,9 @@ class ProblemSolver (object):
     #  \param name name of the config projector created if any,
     #  \param names list of names of the locked joints previously created by
     #         method createLockedJoint.
-    def setLockedJointConstraints (self, name, names, priorities = None):
+    def setLockedJointConstraints (self, name, names):
         return self.client.basic.problem.setLockedJointConstraints \
-            (name, names, priorities)
+            (name, names)
 
     ## Apply constraints
     #
