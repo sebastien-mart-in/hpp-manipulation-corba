@@ -459,7 +459,7 @@ class ProblemSolver (object):
     #        (It will be completed by '_xyz' and '_SO3'),
     # \param values config of the locked joints (7 float)
     def lockFreeFlyerJoint (self, freeflyerBname, lockJointBname,
-                            values = (0,0,0,1,0,0,0)):
+                            values = (0,0,0,0,0,0,1)):
         lockedJoints = list ()
         self.createLockedJoint (lockJointBname, freeflyerBname, values)
         lockedJoints.append (lockJointBname)
@@ -475,23 +475,6 @@ class ProblemSolver (object):
         self.createLockedJoint (lockJointName, jointName, values)
         lockedJoints.append (lockJointName)
         return lockedJoints
-
-    ## Lock degree of freedom with given value
-    # \param jointName name of the joint
-    # \param value value of the locked degree of freedom,
-    # \param rankInConfiguration rank of the locked dof in the joint
-    #        configuration vector
-    # \param rankInVelocity rank of the locked dof in the joint
-    #        velocity vector
-    def lockDof (self, jointName, value, rankInConfiguration, rankInVelocity):
-        return self.client.basic.problem.lockDof \
-            (jointName, value, rankInConfiguration, rankInVelocity)
-
-    ## Lock joint with one degree of freedom with given value
-    # \param jointName name of the joint
-    # \param value value of the locked degree of freedom,
-    def lockOneDofJoint (self, jointName, value):
-        return self.client.basic.problem.lockDof (jointName, value, 0, 0)
 
     ## error threshold in numerical constraint resolution
     def getErrorThreshold (self):
