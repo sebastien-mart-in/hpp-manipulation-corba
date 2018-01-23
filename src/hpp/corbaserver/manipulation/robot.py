@@ -248,6 +248,20 @@ class Robot (object):
     def getJointBounds (self, jointName):
         return self.client.basic.robot.getJointBounds (jointName)
 
+    ## Get joints that are saturated for a given configuration
+    #
+    #  \param q configuration
+    #  \return list of triples joint names, dof id, value
+    def getSaturated (self, q):
+        saturated = []
+        for j in self.jointNames:
+            b = self.getJointBounds (j)
+            r = self.rankInConfiguration [j]
+            for m, M, i in zip (b [::2], b [1::2], xrange (100000)):
+                if q [r+i] == m or q [r+i] == M:
+                    saturated.append ((j, i, q [r+i]))
+        return saturated
+
     ## Set the position of root joint of a robot in world frame
     ## \param robotName key of the robot in ProblemSolver object map.
     ## \param position constant position of the root joint in world frame in
