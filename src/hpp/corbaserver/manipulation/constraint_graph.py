@@ -283,6 +283,21 @@ class ConstraintGraph (object):
     def setConstraints (self, *args, **kwargs):
         return self.addConstraints (*args, **kwargs)
 
+    ## Set the problem constraints to the specified constraint.
+    # 
+    #  \param idComp ID of a node or a configuration
+    #  \param target: ignored for states. For edges:
+    #         \li true: uses the edge target constraint
+    #         \li false: uses the edge path constraint
+    def setProblemConstraints (self, name, target):
+        if self.nodes.has_key(name):
+            id = self.nodes[name]
+        elif self.edges.has_key(name):
+            id = self.edges[name]
+        else:
+            raise RuntimeError ("No node or edge with name {0}".format (name))
+        return self.client.problem.setConstraints (id, target)
+
     ## Add the constraints to an edge, a node or the whole graph
     #
     # This method adds the constraints to an element of the graph and handles
