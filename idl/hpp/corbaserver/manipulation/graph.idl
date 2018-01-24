@@ -241,6 +241,21 @@ module hpp {
 	(in ID EdgeId, in floatSeq leafConfig, in floatSeq config,
 	 out floatSeq errorVector) raises (Error);
 
+	/// Get error of a config with respect to the target of an edge foliation leaf
+	///
+	/// \param edgeId id of the edge.
+	/// \param leafConfig Configuration that determines the foliation leaf,
+	/// \param config Configuration the error of which is computed
+	/// \retval error the error
+	/// \return whether config can be the end point of a path of the edge
+	///         starting at leafConfig
+	/// Call methods core::ConfigProjector::rightHandSideFromConfig with
+	/// leafConfig and then core::ConstraintSet::isSatisfied with config.
+	/// on the edge constraints.
+	boolean getConfigErrorForEdgeTarget
+	(in ID EdgeId, in floatSeq leafConfig, in floatSeq config,
+	 out floatSeq errorVector) raises (Error);
+
 	/// Print set of constraints relative to a node in a string
 	///
 	/// \param config Configuration,

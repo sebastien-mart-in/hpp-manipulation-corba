@@ -676,6 +676,38 @@ namespace hpp {
 	}
       }
 
+      CORBA::Boolean Graph::getConfigErrorForEdgeTarget
+      (ID edgeId, const hpp::floatSeq& leafDofArray,
+       const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
+	throw (hpp::Error)
+      {
+        DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	try {
+	  graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+	  // If steering method is not completely set in the graph, create
+	  // one.
+	  if (!edge->parentGraph ()->problem ()->steeringMethod () ||
+	      !edge->parentGraph ()->problem ()->steeringMethod ()
+	      ->innerSteeringMethod()) {
+	    problemSolver ()->initSteeringMethod ();
+	  }
+	  vector_t err;
+          Configuration_t leafConfig (floatSeqToConfig (robot, leafDofArray, true));
+          Configuration_t config (floatSeqToConfig (robot, dofArray, true));
+	  bool res = graph()->getConfigErrorForEdgeTarget
+	    (leafConfig, config, edge, err);
+	  floatSeq* e = new floatSeq ();
+	  e->length ((ULong) err.size ());
+	  for (std::size_t i=0; i < (std::size_t) err.size (); ++i) {
+	    (*e) [(ULong) i] = err [i];
+	  }
+	  error = e;
+	  return res;
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       void Graph::displayNodeConstraints
       (hpp::ID nodeId, CORBA::String_out constraints) throw (Error)
       {
