@@ -45,6 +45,8 @@ FOREACH(IDL ${IDL_SOURCES})
   INSTALL(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}.hh
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/corbaserver/manipulation)
+  INSTALL(FILES ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation/${IDL}.idl
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/idl/hpp/corbaserver/manipulation)
 ENDFOREACH()
 
 # Generate and install common_idl.py from hpp.corbaserver
