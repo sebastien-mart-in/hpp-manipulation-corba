@@ -372,7 +372,7 @@ namespace hpp {
           }
           if (constraint) {
             problemSolver()->resetConstraints();
-            problemSolver()->addConstraint(constraint);
+            problemSolver()->addConstraint(constraint->copy());
             return true;
           } else
             return false;
