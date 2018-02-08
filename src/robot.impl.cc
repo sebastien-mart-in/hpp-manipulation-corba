@@ -186,7 +186,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-	  srdf::addRobotSRDFModel (robot, std::string (robotName),
+	  srdf::loadModelFromFile (robot, std::string (robotName),
               std::string (packageName), std::string (modelName),
               std::string (srdfSuffix));
           robot->didInsertRobot (robotName);
@@ -227,8 +227,9 @@ namespace hpp {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
           if (robot->has<FrameIndices_t> (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
-          pinocchio::urdf::loadHumanoidModel (robot, 0, robotName, rootJointType,
+          pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
+          pinocchio::urdf::setupHumanoidRobot (robot, robotName);
           srdf::loadModelFromFile (robot, robotName,
               packageName, modelName, srdfSuffix);
           robot->didInsertRobot (robotName);

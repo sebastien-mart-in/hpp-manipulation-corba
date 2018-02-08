@@ -348,6 +348,39 @@ namespace hpp {
 	}
       }
 
+      bool Problem::setConstraints (hpp::ID id, bool target)
+        throw (hpp::Error)
+      {
+        /// First get the constraint.
+        ConstraintSetPtr_t constraint;
+        try {
+          graph::GraphComponentPtr_t comp = graph()->get ((size_t)id).lock ();
+          graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
+          graph::StatePtr_t state = HPP_DYNAMIC_PTR_CAST(graph::State, comp);
+          if (edge) {
+            if (target)
+              constraint = graph()->configConstraint (edge);
+            else
+              constraint = graph()->pathConstraint (edge);
+          } else if (state) {
+            constraint = graph()->configConstraint (state);
+          } else {
+            std::stringstream ss;
+            ss << "ID " << id << " is neither an edge nor a state";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
+          }
+          if (constraint) {
+            problemSolver()->resetConstraints();
+            problemSolver()->addConstraint(constraint->copy());
+            return true;
+          } else
+            return false;
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
       bool Problem::applyConstraints (hpp::ID id,
           const hpp::floatSeq& input,
           hpp::floatSeq_out output,

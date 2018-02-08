@@ -80,6 +80,9 @@ namespace hpp {
             const Names_t& shapesName)
           throw (hpp::Error);
 
+        virtual bool setConstraints (hpp::ID id, bool target)
+          throw (hpp::Error);
+
         virtual bool applyConstraints (hpp::ID id, const hpp::floatSeq& input,
             hpp::floatSeq_out output, double& residualError)
           throw (hpp::Error);

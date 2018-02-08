@@ -184,6 +184,11 @@ namespace hpp {
 	 const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
 	  throw (hpp::Error);
 
+	virtual CORBA::Boolean getConfigErrorForEdgeTarget
+	(ID edgeId, const hpp::floatSeq& leafDofArray,
+	 const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
+	  throw (hpp::Error);
+
 	virtual void displayNodeConstraints
 	(hpp::ID nodeId, CORBA::String_out constraints) throw (Error);
 

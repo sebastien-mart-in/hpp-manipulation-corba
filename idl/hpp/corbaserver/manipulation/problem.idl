@@ -141,6 +141,15 @@ module hpp {
             in Names_t shapesName)
           raises (Error);
 
+        /// Set the problem constraints to the specified constraint.
+        ///
+        /// \param idComp ID of a node or a configuration
+        /// \param target: ignored for states. For edges:
+        ///        \li true: uses the edge target constraint
+        ///        \li false: uses the edge path constraint
+        boolean setConstraints (in ID idComp, in boolean target)
+          raises (Error);
+
         /// Apply constaints to a configuration
         ///
         /// \param idComp ID of a node or a configuration

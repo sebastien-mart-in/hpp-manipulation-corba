@@ -283,6 +283,21 @@ class ConstraintGraph (object):
     def setConstraints (self, *args, **kwargs):
         return self.addConstraints (*args, **kwargs)
 
+    ## Set the problem constraints to the specified constraint.
+    # 
+    #  \param idComp ID of a node or a configuration
+    #  \param target: ignored for states. For edges:
+    #         \li true: uses the edge target constraint
+    #         \li false: uses the edge path constraint
+    def setProblemConstraints (self, name, target):
+        if self.nodes.has_key(name):
+            id = self.nodes[name]
+        elif self.edges.has_key(name):
+            id = self.edges[name]
+        else:
+            raise RuntimeError ("No node or edge with name {0}".format (name))
+        return self.client.problem.setConstraints (id, target)
+
     ## Add the constraints to an edge, a node or the whole graph
     #
     # This method adds the constraints to an element of the graph and handles
@@ -578,6 +593,21 @@ class ConstraintGraph (object):
     #  on the edge constraints.
     def getConfigErrorForEdgeLeaf (self, edgeId, leafConfig, config) :
         return self.client.graph.getConfigErrorForEdgeLeaf \
+            (self.edges[edgeId], leafConfig, config)
+
+    ## Get error of a config with respect to the target of an edge foliation leaf
+    #
+    #  \param edgeId id of the edge.
+    #  \param leafConfig Configuration that determines the foliation leaf,
+    #  \param config Configuration the error of which is computed
+    #  \retval error the error
+    #  \return whether config can be the end point of a path of the edge
+    #          starting at leafConfig
+    #  Call methods core::ConfigProjector::rightHandSideFromConfig with
+    #  leafConfig and then core::ConstraintSet::isSatisfied with config.
+    #  on the edge constraints.
+    def getConfigErrorForEdgeTarget (self, edgeId, leafConfig, config) :
+        return self.client.graph.getConfigErrorForEdgeTarget \
             (self.edges[edgeId], leafConfig, config)
 
     ## Print set of constraints relative to a node in a string
