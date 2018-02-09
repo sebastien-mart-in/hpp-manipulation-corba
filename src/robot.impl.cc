@@ -115,18 +115,6 @@ namespace hpp {
         return server_->problemSolver();
       }
 
-      void Robot::create (const char* name)
-	throw (Error)
-      {
-	try {
-          pinocchio::DevicePtr_t robot
-            (problemSolver()->createRobot (std::string (name)));
-          problemSolver ()->robot (robot);
-	} catch (const std::exception& exc) {
-	  throw Error (exc.what ());
-	}
-      }
-
       void Robot::finishedRobot (const char* name)
 	throw (Error)
       {

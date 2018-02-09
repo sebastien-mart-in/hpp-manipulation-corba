@@ -37,9 +37,6 @@ namespace hpp {
             server_ = server;
           }
 
-          virtual void create (const char* robotName)
-            throw (hpp::Error);
-
           virtual void finishedRobot (const char* robotName)
             throw (hpp::Error);
 
