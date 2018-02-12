@@ -563,7 +563,7 @@ namespace hpp {
         }
       }
 
-      ID Problem::edgeAtParam (UShort pathId, Double param)
+      ID Problem::edgeAtParam (ULong pathId, Double param)
         throw (Error)
       {
 	try {

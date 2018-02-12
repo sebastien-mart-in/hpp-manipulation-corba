@@ -101,7 +101,7 @@ namespace hpp {
 
         virtual void setTargetState (hpp::ID IDstate);
 
-        virtual ID edgeAtParam (UShort pathId, Double param)
+        virtual ID edgeAtParam (ULong pathId, Double param)
           throw (Error);
 
       private:
