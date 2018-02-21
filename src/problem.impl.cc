@@ -145,13 +145,13 @@ namespace hpp {
         Ret_t ret;
 
         if (w == "gripper") {
-          ret = getRobotOrThrow (problemSolver())->getKeys <pinocchio::GripperPtr_t, Ret_t> ();
+          ret = getRobotOrThrow (problemSolver())->grippers.getKeys <Ret_t> ();
         } else if (w == "handle") {
-          ret = getRobotOrThrow (problemSolver())->getKeys <HandlePtr_t, Ret_t> ();
+          ret = getRobotOrThrow (problemSolver())->handles.getKeys <Ret_t> ();
         } else if (w == "robotcontact") {
-          ret = getRobotOrThrow (problemSolver())->getKeys <JointAndShapes_t, Ret_t> ();
+          ret = getRobotOrThrow (problemSolver())->jointAndShapes.getKeys <Ret_t> ();
         } else if (w == "envcontact") {
-          ret = problemSolver()->getKeys <JointAndShapes_t, Ret_t> ();
+          ret = problemSolver()->jointAndShapes.getKeys <Ret_t> ();
         } else if (w == "type") {
           ret = boost::assign::list_of ("Gripper") ("Handle") ("RobotContact")
             ("EnvContact");
@@ -193,7 +193,7 @@ namespace hpp {
       {
         try {
 	  typedef std::map<std::string, JointAndShapes_t> ShapeMap;
-	  const ShapeMap& m = problemSolver()->map <JointAndShapes_t> ();
+	  const ShapeMap& m = problemSolver()->jointAndShapes.map;
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
@@ -218,7 +218,7 @@ namespace hpp {
         try {
           typedef std::map<std::string, JointAndShapes_t> ShapeMap;
           DevicePtr_t r = getRobotOrThrow (problemSolver());
-	  const ShapeMap& m = r->map <JointAndShapes_t> ();
+	  const ShapeMap& m = r->jointAndShapes.map;
 
 	  char** nameList = Names_t::allocbuf((ULong) m.size ());
 	  Names_t *jointNames = new Names_t ((ULong) m.size(), (ULong) m.size(),
@@ -243,7 +243,7 @@ namespace hpp {
       {
         try {
 	  const JointAndShapes_t& js =
-            problemSolver()->get <JointAndShapes_t> (name);
+            problemSolver()->jointAndShapes.get (name);
 
           return jointAndShapes (js, indexes, points);
 	} catch (const std::exception& exc) {
@@ -257,7 +257,7 @@ namespace hpp {
       {
         try {
           DevicePtr_t r = getRobotOrThrow (problemSolver());
-	  const JointAndShapes_t& js = r->get <JointAndShapes_t> (name);
+	  const JointAndShapes_t& js = r->jointAndShapes.get (name);
 
           return jointAndShapes (js, indexes, points);
 	} catch (const std::exception& exc) {
@@ -312,7 +312,7 @@ namespace hpp {
           std::size_t nbPoints = 0;
 
           for (CORBA::ULong i = 0; i < shapesName.length(); ++i) {
-            JointAndShapes_t l = robot->get <JointAndShapes_t>
+            JointAndShapes_t l = robot->jointAndShapes.get
               (std::string (shapesName[i]));
             if (l.empty ()) throw Error ("Robot shapes not found.");
             for (JointAndShapes_t::const_iterator it = l.begin ();

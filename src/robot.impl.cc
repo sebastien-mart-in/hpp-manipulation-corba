@@ -39,7 +39,7 @@ namespace hpp {
     namespace impl {
       namespace {
         using pinocchio::Gripper;
-        typedef core::ProblemSolver CPs_t;
+        using core::Container;
 
         DevicePtr_t getOrCreateRobot (ProblemSolverPtr_t p,
             const std::string& name = "Robot")
@@ -96,13 +96,13 @@ namespace hpp {
         }
 
         template<typename Object>
-        void copy(const DevicePtr_t& from, const DevicePtr_t& to, const std::string& prefix)
+        void copy(const Container<Object>& from, Container<Object>& to, const DevicePtr_t& d, const std::string& prefix)
         {
-          typedef typename Device::Containers_t::traits<Object>::Map_t Map;
-          const Map& m = from->map <Object> ();
-          for (typename Map::const_iterator it = m.begin (); it != m.end (); it++) {
-            Object obj = copy<Object>(it->second, to, prefix);
-            to->add <Object> (obj->name(), obj);
+          typedef Container<Object> Container_t;
+          for (typename Container_t::const_iterator it = from.map.begin ();
+              it != from.map.end (); it++) {
+            Object obj = copy<Object>(it->second, d, prefix);
+            to.add (obj->name(), obj);
           }
         }
       }
@@ -133,7 +133,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndices_t> (robotName))
+          if (robot->frameIndices.has (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
@@ -154,7 +154,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndices_t> (robotName))
+          if (robot->frameIndices.has (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
 
           pinocchio::urdf::loadModelFromString (robot, 0, robotName,
@@ -192,7 +192,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndices_t> (objectName))
+          if (robot->frameIndices.has (objectName))
             HPP_THROW(std::invalid_argument, "A robot named " << objectName << " already exists");
           pinocchio::urdf::loadRobotModel (robot, 0, objectName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
@@ -213,7 +213,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndices_t> (robotName))
+          if (robot->frameIndices.has (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
@@ -235,7 +235,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->has<FrameIndices_t> (robotName))
+          if (robot->frameIndices.has (robotName))
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadModelFromString (robot, 0, robotName,
               rootJointType, urdfString, srdfString);
@@ -278,8 +278,8 @@ namespace hpp {
                 true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
 	  }
-          typedef CPs_t::traits<JointAndShapes_t>::Map_t ShapeMap;
-          const ShapeMap& m = object->map <JointAndShapes_t> ();
+          typedef core::Container<JointAndShapes_t>::Map_t ShapeMap;
+          const ShapeMap& m = object->jointAndShapes.map;
           for (ShapeMap::const_iterator it = m.begin ();
               it != m.end (); it++) {
             JointAndShapes_t shapes;
@@ -291,11 +291,11 @@ namespace hpp {
                 newShape [i] = M.act (itT->second[i]);
               shapes.push_back (JointAndShape_t (JointPtr_t(), newShape));
             }
-            problemSolver()->add (p + it->first, shapes);
+            problemSolver()->jointAndShapes.add (p + it->first, shapes);
           }
 
-          copy<HandlePtr_t > (object, robot, p);
-          copy<GripperPtr_t> (object, robot, p);
+          copy (object->handles , robot->handles , robot, p);
+          copy (object->grippers, robot->grippers, robot, p);
           robot->didInsertRobot (p.substr(0, p.size() - 1));
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
@@ -331,8 +331,8 @@ namespace hpp {
                 true, true);
 	    hppDout (info, "Adding obstacle " << obj->name ());
 	  }
-          typedef CPs_t::traits<JointAndShapes_t>::Map_t ShapeMap;
-          const ShapeMap& m = object->map <JointAndShapes_t> ();
+          typedef core::Container<JointAndShapes_t>::Map_t ShapeMap;
+          const ShapeMap& m = object->jointAndShapes.map;
           for (ShapeMap::const_iterator it = m.begin ();
               it != m.end (); it++) {
             JointAndShapes_t shapes;
@@ -344,11 +344,11 @@ namespace hpp {
                 newShape [i] = M.act (itT->second[i]);
               shapes.push_back (JointAndShape_t (JointPtr_t(), newShape));
             }
-            problemSolver()->add (p + it->first, shapes);
+            problemSolver()->jointAndShapes.add (p + it->first, shapes);
           }
 
-          copy<HandlePtr_t > (object, robot, p);
-          copy<GripperPtr_t> (object, robot, p);
+          copy (object->handles , robot->handles , robot, p);
+          copy (object->grippers, robot->grippers, robot, p);
           robot->didInsertRobot (p.substr(0, p.size() - 1));
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
@@ -362,12 +362,12 @@ namespace hpp {
         try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
-          if (!robot->has<FrameIndices_t> (n))
+          if (!robot->frameIndices.has (n))
             throw hpp::Error
               ("Root of subtree with the provided prefix not found");
           const se3::Model& model = robot->model();
           const se3::Frame& rf = model.frames[
-            robot->get<FrameIndices_t>(n)[0]
+            robot->frameIndices.get(n)[0]
             ];
           double* res = new Transform_;
           if (rf.type == se3::JOINT)
@@ -407,7 +407,7 @@ namespace hpp {
           Transform3f T;
           hppTransformToTransform3f(localPosition, T);
 	  HandlePtr_t handle = Handle::create (handleName, T, joint);
-	  robot->add (handleName, handle);
+	  robot->handles.add (handleName, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -429,7 +429,7 @@ namespace hpp {
                 T, se3::OP_FRAME)
               );
 	  GripperPtr_t gripper = Gripper::create (gripperName, robot);
-	  robot->add (gripperName, gripper);
+	  robot->grippers.add (gripperName, gripper);
           // hppDout (info, "add Gripper: " << *gripper); 
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -449,7 +449,7 @@ namespace hpp {
 	  HandlePtr_t handle = Handle::create (handleName, T, joint);
           std::vector <bool> mask (6, true); mask [5] = false;
           handle->mask (mask);
-	  robot->add (handleName, handle);
+	  robot->handles.add (handleName, handle);
           hppDout (info, "add Handle: " << *handle); 
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -462,7 +462,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
-          GripperPtr_t gripper = robot->get <GripperPtr_t> (gripperName);
+          GripperPtr_t gripper = robot->grippers.get (gripperName);
           if (!gripper)
             throw Error ("This gripper does not exists.");
           const Transform3f& t = gripper->objectPositionInJoint ();
@@ -481,7 +481,7 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
-          HandlePtr_t handle = robot->get <HandlePtr_t> (handleName);
+          HandlePtr_t handle = robot->handles.get (handleName);
           if (!handle)
             throw Error ("This handle does not exists.");
           const Transform3f& t = handle->localPosition ();

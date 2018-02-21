@@ -422,13 +422,13 @@ namespace hpp {
             std::string name (condNC [i]);
             edge->insertConditionConstraint
               (HPP_STATIC_PTR_CAST(NumericalConstraint,
-                                   problemSolver()->get
-                                   <NumericalConstraintPtr_t>(name)->copy ()));
+                                   problemSolver()->numericalConstraints.get
+                                   (name)->copy ()));
           }
           for (CORBA::ULong i=0; i<condLJ.length (); ++i) {
             std::string name (condLJ [i]);
-            edge->insertConditionConstraint (problemSolver()->get
-                                             <LockedJointPtr_t> (name));
+            edge->insertConditionConstraint (
+                problemSolver()->lockedJoints.get (name));
           }
 
           std::vector <std::string> pdofNames = convertPassiveDofNameVector
@@ -437,13 +437,13 @@ namespace hpp {
             std::string name (paramNC [i]);
             edge->insertParamConstraint (
                 HPP_STATIC_PTR_CAST(NumericalConstraint,
-                problemSolver()->get <NumericalConstraintPtr_t>(name)->copy ()),
-                problemSolver()->passiveDofs (pdofNames [i]));
+                problemSolver()->numericalConstraints.get(name)->copy ()),
+                problemSolver()->passiveDofs.get (pdofNames [i], core::segments_t()));
           }
           for (CORBA::ULong i=0; i<paramLJ.length (); ++i) {
             std::string name (paramLJ [i]);
             edge->insertParamConstraint
-              (problemSolver()->get <LockedJointPtr_t> (name));
+              (problemSolver()->lockedJoints.get (name));
           }
 
           // edge->buildHistogram ();
@@ -495,7 +495,7 @@ namespace hpp {
                 throw Error ("The numerical function does not exist.");
               component->addNumericalConstraint
 		(problemSolver()->numericalConstraint(name),
-		 problemSolver()->passiveDofs (pdofNames [i]));
+                 problemSolver()->passiveDofs.get (pdofNames [i], core::segments_t()));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -558,7 +558,7 @@ namespace hpp {
 		(HPP_STATIC_PTR_CAST
 		 (NumericalConstraint,
 		  problemSolver()->numericalConstraint(name)->copy ()),
-		 problemSolver()->passiveDofs (pdofNames [i]));
+                 problemSolver()->passiveDofs.get (pdofNames [i], core::segments_t()));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -577,7 +577,7 @@ namespace hpp {
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               component->addLockedJointConstraint
-		(problemSolver()->get <LockedJointPtr_t> (name));
+		(problemSolver()->lockedJoints.get (name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
