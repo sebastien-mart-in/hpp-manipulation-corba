@@ -28,6 +28,8 @@ def newProblem ():
     cl = Client()
     cl.problem.resetProblem()
 
+from hpp.corbaserver.problem_solver import _convertToCorbaAny
+
 ## Definition of a manipulation planning problem
 #
 #  This class wraps the Corba client to the server implemented by
@@ -85,6 +87,7 @@ class ProblemSolver (object):
     ## Set a parameter
     #  \param value the input type must be long, double, const char*
     def setParameter (self, name, value):
+        value = _convertToCorbaAny (value)
         return self.client.basic.problem.setParameter (name, value)
 
     ## Get parameter with given name
