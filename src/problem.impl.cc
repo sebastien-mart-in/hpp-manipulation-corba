@@ -41,7 +41,7 @@
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/axial-handle.hh>
-#include <hpp/manipulation/graph-steering-method.hh>
+#include <hpp/manipulation/steering-method/graph.hh>
 
 #include "tools.hh"
 
@@ -576,7 +576,7 @@ namespace hpp {
           path->flatten(flat);
           value_type unused;
           std::size_t r = flat->rankAtParam(param, unused);
-          PathPtr_t p = flat->pathAtRank (r);
+          core::PathPtr_t p = flat->pathAtRank (r);
           manipulation::ConstraintSetPtr_t constraint = 
             HPP_DYNAMIC_PTR_CAST (manipulation::ConstraintSet, p->constraints());
           if (!constraint) {

@@ -36,7 +36,7 @@
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/graph/helper.hh>
 #include <hpp/manipulation/constraint-set.hh>
-#include <hpp/manipulation/graph-steering-method.hh>
+#include <hpp/manipulation/steering-method/graph.hh>
 
 #include <hpp/constraints/differentiable-function.hh>
 
