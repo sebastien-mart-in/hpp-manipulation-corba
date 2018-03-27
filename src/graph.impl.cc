@@ -153,20 +153,27 @@ namespace hpp {
       Long Graph::createGraph(const char* graphName)
         throw (hpp::Error)
       {
-        std::string name (graphName);
+        try {
+          std::string name (graphName);
+          if (problemSolver()->graphs.has (name)) {
+            HPP_THROW(Error, "A graph named " << name << " already exists");
+          }
 
-        DevicePtr_t robot = problemSolver()->robot ();
-        if (!robot) throw Error ("Build the robot first.");
-	// Create default steering method to store in edges, until we define a
-	// factory for steering methods.
-        graph::GraphPtr_t g = graph::Graph::create(name, robot,
-            problemSolver()->problem());
-        g->maxIterations (problemSolver()->maxIterProjection ());
-        g->errorThreshold (problemSolver()->errorThreshold ());
+          DevicePtr_t robot = problemSolver()->robot ();
+          if (!robot) throw Error ("Build the robot first.");
+          // Create default steering method to store in edges, until we define a
+          // factory for steering methods.
+          graph::GraphPtr_t g = graph::Graph::create(name, robot,
+              problemSolver()->problem());
+          g->maxIterations (problemSolver()->maxIterProjection ());
+          g->errorThreshold (problemSolver()->errorThreshold ());
 
-        problemSolver()->graphs.add (name, g);
-        problemSolver()->constraintGraph (name);
-        return (Long) g->id ();
+          problemSolver()->graphs.add (name, g);
+          problemSolver()->constraintGraph (name);
+          return (Long) g->id ();
+        } catch (std::exception& e) {
+          throw Error (e.what());
+        }
       }
 
       void Graph::selectGraph(const char* graphName)
