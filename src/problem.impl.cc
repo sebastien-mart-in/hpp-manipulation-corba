@@ -583,7 +583,7 @@ namespace hpp {
         }
       }
 
-      ID Problem::edgeAtParam (ULong pathId, Double param)
+      ID Problem::edgeAtParam (ULong pathId, Double param, String_out name)
         throw (Error)
       {
 	try {
@@ -609,6 +609,7 @@ namespace hpp {
                 << "at id " << pathId << ", param " << param
                 << " (rank: " << r << ")");
           }
+          name = constraint->edge()->parentGraph()->name().c_str();
           return (ID)constraint->edge()->id();
 	}
 	catch (const std::exception& exc) {

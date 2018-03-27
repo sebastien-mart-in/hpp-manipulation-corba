@@ -203,7 +203,7 @@ module hpp {
 
         /// Get the edge ID of the motion that generated the configuration
         /// at the given parameter.
-        ID edgeAtParam (in unsigned long inPathId, in double atDistance)
+        ID edgeAtParam (in unsigned long inPathId, in double atDistance, out string graphName)
           raises (Error);
       }; // interface Problem
     }; // module manipulation

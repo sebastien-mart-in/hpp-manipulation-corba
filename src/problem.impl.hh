@@ -29,6 +29,7 @@ namespace hpp {
       using CORBA::UShort;
       using CORBA::ULong;
       using CORBA::Double;
+      using CORBA::String_out;
 
       class Problem : public virtual POA_hpp::corbaserver::manipulation::Problem
       {
@@ -103,7 +104,7 @@ namespace hpp {
 
         virtual void setTargetState (hpp::ID IDstate);
 
-        virtual ID edgeAtParam (ULong pathId, Double param)
+        virtual ID edgeAtParam (ULong pathId, Double param, String_out name)
           throw (Error);
 
       private:
