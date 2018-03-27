@@ -35,9 +35,14 @@ module hpp {
       typedef sequence<Rule> Rules;
 
       interface Graph {
-        /// Initialize the graph of constraints.
+        /// Initialize the graph of constraints and add it to the ProblemSolver map.
         /// \note The composite hpp::manipulation::robot must be completely defined first.
         long createGraph(in string graphName)
+          raises (Error);
+
+        /// Select the graph of contraints from the ProblemSolver map.
+        /// \note The composite hpp::manipulation::robot must be completely defined first.
+        void selectGraph(in string graphName)
           raises (Error);
 
         /// Create a subgraph of the constraint graph for one particular end-effector.

@@ -152,9 +152,29 @@ namespace hpp {
           ret = getRobotOrThrow (problemSolver())->jointAndShapes.getKeys <Ret_t> ();
         } else if (w == "envcontact") {
           ret = problemSolver()->jointAndShapes.getKeys <Ret_t> ();
+        } else if (w == "constraintgraph") {
+          ret = problemSolver()->graphs.getKeys <Ret_t> ();
         } else if (w == "type") {
           ret = boost::assign::list_of ("Gripper") ("Handle") ("RobotContact")
-            ("EnvContact");
+            ("EnvContact")("ConstraintGraph");
+        } else {
+          throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
+        }
+
+        return toNames_t (ret.begin(), ret.end());
+      }
+
+      Names_t* Problem::getSelected (const char* what) throw (hpp::Error)
+      {
+        std::string w (what);
+        boost::algorithm::to_lower(w);
+        typedef std::list <std::string> Ret_t;
+        Ret_t ret;
+
+        if (w == "constraintgraph") {
+          ret.push_back (problemSolver()->constraintGraph()->name());
+        } else if (w == "type") {
+          ret = boost::assign::list_of ("ConstraintGraph");
         } else {
           throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
         }

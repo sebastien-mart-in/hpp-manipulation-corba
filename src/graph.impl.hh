@@ -42,6 +42,9 @@ namespace hpp {
           virtual Long createGraph(const char* graphName)
             throw (hpp::Error);
 
+          virtual void selectGraph(const char* graphName)
+            throw (hpp::Error);
+
           virtual Long createSubGraph(const char* subgraphName)
             throw (hpp::Error);
 

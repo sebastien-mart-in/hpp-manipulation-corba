@@ -45,6 +45,8 @@ namespace hpp {
 
         virtual Names_t* getAvailable (const char* what) throw (hpp::Error);
 
+        virtual Names_t* getSelected (const char* what) throw (hpp::Error);
+
         virtual void createGrasp (const char* graspName,
             const char* gripperName, const char* handleName)
 	  throw (hpp::Error);
