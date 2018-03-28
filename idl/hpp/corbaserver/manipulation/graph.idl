@@ -360,6 +360,9 @@ module hpp {
         long getWeight (in ID edgeID)
           raises (Error);
 
+        string getName (in ID elmtID)
+          raises (Error);
+
         /// This must be called when the graph has been built.
         void initialize ()
           raises (Error);

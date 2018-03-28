@@ -885,6 +885,16 @@ namespace hpp {
 	}
       }
 
+      char* Graph::getName (ID elmtId)
+        throw (Error)
+      {
+        try {
+          return corbaServer::c_str(graph()->get(elmtId).lock()->name());
+        } catch (std::exception& e) {
+          throw Error (e.what());
+        }
+      }
+
       void Graph::initialize ()
         throw (hpp::Error)
       {

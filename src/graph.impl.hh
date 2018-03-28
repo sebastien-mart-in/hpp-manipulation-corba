@@ -230,6 +230,9 @@ namespace hpp {
           virtual Long getWeight (ID edgeId)
             throw (hpp::Error);
 
+          virtual char* getName (ID elmtId)
+            throw (hpp::Error);
+
           virtual void initialize ()
             throw (hpp::Error);
 
