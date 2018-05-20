@@ -1,3 +1,32 @@
+2018/05/22 - Release 4.1
+* Add ProblemSolver.addConfigValidation and ProblemSolver.clearConfigValidations.
+* If dependency to QPOases is not set, do not implement static stability constr.
+* Bind a few new methods in python:
+  - Graph::getNode,
+  - Robot::getJointBounds,
+  - Robot::getPartialCom,
+  - Robot::getJacobianPartialCom,
+  - Graph::initialize,
+  - Graph::isShort,
+  - Path::edgeAtParam,
+  - ProblemSolver::erasePath,
+  - ProblemSolver::concatenatePath,
+  - ProblemSolver::selectDistance,
+  - ProblemSolver::selectSteeringMethod,
+  - ProblemSolver::projectPath,
+* Check that graph argument is a Boolean in ConstraintGraph.setConstraints.
+* In ProblemSolver.getConstantRightHandSide, return False for locked joints.
+* Add class Constraints to homogeneize various types of constraints
+* Build Handle with mask instead of AxialHandle.
+* In graph construction, use prebuilt placement constraints.
+* Express dependency to hpp-template-corba
+* Use ProblemSolver::createRobot to create robot of appropriate type.
+* Remove idl method Robot::create.
+* Add Problem::setTargetState.
+* Copy handles and grippers when loading environment.
+* Use ProblemSolver::createGraspConstraint and createPregraspConstraint
+* Add insertRobotModelFromString and loadEnvironmentModelFromString.
+
 2014/11/08 - Release 1.0
-        * Python class ConstraintGraph, ProblemSolver, Robot
-        * 3 CORBA server: robot, problem, graph
+* Python class ConstraintGraph, ProblemSolver, Robot
+* 3 CORBA server: robot, problem, graph
