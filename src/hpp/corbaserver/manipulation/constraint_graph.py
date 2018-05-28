@@ -396,6 +396,14 @@ class ConstraintGraph (object):
             self.graph.addNumericalConstraints (self.graphId, nc, nopdofs)
             self.graph.addLockedDofConstraints (self.graphId, lockDof)
 
+    ## Remove a pair of bodies in the collision test of an edge
+    #
+    #  \param edge name of the edge,
+    #  \param joint1, joint2, names of the joints defining the pair.
+    def removeCollisionPairFromEdge (self, edge, joint1, joint2):
+        return self.graph.removeCollisionPairFromEdge \
+            (self.edges [edge], joint1, joint2)
+
     def setLevelSetFoliation (self, *args, **kwargs):
         return self.addLevelSetFoliation (*args, **kwargs)
 

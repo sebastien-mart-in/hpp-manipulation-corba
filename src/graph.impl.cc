@@ -605,6 +605,21 @@ namespace hpp {
         }
       }
 
+      void Graph::removeCollisionPairFromEdge
+      (ID edgeId, const char* joint1, const char* joint2) throw (hpp::Error)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+
+	try {
+	  RelativeMotion::matrix_type& m (edge->relativeMotion ());
+	  JointIndex i1 = model.getJointId (joint1);
+	  JointIndex i2 = model.getJointId (joint2);
+	  m (i1, i2) = m (i2, i1) = hpp::core::RelativeMotion::Constrained;
+	} catch (std::exception& err) {
+	  throw Error (err.what());
+	}
+      }
+
       void Graph::getNode (const hpp::floatSeq& dofArray, ID_out output)
         throw (hpp::Error)
       {

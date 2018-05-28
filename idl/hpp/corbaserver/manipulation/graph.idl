@@ -199,6 +199,13 @@ module hpp {
         void addLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
           raises (Error);
 
+	/// Remove collision pairs from an edge
+	///
+	///  \param edgeId id of the edge,
+	///  \param joint1, joint2, names of the joints defining the pair.
+	void removeCollisionPairFromEdge (in ID edgeId, in string joint1,
+					  in string joint2) raises (Error);
+
         /// Get the node corresponding to the state of the configuration.
         /// \param dofArray the configuration.
         /// \return the ID corresponding to the node.
