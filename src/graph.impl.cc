@@ -21,6 +21,8 @@
 
 #include <boost/foreach.hpp>
 
+#include <pinocchio/multibody/model.hpp>
+
 #include <hpp/util/debug.hh>
 #include <hpp/util/exception-factory.hh>
 #include <hpp/util/pointer.hh>
@@ -611,10 +613,13 @@ namespace hpp {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 
 	try {
+	  using hpp::core::RelativeMotion;
 	  RelativeMotion::matrix_type& m (edge->relativeMotion ());
-	  JointIndex i1 = model.getJointId (joint1);
-	  JointIndex i2 = model.getJointId (joint2);
-	  m (i1, i2) = m (i2, i1) = hpp::core::RelativeMotion::Constrained;
+	  DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	  JointIndex i1 = robot->model ().getJointId (joint1);
+	  JointIndex i2 = robot->model ().getJointId (joint2);
+	  m (i1, i2) = m (i2, i1) = RelativeMotion::Constrained;
+    edge->relativeMotion(m);
 	} catch (std::exception& err) {
 	  throw Error (err.what());
 	}

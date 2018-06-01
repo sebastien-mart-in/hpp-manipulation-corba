@@ -396,7 +396,7 @@ class ConstraintGraph (object):
             self.graph.addNumericalConstraints (self.graphId, nc, nopdofs)
             self.graph.addLockedDofConstraints (self.graphId, lockDof)
 
-    ## Remove a pair of bodies in the collision test of an edge
+    ## Remove collision pairs from an edge
     #
     #  \param edge name of the edge,
     #  \param joint1, joint2, names of the joints defining the pair.
