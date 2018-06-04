@@ -612,17 +612,17 @@ namespace hpp {
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 
-	try {
-	  using hpp::core::RelativeMotion;
-	  RelativeMotion::matrix_type& m (edge->relativeMotion ());
-	  DevicePtr_t robot = getRobotOrThrow (problemSolver());
-	  JointIndex i1 = robot->model ().getJointId (joint1);
-	  JointIndex i2 = robot->model ().getJointId (joint2);
-	  m (i1, i2) = m (i2, i1) = RelativeMotion::Constrained;
-    edge->relativeMotion(m);
-	} catch (std::exception& err) {
-	  throw Error (err.what());
-	}
+        try {
+          using hpp::core::RelativeMotion;
+          RelativeMotion::matrix_type m (edge->relativeMotion ());
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+          JointIndex i1 = robot->getJointByName(joint1)->index();
+          JointIndex i2 = robot->getJointByName(joint2)->index();
+          m (i1, i2) = m (i2, i1) = RelativeMotion::Constrained;
+          edge->relativeMotion(m);
+        } catch (std::exception& err) {
+          throw Error (err.what());
+        }
       }
 
       void Graph::getNode (const hpp::floatSeq& dofArray, ID_out output)
