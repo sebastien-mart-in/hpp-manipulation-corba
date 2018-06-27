@@ -257,27 +257,20 @@ namespace hpp {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
 
           std::string modelName (envModelName); 
-          DevicePtr_t object = Device::create (modelName);
+          std::string p (prefix);
+          DevicePtr_t object = Device::create (p);
           pinocchio::urdf::loadUrdfModel (object, "anchor",
               package, modelName + std::string(urdfSuffix));
           srdf::loadModelFromFile (object, "",
               package, envModelName, srdfSuffix);
-          std::string p (prefix);
           object->controlComputation(Device::JOINT_POSITION);
           object->computeForwardKinematics();
           object->updateGeometryPlacements();
 
 	  // Detach objects from joints
-          using pinocchio::DeviceObjectVector;
-          DeviceObjectVector& objects = object->objectVector();
-          for (DeviceObjectVector::iterator itObj = objects.begin();
-              itObj != objects.end(); ++itObj) {
-            problemSolver()->addObstacle (
-                p + (*itObj)->name (),
-                *(*itObj)->fcl (),
-                true, true);
-	    hppDout (info, "Adding obstacle " << obj->name ());
-	  }
+          problemSolver()->addObstacle (object, true, true);
+
+          // Add contact shapes.
           typedef core::Container<JointAndShapes_t>::Map_t ShapeMap;
           const ShapeMap& m = object->jointAndShapes.map;
           for (ShapeMap::const_iterator it = m.begin ();
@@ -321,16 +314,9 @@ namespace hpp {
           object->updateGeometryPlacements();
 
 	  // Detach objects from joints
-          using pinocchio::DeviceObjectVector;
-          DeviceObjectVector& objects = object->objectVector();
-          for (DeviceObjectVector::iterator itObj = objects.begin();
-              itObj != objects.end(); ++itObj) {
-            problemSolver()->addObstacle (
-                p + (*itObj)->name (),
-                *(*itObj)->fcl (),
-                true, true);
-	    hppDout (info, "Adding obstacle " << obj->name ());
-	  }
+          problemSolver()->addObstacle (object, true, true);
+
+          // Add contact shapes.
           typedef core::Container<JointAndShapes_t>::Map_t ShapeMap;
           const ShapeMap& m = object->jointAndShapes.map;
           for (ShapeMap::const_iterator it = m.begin ();
