@@ -42,12 +42,15 @@
 
 #include <hpp/constraints/differentiable-function.hh>
 
+#include <hpp/constraints/locked-joint.hh>
+
 #include <hpp/corbaserver/manipulation/server.hh>
 
 #include "tools.hh"
 
 namespace hpp {
   namespace manipulation {
+    using constraints::Implicit;
     namespace impl {
       using CORBA::ULong;
       using graph::Edge;
@@ -443,7 +446,7 @@ namespace hpp {
           for (CORBA::ULong i=0; i<condNC.length (); ++i) {
             std::string name (condNC [i]);
             edge->insertConditionConstraint
-              (HPP_STATIC_PTR_CAST(NumericalConstraint,
+              (HPP_STATIC_PTR_CAST(Implicit,
                                    problemSolver()->numericalConstraints.get
                                    (name)->copy ()));
           }
@@ -458,7 +461,7 @@ namespace hpp {
           for (CORBA::ULong i=0; i<paramNC.length (); ++i) {
             std::string name (paramNC [i]);
             edge->insertParamConstraint (
-                HPP_STATIC_PTR_CAST(NumericalConstraint,
+                HPP_STATIC_PTR_CAST(Implicit,
                 problemSolver()->numericalConstraints.get(name)->copy ()),
                 problemSolver()->passiveDofs.get (pdofNames [i], core::segments_t()));
           }
@@ -578,7 +581,7 @@ namespace hpp {
               std::string name (constraintNames [i]);
               n->addNumericalConstraintForPath
 		(HPP_STATIC_PTR_CAST
-		 (NumericalConstraint,
+		 (Implicit,
 		  problemSolver()->numericalConstraint(name)->copy ()),
                  problemSolver()->passiveDofs.get (pdofNames [i], core::segments_t()));
             }

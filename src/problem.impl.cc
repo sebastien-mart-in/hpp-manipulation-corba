@@ -24,6 +24,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include <hpp/util/debug.hh>
+#include <hpp/constraints/implicit.hh>
 #include <hpp/core/roadmap.hh>
 #include <hpp/core/distance.hh>
 #include <hpp/core/config-projector.hh>
@@ -40,7 +41,6 @@
 #include <hpp/manipulation/manipulation-planner.hh>
 #include <hpp/manipulation/graph/node.hh>
 #include <hpp/manipulation/graph/edge.hh>
-#include <hpp/manipulation/axial-handle.hh>
 #include <hpp/manipulation/steering-method/graph.hh>
 
 #include "tools.hh"
@@ -354,7 +354,7 @@ namespace hpp {
           QPStaticStabilityPtr_t c = QPStaticStability::create (placName, robot,
               fds, com);
           problemSolver()->addNumericalConstraint (placName,
-              NumericalConstraint::create (c, core::EqualToZero::create())
+              Implicit::create (c, core::EqualToZero::create())
               );
 #else
           // Avoid unused-variable compilation warnings
