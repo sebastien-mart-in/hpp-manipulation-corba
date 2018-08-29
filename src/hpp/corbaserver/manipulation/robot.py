@@ -50,9 +50,10 @@ class Robot (object):
     # \param load whether to actually load urdf files. Set to no if you only
     #        want to initialize a corba client to an already initialized
     #        problem.
-    def __init__ (self, compositeName = None, robotName = None, rootJointType = None, load = True, client = CorbaClient()):
+    def __init__ (self, compositeName = None, robotName = None, rootJointType = None, load = True, client = None):
         self.tf_root = "base_link"
         self.rootJointType = dict()
+        if client is None: client = CorbaClient()
         self.client = client
         if compositeName is None:
             self.name = self.client.basic.robot.getRobotName()
