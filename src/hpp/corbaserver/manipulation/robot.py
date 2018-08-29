@@ -32,11 +32,11 @@ class CorbaClient:
     """
     Container for corba clients to various interfaces.
     """
-    def __init__ (self):
-        self.basic = BasicClient ()
-        self.manipulation = ManipulationClient ()
+    def __init__ (self, url = None, postContextId = ""):
+        self.basic = BasicClient (url = url, postContextId = postContextId)
+        self.manipulation = ManipulationClient (url = url, postContextId = postContextId)
         if WholebodyStepClient:
-            self.wholebodyStep = WholebodyStepClient ()
+            self.wholebodyStep = WholebodyStepClient (url = url, postContextId = postContextId)
 
 ## Load and handle a composite robot for manipulation planning
 #
@@ -50,10 +50,10 @@ class Robot (object):
     # \param load whether to actually load urdf files. Set to no if you only
     #        want to initialize a corba client to an already initialized
     #        problem.
-    def __init__ (self, compositeName = None, robotName = None, rootJointType = None, load = True):
+    def __init__ (self, compositeName = None, robotName = None, rootJointType = None, load = True, client = CorbaClient()):
         self.tf_root = "base_link"
         self.rootJointType = dict()
-        self.client = CorbaClient ()
+        self.client = client
         if compositeName is None:
             self.name = self.client.basic.robot.getRobotName()
             load = False
