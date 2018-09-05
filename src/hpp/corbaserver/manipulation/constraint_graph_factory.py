@@ -18,7 +18,6 @@
 # <http://www.gnu.org/licenses/>.
 
 import re, abc
-from robot import CorbaClient
 from constraints import Constraints
 
 def zip_idx (a): return zip(range(len(a)), a)
