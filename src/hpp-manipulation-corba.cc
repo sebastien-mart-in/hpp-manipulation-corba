@@ -35,15 +35,12 @@ typedef hpp::manipulation::ManipulationPlannerPtr_t ManipulationPlannerPtr_t;
 
 int main (int argc, char* argv [])
 {
-  bool multithread = true;
-  for (int i = 0; i < argc; ++i)
-    if (strcmp(argv[i], "--singlethread") == 0)
-      multithread = false;
-
   ProblemSolverPtr_t problemSolver = new ProblemSolver();
 
   CorbaServer corbaServer (problemSolver, argc,
-			   const_cast<const char**> (argv), multithread);
+			   const_cast<const char**> (argv), true);
+
+  const bool multithread = corbaServer.multiThread();
   #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP  
     WholebodyServer wbsServer (argc, const_cast<const char**> (argv), multithread);
     wbsServer.setProblemSolverMap (corbaServer.problemSolverMap());
