@@ -95,6 +95,11 @@ class ProblemSolver (object):
     def getParameter (self, name):
         return self.client.basic.problem.getParameter (name)
 
+    ## Get parameter doc with given name
+    #  raise an exception when the parameter is not found.
+    def getParameterDoc (self, name):
+        return self.client.basic.problem.getParameterDoc (name)
+
     #  Move a path from the current problem to another problem.
     #  \param problemName the destination problem
     #  \param jointNames a list of joint names representing the subchain to
