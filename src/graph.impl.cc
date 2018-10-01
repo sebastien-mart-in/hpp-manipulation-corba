@@ -181,6 +181,20 @@ namespace hpp {
         }
       }
 
+      void Graph::deleteGraph(const char* graphName)
+        throw (hpp::Error)
+      {
+        try {
+          std::string name (graphName);
+          if (problemSolver()->graphs.has (name)) {
+            HPP_THROW(Error, "There is no graph named " << name << ".");
+          }
+          problemSolver()->graphs.erase(name);
+        } catch (std::exception& e) {
+          throw Error (e.what());
+        }
+      }
+
       void Graph::selectGraph(const char* graphName)
         throw (Error)
       {
