@@ -40,6 +40,9 @@ module hpp {
         long createGraph(in string graphName)
           raises (Error);
 
+        void deleteGraph(in string graphName)
+          raises (Error);
+
         /// Select the graph of contraints from the ProblemSolver map.
         /// \note The composite hpp::manipulation::robot must be completely defined first.
         void selectGraph(in string graphName)
