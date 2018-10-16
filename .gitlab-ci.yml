@@ -30,6 +30,7 @@ robotpkg-hpp-manipulation-corba-16.04-release:
 robotpkg-hpp-manipulation-corba-18.04-release:
   <<: *robotpkg-hpp-manipulation-corba
   image: eur0c.laas.fr:5000/humanoid-path-planner/hpp-manipulation-corba/hpp-manipulation-corba:18.04
+  allow_failure: true
 
 doc-coverage:
   <<: *robotpkg-hpp-manipulation-corba
