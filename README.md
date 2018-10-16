@@ -1,5 +1,9 @@
 # hpp-manipulation-corba
 
+[![Building Status](https://travis-ci.org/humanoid-path-planner/hpp-manipulation-corba.svg?branch=master)](https://travis-ci.org/humanoid-path-planner/hpp-manipulation-corba)
+[![Pipeline status](https://gepgitlab.laas.fr/humanoid-path-planner/hpp-manipulation-corba/badges/master/pipeline.svg)](https://gepgitlab.laas.fr/humanoid-path-planner/hpp-manipulation-corba/commits/master)
+[![Coverage report](https://gepgitlab.laas.fr/humanoid-path-planner/hpp-manipulation-corba/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/humanoid-path-planner/hpp-manipulation-corba/master/coverage/)
+
 This package is part of the [HPP] software and extends the functionalities of [hpp-corbaserver].
 It implements a CORBA server in order to use the functionalities of package [hpp-manipulation] in Python.
 
