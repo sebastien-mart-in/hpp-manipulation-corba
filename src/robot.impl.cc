@@ -263,7 +263,7 @@ namespace hpp {
               package, modelName + std::string(urdfSuffix));
           srdf::loadModelFromFile (object, "",
               package, envModelName, srdfSuffix);
-          object->controlComputation(Device::JOINT_POSITION);
+          object->controlComputation(hpp::pinocchio::JOINT_POSITION);
           object->computeForwardKinematics();
           object->updateGeometryPlacements();
 
@@ -309,7 +309,7 @@ namespace hpp {
           pinocchio::urdf::loadModelFromString (object, 0, "",
               "anchor", urdfString, srdfString);
           srdf::loadModelFromXML (object, "", srdfString);
-          object->controlComputation(Device::JOINT_POSITION);
+          object->controlComputation(hpp::pinocchio::JOINT_POSITION);
           object->computeForwardKinematics();
           object->updateGeometryPlacements();
 
