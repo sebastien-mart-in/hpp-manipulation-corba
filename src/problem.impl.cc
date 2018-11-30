@@ -172,7 +172,9 @@ namespace hpp {
         Ret_t ret;
 
         if (w == "constraintgraph") {
-          ret.push_back (problemSolver()->constraintGraph()->name());
+          if (problemSolver()->constraintGraph())
+            ret.push_back (problemSolver()->constraintGraph()->name());
+          else throw Error ("No constraint graph selected.");
         } else if (w == "type") {
           ret = boost::assign::list_of ("ConstraintGraph");
         } else {
