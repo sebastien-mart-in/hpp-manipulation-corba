@@ -611,7 +611,10 @@ namespace hpp {
                 << "at id " << pathId << ", param " << param
                 << " (rank: " << r << ")");
           }
-          name = constraint->edge()->parentGraph()->name().c_str();
+          if (constraint->edge()->parentGraph())
+            name = constraint->edge()->parentGraph()->name().c_str();
+          else
+            name = "Parent graph was destroyed.";
           return (ID)constraint->edge()->id();
 	}
 	catch (const std::exception& exc) {
