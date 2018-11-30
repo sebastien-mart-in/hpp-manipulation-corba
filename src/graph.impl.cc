@@ -186,7 +186,7 @@ namespace hpp {
       {
         try {
           std::string name (graphName);
-          if (problemSolver()->graphs.has (name)) {
+          if (!problemSolver()->graphs.has (name)) {
             HPP_THROW(Error, "There is no graph named " << name << ".");
           }
           problemSolver()->graphs.erase(name);
