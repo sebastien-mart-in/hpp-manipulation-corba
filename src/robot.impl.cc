@@ -90,7 +90,7 @@ namespace hpp {
                 ? in->joint()->currentTransformation() * in->localPosition()
                 : in->localPosition());
 
-            HandlePtr_t out = Handle::create(p + in->name(), position, JointPtr_t());
+            HandlePtr_t out = Handle::create(p + in->name(), position, device, JointPtr_t());
             out->clearance (in->clearance());
             return out;
         }
@@ -392,7 +392,7 @@ namespace hpp {
             getJointByBodyNameOrThrow (problemSolver(), linkName);
           Transform3f T;
           hppTransformToTransform3f(localPosition, T);
-	  HandlePtr_t handle = Handle::create (handleName, T, joint);
+	  HandlePtr_t handle = Handle::create (handleName, T, robot, joint);
 	  robot->handles.add (handleName, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -432,7 +432,7 @@ namespace hpp {
             getJointByBodyNameOrThrow (problemSolver(), linkName);
           Transform3f T;
           hppTransformToTransform3f(localPosition, T);
-	  HandlePtr_t handle = Handle::create (handleName, T, joint);
+	  HandlePtr_t handle = Handle::create (handleName, T, robot, joint);
           std::vector <bool> mask (6, true); mask [5] = false;
           handle->mask (mask);
 	  robot->handles.add (handleName, handle);
