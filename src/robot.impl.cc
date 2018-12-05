@@ -90,7 +90,7 @@ namespace hpp {
                 ? in->joint()->currentTransformation() * in->localPosition()
                 : in->localPosition());
 
-            HandlePtr_t out = Handle::create(p + in->name(), position, JointPtr_t(new Joint(device, 0)));
+            HandlePtr_t out = Handle::create(p + in->name(), position, JointPtr_t());
             out->clearance (in->clearance());
             return out;
         }
