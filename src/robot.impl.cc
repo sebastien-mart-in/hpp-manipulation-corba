@@ -278,7 +278,8 @@ namespace hpp {
             JointAndShapes_t shapes;
             for (JointAndShapes_t::const_iterator itT = it->second.begin ();
                 itT != it->second.end(); ++itT) {
-              const Transform3f& M = itT->first->currentTransformation ();
+              Transform3f M (Transform3f::Identity());
+              if (itT->first) M = itT->first->currentTransformation ();
               Shape_t newShape (itT->second.size());
               for (std::size_t i = 0; i < newShape.size (); ++i)
                 newShape [i] = M.act (itT->second[i]);
@@ -324,7 +325,8 @@ namespace hpp {
             JointAndShapes_t shapes;
             for (JointAndShapes_t::const_iterator itT = it->second.begin ();
                 itT != it->second.end(); ++itT) {
-              const Transform3f& M = itT->first->currentTransformation ();
+              Transform3f M (Transform3f::Identity());
+              if (itT->first) M = itT->first->currentTransformation ();
               Shape_t newShape (itT->second.size());
               for (std::size_t i = 0; i < newShape.size (); ++i)
                 newShape [i] = M.act (itT->second[i]);
