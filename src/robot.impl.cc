@@ -455,9 +455,10 @@ namespace hpp {
             throw Error ("This gripper does not exists.");
           const Transform3f& t = gripper->objectPositionInJoint ();
           Transform3fTohppTransform (t, position);
-          char* name = new char[gripper->joint ()->name ().length()+1];
-          strcpy (name, gripper->joint ()->name ().c_str ());
-          return name;
+          if (gripper->joint ())
+            return c_str(gripper->joint ()->name ());
+          else
+            return c_str("universe");
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -474,9 +475,10 @@ namespace hpp {
             throw Error ("This handle does not exists.");
           const Transform3f& t = handle->localPosition ();
           Transform3fTohppTransform (t, position);
-          char* name = new char[handle->joint ()->name ().length()+1];
-          strcpy (name, handle->joint ()->name ().c_str ());
-          return name;
+          if (handle->joint ())
+            return c_str(handle->joint ()->name ());
+          else
+            return c_str("universe");
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
         }

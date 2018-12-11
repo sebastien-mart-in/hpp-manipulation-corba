@@ -30,6 +30,7 @@ namespace hpp {
   using corbaServer::toIntSeq;
   using corbaServer::matrixToIntSeqSeq;
   using corbaServer::toNames_t;
+  using corbaServer::c_str;
   using pinocchio::Transform3f;
   using manipulation::DevicePtr_t;
   using manipulation::ProblemSolverPtr_t;
