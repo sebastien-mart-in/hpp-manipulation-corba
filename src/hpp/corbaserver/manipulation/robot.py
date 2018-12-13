@@ -62,14 +62,15 @@ class Robot (Parent):
             load = False
         self.displayName = robotName
         self.load = load
+        self.robotNames = list()
         self.loadModel (robotName, rootJointType)
 
     ## Virtual function to load the robot model
     def loadModel (self, robotName, rootJointType):
         if self.load:
             self.client.basic.robot.createRobot (self.name)
-            self.insertRobotModel (robotName, rootJointType, self.packageName,
-                                   self.urdfName, self.urdfSuffix, self.srdfSuffix)
+        self.insertRobotModel (robotName, rootJointType, self.packageName,
+                               self.urdfName, self.urdfSuffix, self.srdfSuffix)
 
     ## Load robot model and insert it in the device
     #
@@ -90,6 +91,7 @@ class Robot (Parent):
             self.client.manipulation.robot.insertRobotModel (robotName,
                     rootJointType, packageName, modelName, urdfSuffix,
                     srdfSuffix)
+        self.robotNames.append (robotName)
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
 
@@ -128,6 +130,7 @@ class Robot (Parent):
             self.client.manipulation.robot.insertHumanoidModel \
                 (robotName, rootJointType, packageName, modelName,
                  urdfSuffix, srdfSuffix)
+        self.robotNames.append (robotName)
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
 
@@ -155,6 +158,7 @@ class Robot (Parent):
             self.client.manipulation.robot.insertObjectModel (objectName,
                     rootJointType, packageName, modelName, urdfSuffix,
                     srdfSuffix)
+        self.robotNames.append (objectName)
         self.rootJointType[objectName] = rootJointType
         self.rebuildRanks ()
 
