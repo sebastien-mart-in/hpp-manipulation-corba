@@ -21,6 +21,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CXX_DISABLE_WERROR true)
 
 INCLUDE(cmake/base.cmake)
+INCLUDE(cmake/hpp.cmake)
 INCLUDE(cmake/idl.cmake)
 INCLUDE(cmake/python.cmake)
 
@@ -32,7 +33,7 @@ SET(CLIENT_ONLY FALSE CACHE BOOL "Set to true to install the client only")
 
 SET(CUSTOM_HEADER_DIR hpp/corbaserver/manipulation)
 
-SETUP_PROJECT ()
+SETUP_HPP_PROJECT ()
 
 CONFIG_FILES (include/hpp/corbaserver/manipulation/doc.hh)
 
@@ -77,4 +78,4 @@ ADD_SUBDIRECTORY(src)
 
 PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
 
-SETUP_PROJECT_FINALIZE()
+SETUP_HPP_PROJECT_FINALIZE()
