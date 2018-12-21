@@ -35,7 +35,7 @@ SET(CUSTOM_HEADER_DIR hpp/corbaserver/manipulation)
 
 SETUP_HPP_PROJECT ()
 
-CONFIG_FILES (include/hpp/corbaserver/manipulation/doc.hh)
+CONFIG_FILES (doc/main.hh)
 
 SET(${PROJECT_NAME}_HEADERS
   include/hpp/corbaserver/manipulation/client.hh
@@ -44,7 +44,6 @@ IF (NOT CLIENT_ONLY)
   SET(${PROJECT_NAME}_HEADERS
     include/hpp/corbaserver/manipulation/server.hh
     include/hpp/corbaserver/manipulation/fwd.hh
-    ${CMAKE_BINARY_DIR}/include/hpp/corbaserver/manipulation/doc.hh
     ${${PROJECT_NAME}_HEADERS}
     )
 ENDIF (NOT CLIENT_ONLY)
@@ -54,9 +53,6 @@ SET (HPP_DEBUG FALSE CACHE BOOL "trigger hpp-util debug output")
 IF (HPP_DEBUG)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHPP_DEBUG")
 ENDIF()
-
-# Ask Doxygen to create a tree view in html documentation
-SET(DOXYGEN_TREEVIEW "NO" CACHE STRING "Set to YES to generate a tree view in the html documentation")
 
 SET(HPP_MANIPULATION_HAS_WHOLEBODY_STEP TRUE
   CACHE BOOL "Compile with dependency to hpp-wholebody-step-corba")
