@@ -1,5 +1,5 @@
 INPUT		= @CMAKE_SOURCE_DIR@/include \
-		  @CMAKE_BINARY_DIR@/include \
+		  @CMAKE_BINARY_DIR@/doc \
 		  @CMAKE_SOURCE_DIR@/idl \
 		  @CMAKE_SOURCE_DIR@/src/hpp/corbaserver/manipulation/problem_solver.py \
 		  @CMAKE_SOURCE_DIR@/src/hpp/corbaserver/manipulation/constraint_graph.py \
@@ -10,5 +10,3 @@ INPUT		= @CMAKE_SOURCE_DIR@/include \
 FILE_PATTERNS   = *.cc *.cpp \
                   *.hh *.hxx \
 		  *.idl *.py
-
-GENERATE_TREEVIEW	 = @DOXYGEN_TREEVIEW@

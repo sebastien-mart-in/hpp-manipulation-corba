@@ -90,7 +90,7 @@ namespace hpp {
                 ? in->joint()->currentTransformation() * in->localPosition()
                 : in->localPosition());
 
-            HandlePtr_t out = Handle::create(p + in->name(), position, JointPtr_t(new Joint(device, 0)));
+            HandlePtr_t out = Handle::create(p + in->name(), position, device, JointPtr_t());
             out->clearance (in->clearance());
             return out;
         }
@@ -278,7 +278,8 @@ namespace hpp {
             JointAndShapes_t shapes;
             for (JointAndShapes_t::const_iterator itT = it->second.begin ();
                 itT != it->second.end(); ++itT) {
-              const Transform3f& M = itT->first->currentTransformation ();
+              Transform3f M (Transform3f::Identity());
+              if (itT->first) M = itT->first->currentTransformation ();
               Shape_t newShape (itT->second.size());
               for (std::size_t i = 0; i < newShape.size (); ++i)
                 newShape [i] = M.act (itT->second[i]);
@@ -324,7 +325,8 @@ namespace hpp {
             JointAndShapes_t shapes;
             for (JointAndShapes_t::const_iterator itT = it->second.begin ();
                 itT != it->second.end(); ++itT) {
-              const Transform3f& M = itT->first->currentTransformation ();
+              Transform3f M (Transform3f::Identity());
+              if (itT->first) M = itT->first->currentTransformation ();
               Shape_t newShape (itT->second.size());
               for (std::size_t i = 0; i < newShape.size (); ++i)
                 newShape [i] = M.act (itT->second[i]);
@@ -392,7 +394,7 @@ namespace hpp {
             getJointByBodyNameOrThrow (problemSolver(), linkName);
           Transform3f T;
           hppTransformToTransform3f(localPosition, T);
-	  HandlePtr_t handle = Handle::create (handleName, T, joint);
+	  HandlePtr_t handle = Handle::create (handleName, T, robot, joint);
 	  robot->handles.add (handleName, handle);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -432,7 +434,7 @@ namespace hpp {
             getJointByBodyNameOrThrow (problemSolver(), linkName);
           Transform3f T;
           hppTransformToTransform3f(localPosition, T);
-	  HandlePtr_t handle = Handle::create (handleName, T, joint);
+	  HandlePtr_t handle = Handle::create (handleName, T, robot, joint);
           std::vector <bool> mask (6, true); mask [5] = false;
           handle->mask (mask);
 	  robot->handles.add (handleName, handle);
@@ -453,9 +455,10 @@ namespace hpp {
             throw Error ("This gripper does not exists.");
           const Transform3f& t = gripper->objectPositionInJoint ();
           Transform3fTohppTransform (t, position);
-          char* name = new char[gripper->joint ()->name ().length()+1];
-          strcpy (name, gripper->joint ()->name ().c_str ());
-          return name;
+          if (gripper->joint ())
+            return c_str(gripper->joint ()->name ());
+          else
+            return c_str("universe");
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -472,9 +475,10 @@ namespace hpp {
             throw Error ("This handle does not exists.");
           const Transform3f& t = handle->localPosition ();
           Transform3fTohppTransform (t, position);
-          char* name = new char[handle->joint ()->name ().length()+1];
-          strcpy (name, handle->joint ()->name ().c_str ());
-          return name;
+          if (handle->joint ())
+            return c_str(handle->joint ()->name ());
+          else
+            return c_str("universe");
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
         }

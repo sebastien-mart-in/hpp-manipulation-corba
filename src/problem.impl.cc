@@ -172,7 +172,9 @@ namespace hpp {
         Ret_t ret;
 
         if (w == "constraintgraph") {
-          ret.push_back (problemSolver()->constraintGraph()->name());
+          if (problemSolver()->constraintGraph())
+            ret.push_back (problemSolver()->constraintGraph()->name());
+          else throw Error ("No constraint graph selected.");
         } else if (w == "type") {
           ret = boost::assign::list_of ("ConstraintGraph");
         } else {
@@ -609,7 +611,10 @@ namespace hpp {
                 << "at id " << pathId << ", param " << param
                 << " (rank: " << r << ")");
           }
-          name = constraint->edge()->parentGraph()->name().c_str();
+          if (constraint->edge()->parentGraph())
+            name = constraint->edge()->parentGraph()->name().c_str();
+          else
+            name = "Parent graph was destroyed.";
           return (ID)constraint->edge()->id();
 	}
 	catch (const std::exception& exc) {

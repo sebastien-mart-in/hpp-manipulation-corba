@@ -21,6 +21,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CXX_DISABLE_WERROR true)
 
 INCLUDE(cmake/base.cmake)
+INCLUDE(cmake/hpp.cmake)
 INCLUDE(cmake/idl.cmake)
 INCLUDE(cmake/python.cmake)
 
@@ -32,9 +33,9 @@ SET(CLIENT_ONLY FALSE CACHE BOOL "Set to true to install the client only")
 
 SET(CUSTOM_HEADER_DIR hpp/corbaserver/manipulation)
 
-SETUP_PROJECT ()
+SETUP_HPP_PROJECT ()
 
-CONFIG_FILES (include/hpp/corbaserver/manipulation/doc.hh)
+CONFIG_FILES (doc/main.hh)
 
 SET(${PROJECT_NAME}_HEADERS
   include/hpp/corbaserver/manipulation/client.hh
@@ -43,7 +44,6 @@ IF (NOT CLIENT_ONLY)
   SET(${PROJECT_NAME}_HEADERS
     include/hpp/corbaserver/manipulation/server.hh
     include/hpp/corbaserver/manipulation/fwd.hh
-    ${CMAKE_BINARY_DIR}/include/hpp/corbaserver/manipulation/doc.hh
     ${${PROJECT_NAME}_HEADERS}
     )
 ENDIF (NOT CLIENT_ONLY)
@@ -53,9 +53,6 @@ SET (HPP_DEBUG FALSE CACHE BOOL "trigger hpp-util debug output")
 IF (HPP_DEBUG)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHPP_DEBUG")
 ENDIF()
-
-# Ask Doxygen to create a tree view in html documentation
-SET(DOXYGEN_TREEVIEW "NO" CACHE STRING "Set to YES to generate a tree view in the html documentation")
 
 SET(HPP_MANIPULATION_HAS_WHOLEBODY_STEP TRUE
   CACHE BOOL "Compile with dependency to hpp-wholebody-step-corba")
@@ -77,4 +74,4 @@ ADD_SUBDIRECTORY(src)
 
 PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
 
-SETUP_PROJECT_FINALIZE()
+SETUP_HPP_PROJECT_FINALIZE()

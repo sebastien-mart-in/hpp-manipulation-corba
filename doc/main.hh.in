@@ -1,25 +1,7 @@
-// Copyright (C) 2014 CNRS-LAAS
-// Author: Florent Lamiraux.
-//
-// This file is part of the hpp-manipulation-corba.
-//
-// hpp-manipulation-corba is free software: you can redistribute
-// it and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
-//
-// hpp-manipulation-corba is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with hpp-manipulation-corba.  If not, see
-// <http://www.gnu.org/licenses/>.
-
-/// \mainpage
+/// \mainpage Package documentation
+/// \anchor hpp_manipulation_corba_documentation
 ///
-/// \section hpp_manipulation_corba_intro Introduction
+/// \par Introduction
 ///
 /// This package implements a Corba server running hpp-manipulation
 /// package functions and the corresponding client.
@@ -45,8 +27,7 @@
 ///
 /// See these package documentations for details.
 ///
-/// \section hpp_manipulation_corba_howto_communicate \
-/// How to communicate with the CORBA server
+/// \par How to communicate with the CORBA server
 ///
 /// The easiest way to launch \c hpp-manipulation-server executable is to
 /// open a python terminal and type:
@@ -77,8 +58,7 @@
 ///   \li manipulation.constraint_graph_factory.ConstraintGraphFactory to
 ///       create a graph of constraints
 ///
-/// \section hpp_manipulation_corba_how_to_embed \
-/// How to embed a server in an application
+/// \par How to embed a server in an application
 ///
 /// Embedding the corba server into an application can be done by linking the
 /// application with \c libhpp-manipulation-corba.so in a similar way as
