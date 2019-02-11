@@ -20,8 +20,6 @@
 import re, abc
 from constraints import Constraints
 
-def zip_idx (a): return zip(range(len(a)), a)
-
 def _removeEmptyConstraints (problem, constraints):
     return [ n for n in constraints if problem.getConstraintDimensions(n)[2] > 0 ]
 
@@ -36,9 +34,9 @@ class Rules(object):
             for i in range(len(r.handles)):
                 if r.handles[i] == "": r.handles[i] = "^$"
             handlesRegex = [ None ] * len(grippers)
-            for j, gr in zip_idx (r.grippers):
+            for j, gr in enumerate (r.grippers):
                 grc = re.compile (gr)
-                for i, g in zip_idx (grippers):
+                for i, g in enumerate (grippers):
                     if grc.match (g):
                         assert handlesRegex[i] is None
                         handlesRegex[i] = re.compile(r.handles[j])
@@ -53,7 +51,7 @@ class Rules(object):
     def __call__ (self, grasps):
         for r, s in zip(self.rules, self.status):
             apply = True
-            for i, h in zip_idx(r):
+            for i, h in enumerate(r):
                 if h is not None and not h.match("" if grasps[i] is None else self.handles[grasps[i]]):
                     # This rule does not apply
                     apply = False
@@ -119,7 +117,7 @@ class GraphFactoryAbstract:
         hpo = []
         cpo = []
         ofh = []
-        for io, o in zip_idx (self.objects):
+        for io, o in enumerate (self.objects):
             hpo.append( tuple(range(len(handles), len(handles) + len(handlesPerObjects[io])) ) )
             handles.extend(handlesPerObjects[io])
             ofh.extend( [ io, ] * len(handlesPerObjects[io]) )
@@ -194,7 +192,7 @@ class GraphFactoryAbstract:
     def _stateName (self, grasps, abbrev = False):
         sepGH = "-" if abbrev else " grasps "
         sep = ":" if abbrev else " : "
-        name = sep.join([ (str(ig) if abbrev else self.grippers[ig]) + sepGH + (str(ih) if abbrev else self.handles[ih]) for ig,ih in zip_idx(grasps) if ih is not None ])
+        name = sep.join([ (str(ig) if abbrev else self.grippers[ig]) + sepGH + (str(ih) if abbrev else self.handles[ih]) for ig,ih in enumerate(grasps) if ih is not None ])
         if len(name) == 0: return "f" if abbrev else "free"
         return name
 
@@ -213,11 +211,11 @@ class GraphFactoryAbstract:
         if isAllowed: current = self._makeState (grasps, depth)
 
         if len(grippers) == 0 or len(handles) == 0: return
-        for ig, g in zip_idx(grippers):
+        for ig, g in enumerate(grippers):
             ngrippers = grippers[:ig] + grippers[ig+1:]
 
             isg = self.grippers.index(g)
-            for ih, h in zip_idx(handles):
+            for ih, h in enumerate(handles):
                 nhandles = handles[:ih] + handles[ih+1:]
 
                 ish = self.handles.index(h)
@@ -408,12 +406,12 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
             self.manifold = Constraints()
             self.foliation = Constraints()
             # Add the grasps
-            for ig, ih in zip_idx(grasps):
+            for ig, ih in enumerate(grasps):
                 if ih is not None:
                     self.manifold += factory.constraints.g (ig, ih, 'grasp')
                     self.foliation += factory.constraints.g (ig, ih, 'graspComplement')
             # Add the placement constraints
-            for io, object in zip_idx(factory.objects):
+            for io, object in enumerate(factory.objects):
                 if not factory._isObjectGrasped(grasps, io):
                     self.manifold += factory.constraints.p (object, 'placement')
                     self.foliation += factory.constraints.p (object, 'placementComplement')
