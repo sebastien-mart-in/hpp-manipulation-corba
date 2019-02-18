@@ -69,16 +69,16 @@ namespace hpp {
                 ? in->joint()->currentTransformation() * in->objectPositionInJoint()
                 : in->objectPositionInJoint());
 
-            se3::Model& model = device->model();
+            pinocchio::Model& model = device->model();
             const std::string name = p + in->name();
             if (model.existFrame(name))
               throw std::invalid_argument ("Could not add the gripper because a frame \'" + name + "\" already exists.");
-            model.addFrame (se3::Frame(
+            model.addFrame (::pinocchio::Frame(
                   name,
                   model.getJointId("universe"),
                   model.getFrameId("universe"),
                   position,
-                  se3::OP_FRAME));
+                  ::pinocchio::OP_FRAME));
 
             GripperPtr_t out = Gripper::create(name, device);
             out->clearance (in->clearance());
@@ -353,12 +353,12 @@ namespace hpp {
           if (!robot->frameIndices.has (n))
             throw hpp::Error
               ("Root of subtree with the provided prefix not found");
-          const se3::Model& model = robot->model();
-          const se3::Frame& rf = model.frames[
+          const pinocchio::Model& model = robot->model();
+          const ::pinocchio::Frame& rf = model.frames[
             robot->frameIndices.get(n)[0]
             ];
           double* res = new Transform_;
-          if (rf.type == se3::JOINT)
+          if (rf.type == ::pinocchio::JOINT)
             Transform3fTohppTransform (model.jointPlacements[rf.parent], res);
           else
             Transform3fTohppTransform (rf.placement, res);
@@ -412,9 +412,9 @@ namespace hpp {
           Transform3f T;
           hppTransformToTransform3f(p, T);
           robot->model().addFrame(
-              se3::Frame(gripperName, joint->index(),
+              ::pinocchio::Frame(gripperName, joint->index(),
                 robot->model().getFrameId(joint->name()),
-                T, se3::OP_FRAME)
+                T, ::pinocchio::OP_FRAME)
               );
 	  GripperPtr_t gripper = Gripper::create (gripperName, robot);
 	  robot->grippers.add (gripperName, gripper);
