@@ -288,7 +288,6 @@ namespace hpp {
       void Graph::getGraph (GraphComp_out graph_out, GraphElements_out elmts)
         throw (hpp::Error)
       {
-        graph::GraphPtr_t g = graph();
         GraphComps_t comp_n, comp_e;
         GraphComp comp_g, current;
 
@@ -298,6 +297,8 @@ namespace hpp {
         ULong len_edges = 0;
         ULong len_nodes = 0;
         try {
+          graph::GraphPtr_t g = graph();
+
           // Set the graph values
           graph_out = new GraphComp ();
           graph_out->name = g->name ().c_str();
@@ -343,6 +344,7 @@ namespace hpp {
       void Graph::getEdgeStat (ID edgeId, Names_t_out reasons, intSeq_out freqs)
         throw (hpp::Error)
       {
+        try {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
         core::PathPlannerPtr_t p = problemSolver()->pathPlanner ();
         if (!p) throw Error ("There is no planner");
@@ -358,11 +360,15 @@ namespace hpp {
 
         reasons = r_ptr;
         freqs = f_ptr;
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
       }
 
       Long Graph::getFrequencyOfNodeInRoadmap (ID nodeId, intSeq_out freqPerConnectedComponent)
         throw (hpp::Error)
       {
+        try {
         graph::StatePtr_t state = getComp <graph::State> (nodeId, true);
         // Long nb = graph_->nodeHistogram()->freq(graph::NodeBin(node));
         std::size_t nb = 0;
@@ -379,12 +385,16 @@ namespace hpp {
         }
         freqPerConnectedComponent = toIntSeq(freqs.begin(), freqs.end());
         return (Long) nb;
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
       }
 
       bool Graph::getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
           ConfigProjStat_out path)
         throw (hpp::Error)
       {
+        try {
         graph::StatePtr_t state = getComp <graph::State> (elmt, false);
         graph::EdgePtr_t edge = getComp <graph::Edge> (elmt, false);
         if (state) {
@@ -418,12 +428,16 @@ namespace hpp {
           throw Error ("The ID does not exist.");
         }
         return false;
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
       }
 
       Long Graph::getWaypoint (const Long edgeId, const Long index,
           hpp::ID_out nodeId)
         throw (hpp::Error)
       {
+        try {
         graph::WaypointEdgePtr_t edge = getComp <graph::WaypointEdge> (edgeId);
 
         if (index < 0 || (std::size_t)index > edge->nbWaypoints ())
@@ -431,11 +445,15 @@ namespace hpp {
         graph::EdgePtr_t waypoint = edge->waypoint (index);
         nodeId = (Long) waypoint->to ()->id ();
         return (Long) waypoint->id ();
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
       }
 
       Long Graph::createLevelSetEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const ID isInNodeId)
         throw (hpp::Error)
       {
+        try {
         graph::StatePtr_t from      = getComp <graph::State> (nodeFromId),
                           to        = getComp <graph::State> (nodeToId  ),
 	                  isInState = getComp <graph::State> (isInNodeId);
@@ -447,6 +465,9 @@ namespace hpp {
         edge->state (isInState);
 
         return (Long) edge->id ();
+        } catch (std::out_of_range& e) {
+          throw Error (e.what());
+        }
       }
 
       void Graph::addLevelSetFoliation (const Long edgeId,
