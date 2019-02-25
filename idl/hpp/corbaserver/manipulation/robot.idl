@@ -16,9 +16,9 @@
 // <http://www.gnu.org/licenses/>.
 
 #ifndef HPP_MANIPULATION_CORBA_ROBOT_IDL
-# define HPP_MANIPULATION_CORBA_ROBOT_IDL
+#define HPP_MANIPULATION_CORBA_ROBOT_IDL
 
-# include <hpp/corbaserver/common.idl>
+#include <hpp/corbaserver/common.idl>
 
 module hpp
 {
