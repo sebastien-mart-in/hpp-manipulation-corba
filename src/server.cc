@@ -25,44 +25,45 @@
 
 namespace hpp {
   namespace manipulation {
-    Server::Server (int argc, const char* argv[], bool multiThread,
-		    const std::string& poaName) : 
-      graphImpl_ (new corba::Server <impl::Graph>
-		  (argc, argv, multiThread, poaName)),
-      problemImpl_ (new corba::Server <impl::Problem>
-		    (argc, argv, multiThread, poaName)),
-      robotImpl_ (new corba::Server <impl::Robot>
-		  (argc, argv, multiThread, poaName))
+    Server::Server (bool mThd, const std::string& poaName)
+      : corbaServer::ServerPlugin (mThd),
+      graphImpl_   (new corba::Server <impl::Graph>   (0, NULL, mThd, poaName)),
+      problemImpl_ (new corba::Server <impl::Problem> (0, NULL, mThd, poaName)),
+      robotImpl_   (new corba::Server <impl::Robot>   (0, NULL, mThd, poaName))
     {
-      graphImpl_->implementation ().setServer (this);
+      graphImpl_  ->implementation ().setServer (this);
       problemImpl_->implementation ().setServer (this);
-      robotImpl_->implementation ().setServer (this);
+      robotImpl_  ->implementation ().setServer (this);
     }
 
-    Server::~Server () 
+    Server::~Server ()
     {
       delete graphImpl_;
       delete problemImpl_;
       delete robotImpl_;
     }
 
+    std::string Server::name () const
+    {
+      return "manipulation";
+    }
+
     /// Start corba server
     void Server::startCorbaServer(const std::string& contextId,
-				  const std::string& contextKind,
-				  const std::string& objectId)
+				  const std::string& contextKind)
     {
       if (graphImpl_->startCorbaServer(contextId, contextKind,
-				       objectId, "graph") != 0) {
+				       "manipulation", "graph") != 0) {
 	HPP_THROW_EXCEPTION (hpp::Exception,
 			     "Failed to start corba graph server.");
       }
       if (robotImpl_->startCorbaServer(contextId, contextKind,
-				       objectId, "robot") != 0) {
+				       "manipulation", "robot") != 0) {
 	HPP_THROW_EXCEPTION (hpp::Exception,
 			     "Failed to start corba robot server.");
       }
       if (problemImpl_->startCorbaServer(contextId, contextKind,
-					 objectId, "problem") != 0) {
+					 "manipulation", "problem") != 0) {
 	HPP_THROW_EXCEPTION (hpp::Exception,
 			     "Failed to start corba problem server.");
       }
@@ -77,11 +78,7 @@ namespace hpp {
         throw std::logic_error ("ProblemSolver is not a manipulation problem");
       return psm;
     }
-
-    corbaServer::ProblemSolverMapPtr_t Server::problemSolverMap ()
-    {
-      return problemSolverMap_;
-    }
-
   } // namespace manipulation
 } // namespace hpp
+
+HPP_CORBASERVER_DEFINE_PLUGIN(hpp::manipulation::Server)
