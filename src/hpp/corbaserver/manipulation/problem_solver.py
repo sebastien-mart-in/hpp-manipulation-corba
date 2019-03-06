@@ -24,15 +24,11 @@ except ImportError:
     pass
 
 def newProblem (client = None, name = None):
+    from hpp.corbaserver.problem_solver import newProblem
     if client is None:
         from hpp.corbaserver.manipulation import Client
         client = Client()
-    if name is not None:
-        if not client.problem.selectProblem(name):
-            # if not created, reset it.
-            client.problem.resetProblem()
-    else:
-        client.problem.resetProblem()
+    newProblem (client = client, name = name)
 
 from hpp.corbaserver.problem_solver import _convertToCorbaAny, ProblemSolver as Parent
 
