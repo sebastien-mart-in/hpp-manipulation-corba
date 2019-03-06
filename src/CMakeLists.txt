@@ -38,7 +38,11 @@ FOREACH(IDL ${IDL_SOURCES})
   GENERATE_IDL_CPP (hpp/corbaserver/manipulation/${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation)
   GENERATE_IDL_PYTHON (hpp/corbaserver/manipulation/${IDL}
-    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation)
+    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
+    -p${CMAKE_SOURCE_DIR}/cmake/hpp/idl
+    -bomniidl_be_python_with_docstring
+    -K
+    )
   INSTALL(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}_idl.py
     DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation)

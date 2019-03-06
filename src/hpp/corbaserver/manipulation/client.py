@@ -20,7 +20,7 @@
 from omniORB import CORBA
 import CosNaming
 
-from hpp.corbaserver.client import _getIIOPurl
+from hpp.corbaserver.client import _getIIOPurl, Client as _Parent
 from hpp.corbaserver.manipulation import Graph, Robot, Problem
 
 class CorbaError(Exception):
@@ -32,82 +32,22 @@ class CorbaError(Exception):
     def __str__(self):
         return repr(self.value)
 
-class Client:
+class Client (_Parent):
   """
   Connect and create clients for hpp-manipulation library.
   """
-  def __init__(self, url = None, postContextId = ""):
+
+  defaultClients = {
+          'graph'  : Graph,
+          'problem': Problem,
+          'robot'  : Robot,
+          }
+  def __init__(self, url = None, context = "corbaserver"):
     """
     Initialize CORBA and create default clients.
     :param url: URL in the IOR, corbaloc, corbalocs, and corbanames formats.
                 For a remote corba server, use
                 url = "corbaloc:iiop:<host>:<port>/NameService"
     """
-    import sys
-    self.orb = CORBA.ORB_init (sys.argv, CORBA.ORB_ID)
-    if url is None:
-        obj = self.orb.string_to_object (_getIIOPurl())
-    else:
-        obj = self.orb.string_to_object (url)
-    self.rootContext = obj._narrow(CosNaming.NamingContext)
-    if self.rootContext is None:
-        raise CorbaError ('failed to narrow the root context')
-
-    rtContextId = "hpp" + postContextId;
-
-    # client of Graph interface
-    name = [CosNaming.NameComponent (rtContextId, "corbaserver"),
-            CosNaming.NameComponent ("manipulation", "graph")]
-
-    try:
-        obj = self.rootContext.resolve (name)
-    except CosNaming.NamingContext.NotFound, ex:
-        raise CorbaError ('failed to find manipulation service.')
-    try:
-        client = obj._narrow (Graph)
-    except KeyError:
-        raise CorbaError ('invalid service name manipulation')
-
-    if client is None:
-      # This happens when stubs from client and server are not synchronized.
-        raise CorbaError (
-            'failed to narrow client for service manipulation')
-    self.graph = client
-
-    # client of Problem interface
-    name = [CosNaming.NameComponent (rtContextId, "corbaserver"),
-            CosNaming.NameComponent ("manipulation", "problem")]
-    
-    try:
-        obj = self.rootContext.resolve (name)
-    except CosNaming.NamingContext.NotFound, ex:
-        raise CorbaError ('failed to find manipulation service.')
-    try:
-        client = obj._narrow (Problem)
-    except KeyError:
-        raise CorbaError ('invalid service name manipulation')
-
-    if client is None:
-      # This happens when stubs from client and server are not synchronized.
-        raise CorbaError (
-            'failed to narrow client for service manipulation')
-    self.problem = client
-
-    # client of Robot interface
-    name = [CosNaming.NameComponent (rtContextId, "corbaserver"),
-            CosNaming.NameComponent ("manipulation", "robot")]
-    
-    try:
-        obj = self.rootContext.resolve (name)
-    except CosNaming.NamingContext.NotFound, ex:
-        raise CorbaError ('failed to find manipulation service.')
-    try:
-        client = obj._narrow (Robot)
-    except KeyError:
-        raise CorbaError ('invalid service name manipulation')
-
-    if client is None:
-      # This happens when stubs from client and server are not synchronized.
-        raise CorbaError (
-            'failed to narrow client for service manipulation')
-    self.robot = client
+    self._initOrb (url)
+    self._makeClients ("manipulation", self.defaultClients, context)

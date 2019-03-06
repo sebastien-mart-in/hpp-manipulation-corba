@@ -39,7 +39,7 @@ namespace hpp {
     class HPP_MANIPULATION_CORBA_DLLAPI Server : public corbaServer::ServerPlugin
     {
     public:
-      Server (bool multiThread = false, const std::string& poaName = "child");
+      Server (bool multiThread = false);
 
       ~Server ();
 

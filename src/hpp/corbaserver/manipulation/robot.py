@@ -33,11 +33,11 @@ class CorbaClient:
     """
     Container for corba clients to various interfaces.
     """
-    def __init__ (self, url = None, postContextId = ""):
-        self.basic = BasicClient (url = url, postContextId = postContextId)
-        self.manipulation = ManipulationClient (url = url, postContextId = postContextId)
+    def __init__ (self, url = None, context = "corbaserver"):
+        self.basic = BasicClient (url = url, context = context)
+        self.manipulation = ManipulationClient (url = url, context = context)
         if WholebodyStepClient:
-            self.wholebodyStep = WholebodyStepClient (url = url, postContextId = postContextId)
+            self.wholebodyStep = WholebodyStepClient (url = url, context = context)
 
 ## Load and handle a composite robot for manipulation planning
 #

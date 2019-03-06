@@ -36,7 +36,7 @@ namespace hpp
           /// \param iiop address of the namesever
           /// \param context the hpp context name (passed to the server)
           void connect (const char* iiop = "corbaloc:rir:/NameService",
-              const char* context = "");
+              const char* context = "corbaserver");
 
 
           hpp::corbaserver::manipulation::Robot_var& robot () {

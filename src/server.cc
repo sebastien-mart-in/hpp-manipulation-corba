@@ -25,22 +25,18 @@
 
 namespace hpp {
   namespace manipulation {
-    Server::Server (bool mThd, const std::string& poaName)
+    Server::Server (bool mThd)
       : corbaServer::ServerPlugin (mThd),
-      graphImpl_   (new corba::Server <impl::Graph>   (0, NULL, mThd, poaName)),
-      problemImpl_ (new corba::Server <impl::Problem> (0, NULL, mThd, poaName)),
-      robotImpl_   (new corba::Server <impl::Robot>   (0, NULL, mThd, poaName))
-    {
-      graphImpl_  ->implementation ().setServer (this);
-      problemImpl_->implementation ().setServer (this);
-      robotImpl_  ->implementation ().setServer (this);
-    }
+      graphImpl_   (NULL),
+      problemImpl_ (NULL),
+      robotImpl_   (NULL)
+    {}
 
     Server::~Server ()
     {
-      delete graphImpl_;
-      delete problemImpl_;
-      delete robotImpl_;
+      if (graphImpl_  ) delete graphImpl_;
+      if (problemImpl_) delete problemImpl_;
+      if (robotImpl_  ) delete robotImpl_;
     }
 
     std::string Server::name () const
@@ -52,6 +48,14 @@ namespace hpp {
     void Server::startCorbaServer(const std::string& contextId,
 				  const std::string& contextKind)
     {
+      graphImpl_   = new corba::Server <impl::Graph>   (0, NULL, multithread_, "child");
+      problemImpl_ = new corba::Server <impl::Problem> (0, NULL, multithread_, "child");
+      robotImpl_   = new corba::Server <impl::Robot>   (0, NULL, multithread_, "child");
+
+      graphImpl_  ->implementation ().setServer (this);
+      problemImpl_->implementation ().setServer (this);
+      robotImpl_  ->implementation ().setServer (this);
+
       if (graphImpl_->startCorbaServer(contextId, contextKind,
 				       "manipulation", "graph") != 0) {
 	HPP_THROW_EXCEPTION (hpp::Exception,
