@@ -55,16 +55,9 @@ IF (HPP_DEBUG)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHPP_DEBUG")
 ENDIF()
 
-SET(HPP_MANIPULATION_HAS_WHOLEBODY_STEP TRUE
-  CACHE BOOL "Compile with dependency to hpp-wholebody-step-corba")
-
 ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
 IF (NOT CLIENT_ONLY)
-  IF (HPP_MANIPULATION_HAS_WHOLEBODY_STEP)
-    ADD_REQUIRED_DEPENDENCY ("hpp-wholebody-step-corba >= 4")
-  ELSE ()
-    ADD_REQUIRED_DEPENDENCY("hpp-template-corba >= 1.1")
-  ENDIF ()
+  ADD_REQUIRED_DEPENDENCY("hpp-template-corba >= 1.1")
   ADD_DOC_DEPENDENCY("hpp-core >= 4")
   ADD_REQUIRED_DEPENDENCY("hpp-manipulation >= 4")
   ADD_REQUIRED_DEPENDENCY("hpp-manipulation-urdf >= 4")

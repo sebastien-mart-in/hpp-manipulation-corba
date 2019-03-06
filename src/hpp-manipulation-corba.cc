@@ -17,16 +17,10 @@
 
 #include <hpp/corbaserver/server.hh>
 #include <hpp/manipulation/package-config.hh>
-#if HPP_MANIPULATION_HAS_WHOLEBODY_STEP
-  #include <hpp/corbaserver/wholebody-step/server.hh>
-#endif
 #include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/manipulation/problem-solver.hh>
 
 typedef hpp::corbaServer::Server CorbaServer;
-#if HPP_MANIPULATION_HAS_WHOLEBODY_STEP
-  typedef hpp::wholebodyStep::Server WholebodyServer;
-#endif
 typedef hpp::manipulation::Server ManipulationServer;
 typedef hpp::manipulation::ProblemSolver ProblemSolver;
 typedef hpp::manipulation::ProblemSolverPtr_t ProblemSolverPtr_t;
@@ -49,9 +43,6 @@ int main (int argc, char* argv [])
 			   const_cast<const char**> (argv), true);
   corbaServer.startCorbaServer ();
 
-  #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP  
-    corbaServer.loadPlugin (corbaServer.mainContextId(), "wholebody-step-corba.so");
-  #endif
   corbaServer.loadPlugin (corbaServer.mainContextId(), "manipulation-corba.so");
   corbaServer.processRequest(true);
 }
