@@ -38,25 +38,20 @@ int main (int argc, char* argv [])
   std::cerr << " is provided for backward compatibility.\n"
     "You can now use hppcorbaserver and add the following lines to your Python script:\n"
     "from hpp.corbaserver import loadServerPlugin\n"
-    "loadServerPlugin (\"manipulation-corba.so\")"
+    "loadServerPlugin (\"corbaserver\", \"manipulation-corba.so\")"
+    "# eventually "
+    "# loadServerPlugin (\"corbaserver\", \"wholebody-step-corba.so\")"
     << std::endl;
 
   ProblemSolverPtr_t problemSolver = new ProblemSolver();
 
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), true);
-
-  const bool multithread = corbaServer.multiThread();
-  #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP  
-    WholebodyServer wbsServer (argc, const_cast<const char**> (argv), multithread);
-    wbsServer.setProblemSolverMap (corbaServer.problemSolverMap());
-  #endif
-
   corbaServer.startCorbaServer ();
+
   #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP  
-    wbsServer.startCorbaServer (corbaServer.mainContextId(), "corbaserver",
-				"wholebodyStep", "problem");
+    corbaServer.loadPlugin (corbaServer.mainContextId(), "wholebody-step-corba.so");
   #endif
-  corbaServer.loadPlugin ("manipulation-corba.so");
+  corbaServer.loadPlugin (corbaServer.mainContextId(), "manipulation-corba.so");
   corbaServer.processRequest(true);
 }

@@ -23,10 +23,11 @@ except ImportError:
     hpp=None
     pass
 
-def newProblem ():
-    from hpp.corbaserver.manipulation import Client
-    cl = Client()
-    cl.problem.resetProblem()
+def newProblem (client = None):
+    if client is None
+        from hpp.corbaserver.manipulation import Client
+        client = Client()
+    client.problem.resetProblem()
 
 from hpp.corbaserver.problem_solver import _convertToCorbaAny, ProblemSolver as Parent
 
