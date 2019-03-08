@@ -21,7 +21,7 @@ from omniORB import CORBA
 import CosNaming
 
 from hpp.corbaserver.client import _getIIOPurl, Client as _Parent
-from hpp.corbaserver.manipulation import Graph, Robot, Problem
+from hpp_idl.hpp.corbaserver.manipulation import Graph, Robot, Problem
 
 class CorbaError(Exception):
     """

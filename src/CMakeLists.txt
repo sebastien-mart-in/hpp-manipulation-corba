@@ -36,39 +36,34 @@ FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation)
 
 FOREACH(IDL ${IDL_SOURCES})
   GENERATE_IDL_CPP (hpp/corbaserver/manipulation/${IDL}
-    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation)
-  GENERATE_IDL_PYTHON (hpp/corbaserver/manipulation/${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
-    -p${CMAKE_SOURCE_DIR}/cmake/hpp/idl
-    -bomniidl_be_python_with_docstring
-    -K
+    HEADER_SUFFIX -idl.hh)
+  GENERATE_IDL_PYTHON (${IDL} ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
+    ENABLE_DOCSTRING
+    STUBS hpp_stubs.manipulation
+    ARGUMENTS
+    -Wbmodules=hpp_idl
+    -Wbextern=common:hpp_stubs
     )
   INSTALL(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}_idl.py
-    DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation)
-  INSTALL(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}.hh
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}-idl.hh
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/corbaserver/manipulation)
   INSTALL(FILES ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation/${IDL}.idl
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/idl/hpp/corbaserver/manipulation)
 ENDFOREACH()
 
-# Generate and install common_idl.py from hpp.corbaserver
-GENERATE_IDL_PYTHON (hpp/corbaserver/manipulation/common
-  ${HPP_CORBASERVER_DATAROOTDIR}/idl/hpp/corbaserver)
+INSTALL(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_idl/hpp/corbaserver/manipulation
+  DESTINATION ${PYTHON_SITELIB}/hpp_idl/hpp/corbaserver)
+INSTALL(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_stubs/manipulation
+  DESTINATION ${PYTHON_SITELIB}/hpp_stubs)
 
 ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS})
 ADD_CUSTOM_TARGET(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
 
 ADD_LIBRARY(${LIBRARY_NAME} SHARED
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/gcommon.hh
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/graph.hh
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/robot.hh
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/problem.hh
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/gcommonSK.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/graphSK.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/robotSK.cc
-  ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/problemSK.cc
+  ${ALL_IDL_CPP_STUBS}
   client.cc
   )
 
@@ -108,11 +103,6 @@ ENDIF (NOT CLIENT_ONLY)
 
 ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_cpp)
 ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_python)
-
-INSTALL(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/common_idl.py
-  DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
-  )
 
 INSTALL(
   FILES
