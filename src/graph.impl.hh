@@ -21,7 +21,7 @@
 # include <hpp/manipulation/graph/graph.hh>
 
 # include "hpp/corbaserver/manipulation/fwd.hh"
-# include "hpp/corbaserver/manipulation/graph.hh"
+# include "hpp/corbaserver/manipulation/graph-idl.hh"
 
 namespace hpp {
   namespace manipulation {

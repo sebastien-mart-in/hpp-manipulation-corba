@@ -15,11 +15,11 @@
 // hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef HPP_MANIPULATION_CORBA_ROBOT_IDL
-#define HPP_MANIPULATION_CORBA_ROBOT_IDL
+#ifndef HPP_MANIPULATION_CORBA_PROBLEM_IDL
+#define HPP_MANIPULATION_CORBA_PROBLEM_IDL
 
 #include "hpp/corbaserver/manipulation/gcommon.idl"
-#include <hpp/corbaserver/common.idl>
+#include <hpp/common.idl>
 
 
 module hpp {
