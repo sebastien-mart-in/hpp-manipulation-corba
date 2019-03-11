@@ -17,20 +17,8 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-from omniORB import CORBA
-import CosNaming
-
-from hpp.corbaserver.client import _getIIOPurl, Client as _Parent
+from hpp.corbaserver.client import Client as _Parent
 from hpp_idl.hpp.corbaserver.manipulation import Graph, Robot, Problem
-
-class CorbaError(Exception):
-    """
-    Raised when a CORBA error occurs.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
 
 class Client (_Parent):
   """
