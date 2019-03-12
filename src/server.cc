@@ -17,16 +17,18 @@
 // License along with hpp-manipulation-corba.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#include <hpp/util/exception.hh>
 #include <hpp/corbaserver/manipulation/server.hh>
+
+#include <hpp/util/exception.hh>
+#include <hpp/corbaserver/server.hh>
 #include "graph.impl.hh"
 #include "problem.impl.hh"
 #include "robot.impl.hh"
 
 namespace hpp {
   namespace manipulation {
-    Server::Server (bool mThd)
-      : corbaServer::ServerPlugin (mThd),
+    Server::Server (corbaServer::Server* server)
+      : corbaServer::ServerPlugin (server),
       graphImpl_   (NULL),
       problemImpl_ (NULL),
       robotImpl_   (NULL)
@@ -48,9 +50,10 @@ namespace hpp {
     void Server::startCorbaServer(const std::string& contextId,
 				  const std::string& contextKind)
     {
-      graphImpl_   = new corba::Server <impl::Graph>   (0, NULL, multithread_, "child");
-      problemImpl_ = new corba::Server <impl::Problem> (0, NULL, multithread_, "child");
-      robotImpl_   = new corba::Server <impl::Robot>   (0, NULL, multithread_, "child");
+      bool mThd = parent()->multiThread();
+      graphImpl_   = new corba::Server <impl::Graph>   (0, NULL, mThd, "child");
+      problemImpl_ = new corba::Server <impl::Problem> (0, NULL, mThd, "child");
+      robotImpl_   = new corba::Server <impl::Robot>   (0, NULL, mThd, "child");
 
       graphImpl_  ->implementation ().setServer (this);
       problemImpl_->implementation ().setServer (this);
