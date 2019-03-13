@@ -20,7 +20,7 @@
 
 # include <hpp/corbaserver/manipulation/fwd.hh>
 # include <hpp/manipulation/problem-solver.hh>
-# include "hpp/corbaserver/manipulation/problem.hh"
+# include "hpp/corbaserver/manipulation/problem-idl.hh"
 
 namespace hpp {
   namespace manipulation {

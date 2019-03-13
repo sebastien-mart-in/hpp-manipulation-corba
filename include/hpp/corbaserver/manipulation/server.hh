@@ -24,7 +24,7 @@
 
 # include <hpp/corba/template/server.hh>
 
-# include <hpp/corbaserver/problem-solver-map.hh>
+# include <hpp/corbaserver/server-plugin.hh>
 
 # include <hpp/corbaserver/manipulation/fwd.hh>
 # include <hpp/corbaserver/manipulation/config.hh>
@@ -36,36 +36,26 @@ namespace hpp {
       class Problem;
       class Robot;
     }
-    class HPP_MANIPULATION_CORBA_DLLAPI Server
+    class HPP_MANIPULATION_CORBA_DLLAPI Server : public corbaServer::ServerPlugin
     {
     public:
-      Server (int argc, const char* argv[], bool multiThread = false,
-	      const std::string& poaName = "child");
+      Server (corbaServer::Server* parent);
+
       ~Server ();
 
-      /// Set planner that will be controlled by server
-      void setProblemSolverMap (corbaServer::ProblemSolverMapPtr_t psMap)
-      {
-        problemSolverMap_ = psMap;
-      }
-
       /// Start corba server
-
       /// Call hpp::corba::Server <impl::Problem>::startCorbaServer
       void startCorbaServer(const std::string& contextId,
-			    const std::string& contextKind,
-			    const std::string& objectId);
+			    const std::string& contextKind);
+
+      std::string name () const;
 
       ProblemSolverPtr_t problemSolver () throw (std::logic_error);
-
-      corbaServer::ProblemSolverMapPtr_t problemSolverMap ();
 
     private:
       corba::Server <impl::Graph>* graphImpl_;
       corba::Server <impl::Problem>* problemImpl_;
       corba::Server <impl::Robot>* robotImpl_;
-
-      corbaServer::ProblemSolverMapPtr_t problemSolverMap_;
     }; // class Server
   } // namespace manipulation
 } // namespace hpp

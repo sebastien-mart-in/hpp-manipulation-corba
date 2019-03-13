@@ -124,17 +124,15 @@ namespace hpp {
         std::string psName (name);
         corbaServer::ProblemSolverMapPtr_t psMap (server_->problemSolverMap());
         bool has = psMap->has (psName);
-        if (!has) psMap->map_[psName] = ProblemSolver::create ();
-        psMap->selected_ = psName;
+        if (!has) psMap->add (psName, ProblemSolver::create ());
+        psMap->selected (psName);
         return !has;
       }
 
       void Problem::resetProblem () throw (hpp::Error)
       {
         corbaServer::ProblemSolverMapPtr_t psMap (server_->problemSolverMap());
-        delete psMap->map_ [ psMap->selected_ ];
-        psMap->map_ [ psMap->selected_ ]
-          = manipulation::ProblemSolver::create ();
+        psMap->replaceSelected (ProblemSolver::create ());
       }
 
       Names_t* Problem::getAvailable (const char* what) throw (hpp::Error)

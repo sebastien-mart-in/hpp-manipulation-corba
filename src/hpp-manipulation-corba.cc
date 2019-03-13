@@ -17,43 +17,32 @@
 
 #include <hpp/corbaserver/server.hh>
 #include <hpp/manipulation/package-config.hh>
-#if HPP_MANIPULATION_HAS_WHOLEBODY_STEP
-  #include <hpp/corbaserver/wholebody-step/server.hh>
-#endif
 #include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/manipulation/problem-solver.hh>
 
 typedef hpp::corbaServer::Server CorbaServer;
-#if HPP_MANIPULATION_HAS_WHOLEBODY_STEP
-  typedef hpp::wholebodyStep::Server WholebodyServer;
-#endif
 typedef hpp::manipulation::Server ManipulationServer;
 typedef hpp::manipulation::ProblemSolver ProblemSolver;
 typedef hpp::manipulation::ProblemSolverPtr_t ProblemSolverPtr_t;
-typedef hpp::manipulation::ManipulationPlanner ManipulationPlanner;
-typedef hpp::manipulation::ManipulationPlannerPtr_t ManipulationPlannerPtr_t;
 
 int main (int argc, char* argv [])
 {
+  if (argc > 0) std::cerr << argv[0];
+  else          std::cerr << "hpp-manipulation-server";
+  std::cerr << " is provided for backward compatibility.\n"
+    "You can now use hppcorbaserver and add the following lines to your Python script:\n"
+    "from hpp.corbaserver import loadServerPlugin\n"
+    "loadServerPlugin (\"corbaserver\", \"manipulation-corba.so\")"
+    "# eventually "
+    "# loadServerPlugin (\"corbaserver\", \"wholebody-step-corba.so\")"
+    << std::endl;
+
   ProblemSolverPtr_t problemSolver = new ProblemSolver();
 
   CorbaServer corbaServer (problemSolver, argc,
 			   const_cast<const char**> (argv), true);
-
-  const bool multithread = corbaServer.multiThread();
-  #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP  
-    WholebodyServer wbsServer (argc, const_cast<const char**> (argv), multithread);
-    wbsServer.setProblemSolverMap (corbaServer.problemSolverMap());
-  #endif
-  ManipulationServer manipServer (argc, const_cast<const char**> (argv), multithread);
-  manipServer.setProblemSolverMap (corbaServer.problemSolverMap());
-
   corbaServer.startCorbaServer ();
-  #if HPP_MANIPULATION_HAS_WHOLEBODY_STEP  
-    wbsServer.startCorbaServer (corbaServer.mainContextId(), "corbaserver",
-				"wholebodyStep", "problem");
-  #endif
-  manipServer.startCorbaServer (corbaServer.mainContextId(), "corbaserver",
-				"manipulation");
+
+  corbaServer.loadPlugin (corbaServer.mainContextId(), "manipulation-corba.so");
   corbaServer.processRequest(true);
 }
