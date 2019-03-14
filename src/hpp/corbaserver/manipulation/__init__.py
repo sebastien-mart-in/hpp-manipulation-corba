@@ -1,3 +1,5 @@
+import hpp_idl.hpp.manipulation_idl
+
 from .client import Client
 from .problem_solver import ProblemSolver, newProblem
 from .constraint_graph import ConstraintGraph

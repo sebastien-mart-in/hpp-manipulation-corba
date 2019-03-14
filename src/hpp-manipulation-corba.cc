@@ -32,9 +32,9 @@ int main (int argc, char* argv [])
   std::cerr << " is provided for backward compatibility.\n"
     "You can now use hppcorbaserver and add the following lines to your Python script:\n"
     "from hpp.corbaserver import loadServerPlugin\n"
-    "loadServerPlugin (\"corbaserver\", \"manipulation-corba.so\")"
-    "# eventually "
-    "# loadServerPlugin (\"corbaserver\", \"wholebody-step-corba.so\")"
+    "loadServerPlugin (\"corbaserver\", \"manipulation-corba.so\")\n"
+    "# eventually\n"
+    "# loadServerPlugin (\"corbaserver\", \"wholebody-step-corba.so\")\n"
     << std::endl;
 
   ProblemSolverPtr_t problemSolver = new ProblemSolver();

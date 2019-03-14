@@ -32,15 +32,15 @@ OMNIIDL_INCLUDE_DIRECTORIES(
   )
 
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/src)
-FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation)
 
+FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation)
 FOREACH(IDL ${IDL_SOURCES})
   GENERATE_IDL_CPP (hpp/corbaserver/manipulation/${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
     HEADER_SUFFIX -idl.hh)
   GENERATE_IDL_PYTHON (${IDL} ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
     ENABLE_DOCSTRING
-    STUBS hpp_stubs.manipulation
+    STUBS hpp_stubs.corbaserver.manipulation
     ARGUMENTS
     -Wbmodules=hpp_idl
     -Wbextern=common:hpp_stubs
@@ -48,13 +48,43 @@ FOREACH(IDL ${IDL_SOURCES})
   INSTALL(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}-idl.hh
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/corbaserver/manipulation)
-  INSTALL(FILES ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation/${IDL}.idl
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/idl/hpp/corbaserver/manipulation)
+ENDFOREACH()
+
+FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl)
+FOREACH(IDL steering_methods)
+  GENERATE_IDL_CPP (hpp/manipulation_idl/${IDL}
+    ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
+    ARGUMENTS
+    -Wbguard_prefix=hpp_manipulation_idl
+    HEADER_SUFFIX -idl.hh)
+  GENERATE_IDL_PYTHON (${IDL} ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
+    ENABLE_DOCSTRING
+    STUBS hpp_stubs.manipulation
+    ARGUMENTS
+    -Wbmodules=hpp_idl
+    -Wbextern=common:hpp_stubs
+    -Wbextern=gcommon:hpp_stubs.corbaserver.manipulation
+    -Wbextern=paths:hpp_stubs.core
+    -Wbextern=steering_methods:hpp_stubs.core
+    -Wbextern=constraints:hpp_stubs.constraints
+    )
+  INSTALL(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-idl.hh
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/manipulation_idl)
 ENDFOREACH()
 
 INSTALL(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/idl/hpp
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/idl/)
+INSTALL(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_idl/hpp/corbaserver/manipulation
   DESTINATION ${PYTHON_SITELIB}/hpp_idl/hpp/corbaserver)
+INSTALL(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_idl/hpp/manipulation_idl
+  DESTINATION ${PYTHON_SITELIB}/hpp_idl/hpp/)
+INSTALL(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_stubs/corbaserver/manipulation
+  DESTINATION ${PYTHON_SITELIB}/hpp_stubs/corbaserver)
 INSTALL(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_stubs/manipulation
   DESTINATION ${PYTHON_SITELIB}/hpp_stubs)
@@ -67,8 +97,6 @@ ADD_LIBRARY(${LIBRARY_NAME} SHARED
   client.cc
   )
 
-PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation)
-PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-manipulation-urdf)
 PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} omniORB4)
 
 INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION lib)
@@ -86,8 +114,9 @@ IF (NOT CLIENT_ONLY)
     robot.impl.hh
     server.cc
     tools.cc # Should be moved into the library
+    manipulation_idl/steering-methods.cc
     LINK_DEPENDENCIES hpp-manipulation-corba
-    PKG_CONFIG_DEPENDENCIES omniORB4 hpp-corbaserver)
+    PKG_CONFIG_DEPENDENCIES omniORB4 hpp-corbaserver hpp-manipulation hpp-manipulation-urdf)
 
 
   # Stand alone corba server
