@@ -18,8 +18,8 @@
 
 # include <hpp/corbaserver/fwd.hh>
 # include <hpp/corbaserver/conversions.hh>
-# include <hpp/corbaserver/constraints_idl/constraints.hh>
-# include <hpp/corbaserver/core_idl/steering-methods.hh>
+# include <hpp/constraints_idl/constraints.hh>
+# include <hpp/core_idl/steering_methods.hh>
 # include <hpp/manipulation_idl/steering_methods-idl.hh>
 
 # include "hpp/corbaserver/servant-base.hh"
@@ -28,15 +28,15 @@ namespace hpp
 {
   namespace corbaServer
   {
-    namespace manipulation_idl
+    namespace manipulation_impl
     {
       template <typename _Base, typename _Storage>
-      class EndEffectorTrajectoryServant : public core_idl::SteeringMethodServant<_Base, _Storage>
+      class EndEffectorTrajectoryServant : public core_impl::SteeringMethodServant<_Base, _Storage>
       {
           SERVANT_BASE_TYPEDEFS(hpp::manipulation_idl::EndEffectorTrajectory, core::SteeringMethod);
 
         public:
-          typedef core_idl::SteeringMethodServant<Base, Storage> Parent;
+          typedef core_impl::SteeringMethodServant<Base, Storage> Parent;
 
           EndEffectorTrajectoryServant (Server* server, const Storage& s) :
             Parent (server, s) {}
@@ -59,7 +59,7 @@ namespace hpp
       };
 
       typedef EndEffectorTrajectoryServant<POA_hpp::manipulation_idl::EndEffectorTrajectory,
-              core_idl::SteeringMethodStorage<manipulation::steeringMethod::EndEffectorTrajectory> > EndEffectorTrajectory;
+              manipulation::steeringMethod::EndEffectorTrajectoryPtr_t> EndEffectorTrajectory;
     } // end of namespace core.
   } // end of namespace corbaServer.
 } // end of namespace hpp.

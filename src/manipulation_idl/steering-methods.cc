@@ -14,9 +14,9 @@ namespace hpp
 {
   namespace corbaServer
   {
-    namespace manipulation_idl
+    namespace manipulation_impl
     {
-      HPP_CORBASERVER_ADD_DOWNCAST_OBJECT(EndEffectorTrajectory, core_idl::SteeringMethod, 1)
+      HPP_CORBASERVER_ADD_DOWNCAST_OBJECT(EndEffectorTrajectory, core_impl::SteeringMethod, 1)
     } // end of namespace manipulation.
   } // end of namespace corbaServer.
 } // end of namespace hpp.
