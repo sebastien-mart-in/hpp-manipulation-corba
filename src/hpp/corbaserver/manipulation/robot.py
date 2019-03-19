@@ -95,6 +95,18 @@ class Robot (Parent):
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
 
+    ## Same as Robot.insertRobotModel
+    #
+    #  \param urdfString XML string of the URDF,
+    #  \param srdfString XML string of the SRDF
+    def insertRobotModelFromString (self, robotName, rootJointType, urdfString, srdfString):
+        if self.load:
+            self.client.manipulation.robot.insertRobotModelFromString (robotName,
+                    rootJointType, urdfString, srdfString)
+        self.robotNames.append (robotName)
+        self.rootJointType[robotName] = rootJointType
+        self.rebuildRanks ()
+
     ## Load a SRDF for the robot. Several SRDF can thus be loaded for the same robot
     #
     #  \param robotName key of the robot in hpp::manipulation::Device object

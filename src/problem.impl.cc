@@ -155,8 +155,13 @@ namespace hpp {
         } else if (w == "constraintgraph") {
           ret = problemSolver()->graphs.getKeys <Ret_t> ();
         } else if (w == "type") {
+#if __cplusplus <= 199711L
           ret = boost::assign::list_of ("Gripper") ("Handle") ("RobotContact")
             ("EnvContact")("ConstraintGraph");
+#else
+          ret = { "Gripper", "Handle", "RobotContact", "EnvContact",
+                  "ConstraintGraph" };
+#endif
         } else {
           throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
         }
@@ -176,7 +181,11 @@ namespace hpp {
             ret.push_back (problemSolver()->constraintGraph()->name());
           else throw Error ("No constraint graph selected.");
         } else if (w == "type") {
+#if __cplusplus <= 199711L
           ret = boost::assign::list_of ("ConstraintGraph");
+#else
+          ret = { "ConstraintGraph" };
+#endif
         } else {
           throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
         }
