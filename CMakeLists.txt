@@ -27,7 +27,6 @@ INCLUDE(cmake/python.cmake)
 
 SET(PROJECT_NAME hpp-manipulation-corba)
 SET(PROJECT_DESCRIPTION "Corba server for manipulation planning")
-SET(PROJECT_URL "")
 
 SET(CLIENT_ONLY FALSE CACHE BOOL "Set to true to install the client only")
 
