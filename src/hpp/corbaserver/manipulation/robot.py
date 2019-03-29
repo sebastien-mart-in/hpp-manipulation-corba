@@ -95,6 +95,31 @@ class Robot (Parent):
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
 
+    ## Insert robot model as a child of a frame of the Device
+    #
+    # \param robotName key of the robot in ProblemSolver object map
+    #        (see hpp::manipulation::ProblemSolver::addRobot)
+    # \param frameName name of the existing frame that will the root of the added robot,
+    # \param rootJointType type of root joint among "anchor", "freeflyer",
+    # "planar",
+    # \param packageName Name of the ROS package containing the model,
+    # \param modelName Name of the package containing the model
+    # \param urdfSuffix suffix for urdf file,
+    #
+    # The ros url are built as follows:
+    # "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
+    # "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
+    #
+    def insertRobotModelOnFrame (self, robotName, frameName, rootJointType,
+            packageName, modelName, urdfSuffix, srdfSuffix):
+        if self.load:
+            self.client.manipulation.robot.insertRobotModelOnFrame (robotName,
+                    frameName, rootJointType, packageName, modelName,
+                    urdfSuffix, srdfSuffix)
+        self.robotNames.append (robotName)
+        self.rootJointType[robotName] = rootJointType
+        self.rebuildRanks ()
+
     ## Same as Robot.insertRobotModel
     #
     #  \param urdfString XML string of the URDF,

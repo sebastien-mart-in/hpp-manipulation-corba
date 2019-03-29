@@ -121,11 +121,24 @@ namespace hpp {
           const char* srdfSuffix)
 	throw (Error)
       {
+        insertRobotModelOnFrame (robotName, "universe", rootJointType,
+            packageName, modelName, urdfSuffix, srdfSuffix);
+      }
+
+      void Robot::insertRobotModelOnFrame (const char* robotName,
+          const char* frameName, const char* rootJointType,
+          const char* packageName, const char* modelName,
+          const char* urdfSuffix, const char* srdfSuffix)
+        throw (hpp::Error)
+      {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
           if (robot->robotFrames(robotName).size() > 0)
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
-          pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
+          if (!robot->model().existFrame (frameName))
+            HPP_THROW(std::invalid_argument, "No frame named " << frameName << ".");
+          pinocchio::FrameIndex frame = robot->model().getFrameId(frameName);
+          pinocchio::urdf::loadRobotModel (robot, frame, robotName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
 	  srdf::loadModelFromFile (robot, robotName,
               packageName, modelName, srdfSuffix);

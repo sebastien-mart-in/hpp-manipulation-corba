@@ -45,6 +45,12 @@ module hpp
         in string srdfSuffix)
       raises (Error);
 
+    /// \copydoc hpp::corbaserver::manipulation::robot::Robot::insertRobotModelOnFrame
+    void insertRobotModelOnFrame (in string robotName, in string frameName,
+        in string rootJointType, in string packageName, in string modelName,
+        in string urdfSuffix, in string srdfSuffix)
+      raises (Error);
+
     ///  Insert robot model as a child of the root joint of the Device
     ///
     /// \param robotName key of the robot in ProblemSolver object map

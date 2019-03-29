@@ -43,6 +43,12 @@ namespace hpp {
               const char* srdfSuffix)
             throw (hpp::Error);
 
+          virtual void insertRobotModelOnFrame (const char* robotName,
+              const char* frameName, const char* rootJointType,
+              const char* packageName, const char* modelName,
+              const char* urdfSuffix, const char* srdfSuffix)
+            throw (hpp::Error);
+
           virtual void insertRobotModelFromString (const char* robotName,
               const char* rootJointType,
               const char* urdfString,
