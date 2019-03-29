@@ -26,10 +26,6 @@ module hpp
   module manipulation {
   interface Robot
   {
-    /// \param robotName the name of the robot.
-    void finishedRobot (in string robotName)
-      raises (Error);
-
     ///  Insert robot model as a child of the root joint of the Device
     ///
     /// \param robotName key of the robot in ProblemSolver object map
@@ -99,21 +95,7 @@ module hpp
         in string urdfString, in string srdfString)
       raises (Error);
 
-
-    ///  Load object model and store in local map
-    ///
-    /// \param robotName key of the object in ProblemSolver object map
-    ///        (see hpp::manipulation::ProblemSolver::addRobot)
-    /// \param rootJointType type of root joint among "anchor", "freeflyer",
-    /// "planar",
-    /// \param packageName Name of the ROS package containing the model,
-    /// \param modelName Name of the package containing the model
-    /// \param urdfSuffix suffix for urdf file,
-    ///
-    /// The ros url are built as follows:
-    /// "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-    /// "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-    ///
+    /// \deprecated use insertRobotModel(in string, in string, in string, in string, in string, in string) instead
     void insertObjectModel (in string objectName, in string rootJointType,
         in string packageName, in string modelName, in string urdfSuffix,
         in string srdfSuffix)

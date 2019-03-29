@@ -151,28 +151,11 @@ class Robot (Parent):
         self.insertHumanoidModel (robotName, rootJointType, packageName,
                            modelName, urdfSuffix, srdfSuffix)
 
-    ## Load object model and insert it in the device
-    #
-    #  \param robotName key of the object in ProblemSolver object map
-    #         (see hpp::manipulation::ProblemSolver::addRobot)
-    #  \param rootJointType type of root joint among "anchor", "freeflyer",
-    #         "planar",
-    #  \param packageName Name of the ROS package containing the model,
-    #  \param modelName Name of the package containing the model
-    #  \param urdfSuffix suffix for urdf file,
-    #
-    #  The ros url are built as follows:
-    #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
+    ## \deprecated use hpp.corbaserver.manipulation.Robot.insertRobotModel instead
     def insertObjectModel (self, objectName, rootJointType,
             packageName, modelName, urdfSuffix, srdfSuffix):
-        if self.load:
-            self.client.manipulation.robot.insertObjectModel (objectName,
-                    rootJointType, packageName, modelName, urdfSuffix,
-                    srdfSuffix)
-        self.robotNames.append (objectName)
-        self.rootJointType[objectName] = rootJointType
-        self.rebuildRanks ()
+        self.insertRobotModel (self, objectName, rootJointType,
+                packageName, modelName, urdfSuffix, srdfSuffix)
 
     ## Load environment model and store in local map.
     #  Contact surfaces are build from the corresping srdf file.

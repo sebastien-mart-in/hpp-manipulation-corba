@@ -115,16 +115,6 @@ namespace hpp {
         return server_->problemSolver();
       }
 
-      void Robot::finishedRobot (const char* name)
-	throw (Error)
-      {
-	try {
-          problemSolver()->robot ()->didInsertRobot(std::string (name));
-	} catch (const std::exception& exc) {
-	  throw Error (exc.what ());
-	}
-      }
-
       void Robot::insertRobotModel (const char* robotName,
           const char* rootJointType, const char* packageName,
           const char* modelName, const char* urdfSuffix,
@@ -133,13 +123,12 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->frameIndices.has (robotName))
+          if (robot->robotFrames(robotName).size() > 0)
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
 	  srdf::loadModelFromFile (robot, robotName,
               packageName, modelName, srdfSuffix);
-          robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -154,13 +143,12 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->frameIndices.has (robotName))
+          if (robot->robotFrames(robotName).size() > 0)
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
 
           pinocchio::urdf::loadModelFromString (robot, 0, robotName,
               rootJointType, urdfString, srdfString);
 	  srdf::loadModelFromXML (robot, robotName, srdfString);
-          robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -177,7 +165,6 @@ namespace hpp {
 	  srdf::loadModelFromFile (robot, std::string (robotName),
               std::string (packageName), std::string (modelName),
               std::string (srdfSuffix));
-          robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -190,19 +177,7 @@ namespace hpp {
           const char* srdfSuffix)
 	throw (Error)
       {
-	try {
-          DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->frameIndices.has (objectName))
-            HPP_THROW(std::invalid_argument, "A robot named " << objectName << " already exists");
-          pinocchio::urdf::loadRobotModel (robot, 0, objectName, rootJointType,
-              packageName, modelName, urdfSuffix, srdfSuffix);
-          srdf::loadModelFromFile (robot, objectName,
-              packageName, modelName, srdfSuffix);
-          robot->didInsertRobot (objectName);
-          problemSolver()->resetProblem ();
-	} catch (const std::exception& exc) {
-	  throw Error (exc.what ());
-	}
+        insertRobotModel (objectName, rootJointType, packageName, modelName, urdfSuffix, srdfSuffix);
       }
 
       void Robot::insertHumanoidModel (const char* robotName,
@@ -213,14 +188,13 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->frameIndices.has (robotName))
+          if (robot->robotFrames(robotName).size() > 0)
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
               packageName, modelName, urdfSuffix, srdfSuffix);
           pinocchio::urdf::setupHumanoidRobot (robot, robotName);
           srdf::loadModelFromFile (robot, robotName,
               packageName, modelName, srdfSuffix);
-          robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -235,13 +209,12 @@ namespace hpp {
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-          if (robot->frameIndices.has (robotName))
+          if (robot->robotFrames(robotName).size() > 0)
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
           pinocchio::urdf::loadModelFromString (robot, 0, robotName,
               rootJointType, urdfString, srdfString);
           pinocchio::urdf::setupHumanoidRobot (robot, robotName);
 	  srdf::loadModelFromXML (robot, robotName, srdfString);
-          robot->didInsertRobot (robotName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -290,7 +263,6 @@ namespace hpp {
 
           copy (object->handles , robot->handles , robot, p);
           copy (object->grippers, robot->grippers, robot, p);
-          robot->didInsertRobot (p.substr(0, p.size() - 1));
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
@@ -337,7 +309,6 @@ namespace hpp {
 
           copy (object->handles , robot->handles , robot, p);
           copy (object->grippers, robot->grippers, robot, p);
-          robot->didInsertRobot (p.substr(0, p.size() - 1));
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
@@ -350,13 +321,12 @@ namespace hpp {
         try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
           std::string n (robotName);
-          if (!robot->frameIndices.has (n))
+          FrameIndices_t frameIdx = robot->robotFrames (robotName);
+          if (frameIdx.size() == 0)
             throw hpp::Error
               ("Root of subtree with the provided prefix not found");
           const pinocchio::Model& model = robot->model();
-          const ::pinocchio::Frame& rf = model.frames[
-            robot->frameIndices.get(n)[0]
-            ];
+          const ::pinocchio::Frame& rf = model.frames[frameIdx[0]];
           double* res = new Transform_;
           if (rf.type == ::pinocchio::JOINT)
             Transform3fTohppTransform (model.jointPlacements[rf.parent], res);
