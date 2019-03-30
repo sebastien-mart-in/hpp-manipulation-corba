@@ -179,7 +179,7 @@ class Robot (Parent):
     ## \deprecated use hpp.corbaserver.manipulation.Robot.insertRobotModel instead
     def insertObjectModel (self, objectName, rootJointType,
             packageName, modelName, urdfSuffix, srdfSuffix):
-        self.insertRobotModel (self, objectName, rootJointType,
+        self.insertRobotModel (objectName, rootJointType,
                 packageName, modelName, urdfSuffix, srdfSuffix)
 
     ## Load environment model and store in local map.
@@ -231,7 +231,8 @@ class Robot (Parent):
 
     ## \}
 
-class HumanoidRobot (Robot):
+from hpp.corbaserver.robot import StaticStabilityConstraintsFactory
+class HumanoidRobot (Robot, StaticStabilityConstraintsFactory):
     ## Constructor
     # \param compositeName name of the composite robot that will be built later,
     # \param robotName name of the first robot that is loaded now,
