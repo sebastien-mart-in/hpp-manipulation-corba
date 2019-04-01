@@ -134,18 +134,10 @@ ENDIF (NOT CLIENT_ONLY)
 ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_cpp)
 ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_python)
 
-INSTALL(
-  FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/__init__.py
-  DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
-  )
-INSTALL(
-  FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/client.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/problem_solver.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/robot.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/constraints.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/constraint_graph.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/hpp/corbaserver/manipulation/constraint_graph_factory.py
-  DESTINATION ${PYTHON_SITELIB}/hpp/corbaserver/manipulation
-  )
+PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation __init__.py)
+PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation client.py)
+PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation problem_solver.py)
+PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation robot.py)
+PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation constraints.py)
+PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation constraint_graph.py)
+PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation constraint_graph_factory.py)
