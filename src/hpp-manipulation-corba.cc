@@ -33,8 +33,6 @@ int main (int argc, char* argv [])
     "You can now use hppcorbaserver and add the following lines to your Python script:\n"
     "from hpp.corbaserver import loadServerPlugin\n"
     "loadServerPlugin (\"corbaserver\", \"manipulation-corba.so\")\n"
-    "# eventually\n"
-    "# loadServerPlugin (\"corbaserver\", \"wholebody-step-corba.so\")\n"
     << std::endl;
 
   ProblemSolverPtr_t problemSolver = new ProblemSolver();

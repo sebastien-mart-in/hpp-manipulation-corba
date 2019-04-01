@@ -17,12 +17,6 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-try:
-    import hpp.corbaserver.wholebody_step
-except ImportError:
-    hpp=None
-    pass
-
 def newProblem (client = None, name = None):
     from hpp.corbaserver.problem_solver import newProblem
     if client is None:
@@ -41,15 +35,6 @@ from hpp.corbaserver.problem_solver import _convertToCorbaAny, ProblemSolver as 
 #  goal of this class is to hide them and to expose those that can be
 #  considered as public.
 class ProblemSolver (Parent):
-    if hpp:
-        SLIDING = hpp.corbaserver.wholebody_step.Problem.SLIDING
-        SLIDING_ALIGNED_COM = \
-            hpp.corbaserver.wholebody_step.Problem.SLIDING_ALIGNED_COM
-        FIXED_ON_THE_GROUND = \
-            hpp.corbaserver.wholebody_step.Problem.FIXED_ON_THE_GROUND
-        FIXED_ALIGNED_COM = \
-            hpp.corbaserver.wholebody_step.Problem.FIXED_ALIGNED_COM
-
     def __init__ (self, robot):
         super (ProblemSolver, self).__init__ (robot, hppcorbaClient = robot.client.basic)
 
@@ -87,58 +72,16 @@ class ProblemSolver (Parent):
     ## \name Constraints
     #  \{
 
-    ##  Create static stability constraints
-    #
-    #   Call corba request
-    #   hpp::corbaserver::wholebody_step::Problem::addStaticStabilityConstraints
-    #
-    #   The ankles are defined by members leftAnkle and rightAnkle of variable
-    #   robot passed at construction of this object.
-    #   \param constraintName name of the resulting constraint,
-    #   \param q0 configuration that satisfies the constraints,
-    #   \param comName name of a partial COM,
-    #   \param type Type of static stability constraints (Default value: ProblemSolver.SLIDING)
-    #
-    #   \sa hpp::corbaserver::wholebody_step::Problem::StaticStabilityType
+    ## \deprecated Use hpp.corbaserver.robot.HumanoidRobot methods
     def createStaticStabilityConstraints (self, constraintName, q0, comName = "",
             type = None):
-        if type is None:
-            type = self.SLIDING
-        self.client.wholebodyStep.problem.addStaticStabilityConstraints \
-            (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle, comName, type)
-        if type == self.SLIDING:
-            self.balanceConstraints_ = [constraintName + "/relative-com",
-                                        constraintName + "/relative-orientation",
-                                        constraintName + "/relative-position",
-                                        constraintName + "/orientation-left-foot",
-                                        constraintName + "/position-left-foot"]
-        elif type == self.SLIDING_ALIGNED_COM:
-            self.balanceConstraints_ = [constraintName + '/com-between-feet',
-                                        constraintName + '/pose-left-foot',
-                                        constraintName + '/pose-right-foot']
-        elif type == self.FIXED_ON_THE_GROUND:
-            self.balanceConstraints_ = [constraintName + '/pose-left-foot',
-                                        constraintName + '/pose-right-foot',
-                                        constraintName + '/relative-com']
+        raise Error ("This method has been moved into Python class hpp.corbaserver.robot.StaticStabilityConstraintsFactory.\n"
+                "It is accessible from HumanoidRobot derived classed.")
 
-        elif type == self.FIXED_ALIGNED_COM:
-            self.balanceConstraints_ = [constraintName + '/com-between-feet',
-                                        constraintName + '/pose-left-foot',
-                                        constraintName + '/pose-right-foot']
-
-
-    ##  Create complement of static stability constraints
-    #
-    #   Call corba request
-    #   hpp::corbaserver::wholebody_step::Problem::addComplementStaticStabilityConstraints
-    #
-    #   The ankles are defined by members leftAnkle and rightAnkle of variable
-    #   robot passed at construction of this object.
-    #   \param constraintName name of the resulting constraint,
-    #   \param q0 configuration that satisfies the constraints
+    ## \deprecated Use hpp.corbaserver.robot.HumanoidRobot methods
     def createComplementStaticStabilityConstraints (self, constraintName, q0):
-        self.client.wholebodyStep.problem.addComplementStaticStabilityConstraints \
-            (constraintName, q0, self.robot.leftAnkle, self.robot.rightAnkle)
+        raise Error ("This method has been moved into Python class hpp.corbaserver.robot.StaticStabilityConstraintsFactory.\n"
+                "It is accessible from HumanoidRobot derived classed.")
 
     ## Create placement and pre-placement constraints
     #
