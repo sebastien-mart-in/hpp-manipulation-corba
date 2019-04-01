@@ -67,6 +67,7 @@ FOREACH(IDL steering_methods)
     -Wbextern=paths:hpp_stubs.core
     -Wbextern=steering_methods:hpp_stubs.core
     -Wbextern=constraints:hpp_stubs.constraints
+    -Wbextern=_constraints:hpp_stubs.core
     )
   INSTALL(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-idl.hh
