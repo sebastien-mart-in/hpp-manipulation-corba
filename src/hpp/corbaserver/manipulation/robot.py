@@ -53,10 +53,13 @@ class Robot (Parent):
         self.rootJointType = dict()
         if compositeName is None:
             load = False
-        self.displayName = robotName
         self.load = load
         self.robotNames = list()
-        self.loadModel (robotName, rootJointType)
+        if robotName is None:
+            if load:
+                self.client.basic.robot.createRobot (self.name)
+        else:
+            self.loadModel (robotName, rootJointType)
 
     ## Virtual function to load the robot model
     def loadModel (self, robotName, rootJointType):

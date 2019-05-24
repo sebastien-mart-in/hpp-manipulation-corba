@@ -27,6 +27,8 @@ SET(IDL_SOURCES
 # search for python
 FINDPYTHON(2.7 EXACT REQUIRED)
 
+INCLUDE(${HPP_CORBASERVER_CMAKE_PLUGIN})
+INCLUDE(${HPP_CORBASERVER_DATAROOTDIR}/hpp-corbaserver/cmake/omniidl.cmake)
 OMNIIDL_INCLUDE_DIRECTORIES(
   ${HPP_CORBASERVER_DATAROOTDIR}/idl ${CMAKE_SOURCE_DIR}/idl
   )
@@ -51,12 +53,18 @@ FOREACH(IDL ${IDL_SOURCES})
 ENDFOREACH()
 
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl)
-FOREACH(IDL steering_methods)
+FOREACH(IDL steering_methods _graph _problem)
   GENERATE_IDL_CPP (hpp/manipulation_idl/${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
     ARGUMENTS
     -Wbguard_prefix=hpp_manipulation_idl
     HEADER_SUFFIX -idl.hh)
+  GENERATE_IDL_CPP_IMPL (hpp/manipulation_idl/${IDL}
+    ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
+    ARGUMENTS
+    -Wbguard_prefix=hpp_manipulation_idl
+    -Wbinc_prefix=hpp/manipulation_idl
+    HH_SUFFIX -idl.hh)
   GENERATE_IDL_PYTHON (${IDL} ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
     ENABLE_DOCSTRING
     STUBS hpp_stubs.manipulation
@@ -66,11 +74,17 @@ FOREACH(IDL steering_methods)
     -Wbextern=gcommon:hpp_stubs.corbaserver.manipulation
     -Wbextern=paths:hpp_stubs.core
     -Wbextern=steering_methods:hpp_stubs.core
+    -Wbextern=distances:hpp_stubs.core
+    -Wbextern=path_validations:hpp_stubs.core
     -Wbextern=constraints:hpp_stubs.constraints
+    -Wbextern=configuration_shooters:hpp_stubs.core
     -Wbextern=_constraints:hpp_stubs.core
+    -Wbextern=_problem:hpp_stubs.core
     )
-  INSTALL(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-idl.hh
+  INSTALL(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-idl.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}.hh
+    ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-fwd.hh
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/manipulation_idl)
 ENDFOREACH()
 
@@ -90,7 +104,7 @@ INSTALL(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_stubs/manipulation
   DESTINATION ${PYTHON_SITELIB}/hpp_stubs)
 
-ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS})
+ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS} ${ALL_IDL_CPP_IMPL_STUBS})
 ADD_CUSTOM_TARGET(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
 
 ADD_LIBRARY(${LIBRARY_NAME} SHARED
@@ -104,9 +118,9 @@ INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION lib)
 
 IF (NOT CLIENT_ONLY)
   # Server plugin
-  INCLUDE(${HPP_CORBASERVER_CMAKE_PLUGIN})
   HPP_ADD_SERVER_PLUGIN(manipulation-corba
     SOURCES
+    ${ALL_IDL_CPP_IMPL_STUBS}
     graph.impl.cc
     graph.impl.hh
     problem.impl.cc
@@ -115,7 +129,6 @@ IF (NOT CLIENT_ONLY)
     robot.impl.hh
     server.cc
     tools.cc # Should be moved into the library
-    manipulation_idl/steering-methods.cc
     LINK_DEPENDENCIES hpp-manipulation-corba
     PKG_CONFIG_DEPENDENCIES omniORB4 hpp-corbaserver hpp-manipulation hpp-manipulation-urdf)
 
