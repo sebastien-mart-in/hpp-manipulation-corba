@@ -1,4 +1,10 @@
-2018/05/22 - Release 4.1
+                                                                -*- outline -*-
+New in v4.6.0
+* Update Robot class.
+* Automatically generate EndEffectorTrajectory bindings.
+* Add graph components to IDL.
+ 
+New in v4.1
 * Add ProblemSolver.addConfigValidation and ProblemSolver.clearConfigValidations.
 * If dependency to QPOases is not set, do not implement static stability constr.
 * Bind a few new methods in python:
@@ -26,7 +32,3 @@
 * Copy handles and grippers when loading environment.
 * Use ProblemSolver::createGraspConstraint and createPregraspConstraint
 * Add insertRobotModelFromString and loadEnvironmentModelFromString.
-
-2014/11/08 - Release 1.0
-* Python class ConstraintGraph, ProblemSolver, Robot
-* 3 CORBA server: robot, problem, graph
