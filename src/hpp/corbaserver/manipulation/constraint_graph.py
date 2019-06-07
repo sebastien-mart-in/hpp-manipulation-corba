@@ -283,10 +283,6 @@ class ConstraintGraph (object):
         self.pregrasps [name] = \
             (_ConstraintAndPassiveJoints (self._(name), passiveJoints),)
 
-    # \deprecated use addConstraints
-    def setConstraints (self, *args, **kwargs):
-        return self.addConstraints (*args, **kwargs)
-
     ## Set the problem constraints to the specified constraint.
     # 
     #  \param idComp ID of a node or a configuration
@@ -313,16 +309,11 @@ class ConstraintGraph (object):
     # \param constraints set of constraints containing grasps, pregrasps,
     #                    numerical constraints and locked joints
     #
-    # \param grasps (deprecated) list of names of grasp. Each grasp
-    # \param pregrasps (deprecated) list of names of pregrasps
-    # \param numConstraints (deprecated) numerical constraints
     # \param passiveJoints passive joints (not modified by constraint
     #                      resolution)
     # \note Exaclty one of the parameter graph, node and edge must be set.
     def addConstraints (self, graph = False, node = None, edge = None,
-                        constraints = None,
-                        grasps = None, pregrasps = None, lockDof = [],
-                        numConstraints = [], passiveJoints = []):
+                        constraints = None, passiveJoints = []):
         """
         Add the constraints to an edge, a node or the whole graph
 

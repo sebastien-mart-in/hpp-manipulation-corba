@@ -172,12 +172,6 @@ class Robot (Parent):
         self.insertHumanoidModel (robotName, rootJointType, packageName,
                            modelName, urdfSuffix, srdfSuffix)
 
-    ## \deprecated use hpp.corbaserver.manipulation.Robot.insertRobotModel instead
-    def insertObjectModel (self, objectName, rootJointType,
-            packageName, modelName, urdfSuffix, srdfSuffix):
-        self.insertRobotModel (objectName, rootJointType,
-                packageName, modelName, urdfSuffix, srdfSuffix)
-
     ## Load environment model and store in local map.
     #  Contact surfaces are build from the corresping srdf file.
     #  See hpp-manipulation-urdf for more details about contact surface
