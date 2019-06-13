@@ -72,17 +72,6 @@ class ProblemSolver (Parent):
     ## \name Constraints
     #  \{
 
-    ## \deprecated Use hpp.corbaserver.robot.HumanoidRobot methods
-    def createStaticStabilityConstraints (self, constraintName, q0, comName = "",
-            type = None):
-        raise Error ("This method has been moved into Python class hpp.corbaserver.robot.StaticStabilityConstraintsFactory.\n"
-                "It is accessible from HumanoidRobot derived classed.")
-
-    ## \deprecated Use hpp.corbaserver.robot.HumanoidRobot methods
-    def createComplementStaticStabilityConstraints (self, constraintName, q0):
-        raise Error ("This method has been moved into Python class hpp.corbaserver.robot.StaticStabilityConstraintsFactory.\n"
-                "It is accessible from HumanoidRobot derived classed.")
-
     ## Create placement and pre-placement constraints
     #
     # \param width set to None to skip creation of pre-placement constraint
