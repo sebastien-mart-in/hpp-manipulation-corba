@@ -307,8 +307,8 @@ class ConstraintGraph (object):
     # \param node edge name of a component of the graph,
     #
     # \param constraints set of constraints containing grasps, pregrasps,
-    #                    numerical constraints and locked joints
-    #
+    #                    numerical constraints and locked joints.
+    #                    It must be of type hpp.corbaserver.manipulation.Constraints.
     # \param passiveJoints passive joints (not modified by constraint
     #                      resolution)
     # \note Exaclty one of the parameter graph, node and edge must be set.
@@ -324,33 +324,21 @@ class ConstraintGraph (object):
             graph: set to true if you are defining constraints for every nodes,
             node, edge: name of a component of the graph,
             constraints: set of constraints containing grasps, pregrasps,
-                         numerical constraints and locked joints
-
+                         numerical constraints and locked joints.
+                         It must be of type hpp.corbaserver.manipulation.Constraints.
             passiveJoints: passive joints (not modified by constraint
                            resolution)
           note: Exaclty one of the parameter graph, node and edge must be set.
         """
-        if constraints is None :
-            from warnings import warn
-            warn ("arguments grasps, pregrasps, lockDof and numConstraints " +\
-                  "are deprecated. Use argument constraints instead")
-        if constraints:
-            if not type (constraints) is Constraints:
-                raise TypeError \
-                    ("argument constraints should be of type Constraints")
-
-            return self._addConstraints \
-                (graph = graph, node = node, edge = edge,
-                 grasps = constraints.grasps,
-                 pregrasps = constraints.pregrasps,
-                 lockDof = constraints.lockedJoints,
-                 numConstraints = constraints.numConstraints,
-                 passiveJoints = passiveJoints)
-        else:
-            return self._addConstraints \
-                (graph = graph, node = node, edge = edge, grasps = grasps,
-                 pregrasps = pregrasps, lockDof = lockDof,
-                 numConstraints = numConstraints, passiveJoints = passiveJoints)
+        if not isinstance (constraints, Constraints):
+            raise TypeError ("argument constraints should be of type Constraints")
+        return self._addConstraints \
+            (graph = graph, node = node, edge = edge,
+             grasps = constraints.grasps,
+             pregrasps = constraints.pregrasps,
+             lockDof = constraints.lockedJoints,
+             numConstraints = constraints.numConstraints,
+             passiveJoints = passiveJoints)
 
     def _addConstraints (self, graph = False, node = None, edge = None,
                          grasps = None, pregrasps = None, lockDof = [],
