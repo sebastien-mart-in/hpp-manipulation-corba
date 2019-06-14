@@ -1,4 +1,6 @@
                                                                 -*- outline -*-
+New in v4.6.1
+* Remove deprecated methods and functions.
 New in v4.6.0
 * Update Robot class.
 * Automatically generate EndEffectorTrajectory bindings.
