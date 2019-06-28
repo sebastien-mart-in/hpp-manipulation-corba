@@ -228,8 +228,8 @@ class HumanoidRobot (Robot, StaticStabilityConstraintsFactory):
     # \param robotName name of the first robot that is loaded now,
     # \param rootJointType type of root joint among ("freeflyer", "planar",
     #        "anchor"),
-    def __init__ (self, compositeName, robotName, rootJointType, load = True):
-        Robot.__init__ (self, compositeName, robotName, rootJointType, load)
+    def __init__ (self, compositeName = None, robotName = None, rootJointType = None, load = True, client = None):
+        Robot.__init__ (self, compositeName, robotName, rootJointType, load, client)
 
     def loadModel (self, robotName, rootJointType):
         self.client.basic.robot.createRobot (self.name)
