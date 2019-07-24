@@ -18,7 +18,7 @@
 # <http://www.gnu.org/licenses/>.
 
 import re, abc
-from constraints import Constraints
+from .constraints import Constraints
 
 def _removeEmptyConstraints (problem, constraints):
     return [ n for n in constraints if problem.getConstraintDimensions(n)[2] > 0 ]
@@ -64,9 +64,7 @@ class Rules(object):
 # The behaviour can be tuned by setting the callback functions:
 # - \ref graspIsAllowed (redundant with \ref setRules)
 # - \ref constraint_graph_factory_algo_callbacks "Algorithm steps"
-class GraphFactoryAbstract:
-    __metaclass__ = abc.ABCMeta
-
+class GraphFactoryAbstract(abc.ABC):
     def __init__(self):
 
         ## Reduces the problem combinatorial.
@@ -173,7 +171,7 @@ class GraphFactoryAbstract:
     ## \}
 
     def _makeState(self, grasps, priority):
-        if not self.states.has_key(grasps):
+        if grasps not in self.states:
             state = self.makeState (grasps, priority)
             self.states[grasps] = state
 
@@ -234,9 +232,7 @@ class GraphFactoryAbstract:
 # Child classes are responsible for building them.
 # - \ref buildGrasp
 # - \ref buildPlacement
-class ConstraintFactoryAbstract:
-    __metaclass__ = abc.ABCMeta
-
+class ConstraintFactoryAbstract(abc.ABC):
     def __init__(self, graphfactory):
         self._grasp = dict()
         self._placement = dict()
@@ -251,7 +247,7 @@ class ConstraintFactoryAbstract:
         if isinstance(handle, str): ih = self.graphfactory.handles.index(handle)
         else: ih = handle
         k = (ig, ih)
-        if not self._grasp.has_key(k):
+        if k not in self._grasp:
             self._grasp[k] = self.buildGrasp(self.graphfactory.grippers[ig], None if ih is None else self.graphfactory.handles[ih])
             assert isinstance (self._grasp[k], dict)
         return self._grasp[k]
@@ -263,7 +259,7 @@ class ConstraintFactoryAbstract:
         if isinstance(object, str): io = self.graphfactory.objects.index(object)
         else: io = object
         k = io
-        if not self._placement.has_key(k):
+        if k not in self._placement:
             self._placement[k] = self.buildPlacement(self.graphfactory.objects[io])
         return self._placement[k]
 
@@ -312,11 +308,11 @@ class ConstraintFactory(ConstraintFactoryAbstract):
         pn = g + " pregrasps " + h
         self.graph.createGrasp (n, g, h)
         self.graph.createPreGrasp (pn, g, h)
-        return dict ( zip (self.gfields, (
+        return dict ( list(zip (self.gfields, (
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),
-            )))
+            ))))
 
     def buildPlacement (self, o):
         if self.strict:
@@ -341,16 +337,16 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                     ljs.append(n)
                     q = self.graph.clientBasic.robot.getJointConfig(n)
                     self.graph.clientBasic.problem.createLockedJoint(n, n, q)
-            return dict ( zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)))
+            return dict ( list(zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),))))
         if not placeAlreadyCreated:
             self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
         if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
             self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
-        return dict ( zip (self.pfields, (
+        return dict ( list(zip (self.pfields, (
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),
-            )))
+            ))))
 
     ## This implements relaxed placement manifolds,
     ## where the parameterization constraints is the LockedJoint of
@@ -369,15 +365,15 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                 self.graph.clientBasic.problem.createLockedJoint(jn, jn, q)
         placeAlreadyCreated = n in self.graph.clientBasic.problem.getAvailable ("numericalconstraint")
         if (len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0) and not placeAlreadyCreated:
-            return dict ( zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),)))
+            return dict ( list(zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),))))
         if not placeAlreadyCreated:
             self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
         if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
             self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
-        return dict ( zip (self.pfields, (
+        return dict ( list(zip (self.pfields, (
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
             Constraints (lockedJoints = ljs),
-            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),)))
+            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),))))
 
 ## Default implementation of ConstraintGraphFactory
 #

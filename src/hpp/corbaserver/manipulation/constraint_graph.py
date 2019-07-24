@@ -17,8 +17,9 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 from subprocess import Popen
-from constraints import Constraints
+from .constraints import Constraints
 
 ## Association of a numerical constraint with the associated passive joints
 #
@@ -74,12 +75,12 @@ class ConstraintGraph (object):
                 self.graphId = g[0].id
                 self.subGraphId = self.graphId + 1
                 for n in g[1].nodes:
-                    if self.nodes.has_key(n.name):
-                        print "Erasing node", n.name, "id", self.nodes[n.name]
+                    if n.name in self.nodes:
+                        print("Erasing node", n.name, "id", self.nodes[n.name])
                     self.nodes[n.name] = n.id
                 for e in g[1].edges:
-                    if self.edges.has_key(e.name):
-                        print "Erasing edge", e.name, "id", self.edges[e.name]
+                    if e.name in self.edges:
+                        print("Erasing edge", e.name, "id", self.edges[e.name])
                     self.edges[e.name] = e.id
             except:
                 pass
@@ -290,9 +291,9 @@ class ConstraintGraph (object):
     #         \li true: uses the edge target constraint
     #         \li false: uses the edge path constraint
     def setProblemConstraints (self, name, target):
-        if self.nodes.has_key(name):
+        if name in self.nodes:
             id = self.nodes[name]
-        elif self.edges.has_key(name):
+        elif name in self.edges:
             id = self.edges[name]
         else:
             raise RuntimeError ("No node or edge with name {0}".format (name))
@@ -473,14 +474,14 @@ class ConstraintGraph (object):
     ## deleted so you can keep them.
     def display (self, dotOut = '/tmp/constraintgraph.dot', pdfOut = '/tmp/constraintgraph', format = 'pdf', open = True):
         self.graph.display (dotOut)
-        if not self.cmdDot.has_key (format):
+        if format not in self.cmdDot:
             raise TypeError ("This format is not supported. See member cmdDot for supported format.")
         dotCmd = self.cmdDot [format]
         dotCmd.append ('-o' + pdfOut + '.' + format)
         dotCmd.append (dotOut)
         dot = Popen (dotCmd)
         dot.wait ()
-        if open and self.cmdViewer.has_key (format):
+        if open and format in self.cmdViewer:
             viewCmd = self.cmdViewer [format]
             viewCmd.append (pdfOut + '.' + format)
             Popen (viewCmd)
@@ -553,7 +554,7 @@ class ConstraintGraph (object):
     #  \return the name of the node
     def getNode (self, config):
         nodeId = self.client.graph.getNode (config)
-        for n,id in self.nodes.iteritems ():
+        for n,id in self.nodes.items ():
             if id == nodeId: return n
         raise RuntimeError ("No node with id {0}".format (nodeId))
 
