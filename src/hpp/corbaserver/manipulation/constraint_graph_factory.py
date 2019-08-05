@@ -17,7 +17,7 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-import re, abc
+import re, abc, sys
 from .constraints import Constraints
 
 def _removeEmptyConstraints (problem, constraints):
@@ -59,12 +59,19 @@ class Rules(object):
             if apply: return s
         return self.defaultAcceptation
 
+if sys.version_info.major == 2:
+    class ABC:
+        """ Python 2.7 equivalent to abc.ABC Python 3 class."""
+        __metaclass__ = abc.ABCMeta
+else:
+    from abc import ABC
+
 ## An abstract class which is loops over the different (gripper, handle) associations.
 #
 # The behaviour can be tuned by setting the callback functions:
 # - \ref graspIsAllowed (redundant with \ref setRules)
 # - \ref constraint_graph_factory_algo_callbacks "Algorithm steps"
-class GraphFactoryAbstract(abc.ABC):
+class GraphFactoryAbstract(ABC):
     def __init__(self):
 
         ## Reduces the problem combinatorial.
@@ -232,7 +239,7 @@ class GraphFactoryAbstract(abc.ABC):
 # Child classes are responsible for building them.
 # - \ref buildGrasp
 # - \ref buildPlacement
-class ConstraintFactoryAbstract(abc.ABC):
+class ConstraintFactoryAbstract(ABC):
     def __init__(self, graphfactory):
         self._grasp = dict()
         self._placement = dict()
