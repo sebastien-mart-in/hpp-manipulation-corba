@@ -23,7 +23,7 @@ SET(CXX_DISABLE_WERROR true)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/hpp.cmake)
 INCLUDE(cmake/idl.cmake)
-INCLUDE(cmake/python.cmake)
+INCLUDE(cmake/hpp/python.cmake)
 
 SET(PROJECT_NAME hpp-manipulation-corba)
 SET(PROJECT_DESCRIPTION "Corba server for manipulation planning")
@@ -48,17 +48,8 @@ IF (NOT CLIENT_ONLY)
     )
 ENDIF (NOT CLIENT_ONLY)
 
-# Activate hpp-util logging if requested
-SET (HPP_DEBUG FALSE CACHE BOOL "trigger hpp-util debug output")
-IF (HPP_DEBUG)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHPP_DEBUG")
-ENDIF()
-
 # search for python
-IF(NOT DEFINED PYTHON_DESIRED_VERSION)
-  SET(PYTHON_DESIRED_VERSION 2.7)
-ENDIF()
-FINDPYTHON(${PYTHON_DESIRED_VERSION} EXACT)
+HPP_FINDPYTHON()
 
 ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
 IF (NOT CLIENT_ONLY)
