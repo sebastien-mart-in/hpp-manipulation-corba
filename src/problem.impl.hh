@@ -22,6 +22,8 @@
 # include <hpp/manipulation/problem-solver.hh>
 # include "hpp/corbaserver/manipulation/problem-idl.hh"
 
+# include "hpp/manipulation_idl/_graph-idl.hh"
+
 namespace hpp {
   namespace manipulation {
     namespace impl {
@@ -105,6 +107,9 @@ namespace hpp {
         virtual void setTargetState (hpp::ID IDstate);
 
         virtual ID edgeAtParam (ULong pathId, Double param, String_out name)
+          throw (Error);
+
+        hpp::manipulation_idl::graph_idl::Validation_ptr createGraphValidation ()
           throw (Error);
 
       private:

@@ -85,6 +85,17 @@ module hpp {
         core_idl::PathValidation getPathValidation () raises (Error);
         //-> pathValidation
       }; // interface Edge
+
+      interface Validation
+      {
+        string str () raises (Error);
+
+        boolean hasErrors () raises (Error);
+
+        boolean hasWarnings () raises (Error);
+
+        boolean validate (in GraphComponent comp) raises (Error);
+      }; // interface Validation
     }; // module graph
   }; // module manipulation
 }; // module hpp
@@ -96,5 +107,6 @@ module hpp {
 //* #include <hpp/manipulation/graph/graph.hh>
 //* #include <hpp/manipulation/graph/state.hh>
 //* #include <hpp/manipulation/graph/state-selector.hh>
+//* #include <hpp/manipulation/graph/validation.hh>
 
 #endif // HPP_MANIPULATION_STEERING_METHODS_IDL

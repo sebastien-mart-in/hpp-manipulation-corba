@@ -42,6 +42,12 @@ FOREACH(IDL ${IDL_SOURCES})
     ARGUMENTS
     -Wbmodules=hpp_idl
     -Wbextern=common:hpp_stubs
+    -Wbextern=constraints:hpp_stubs.constraints
+    -Wbextern=paths:hpp_stubs.core
+    -Wbextern=steering_methods:hpp_stubs.core
+    -Wbextern=path_validations:hpp_stubs.core
+    -Wbextern=_constraints:hpp_stubs.core
+    -Wbextern=_graph:hpp_stubs.manipulation
     )
   INSTALL(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}-idl.hh

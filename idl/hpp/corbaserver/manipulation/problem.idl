@@ -18,9 +18,10 @@
 #ifndef HPP_MANIPULATION_CORBA_PROBLEM_IDL
 #define HPP_MANIPULATION_CORBA_PROBLEM_IDL
 
-#include "hpp/corbaserver/manipulation/gcommon.idl"
+#include <hpp/corbaserver/manipulation/gcommon.idl>
 #include <hpp/common.idl>
 
+#include <hpp/manipulation_idl/_graph.idl>
 
 module hpp {
   module corbaserver {
@@ -204,6 +205,9 @@ module hpp {
         /// Get the edge ID of the motion that generated the configuration
         /// at the given parameter.
         ID edgeAtParam (in unsigned long inPathId, in double atDistance, out string graphName)
+          raises (Error);
+
+        manipulation_idl::graph_idl::Validation createGraphValidation ()
           raises (Error);
       }; // interface Problem
     }; // module manipulation

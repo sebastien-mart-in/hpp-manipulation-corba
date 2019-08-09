@@ -17,6 +17,8 @@
 
 #include "problem.impl.hh"
 
+#include <hpp/corbaserver/servant-base.hh>
+
 #include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/corbaserver/conversions.hh>
 
@@ -39,9 +41,12 @@
 #include <hpp/manipulation/problem.hh>
 #include <hpp/manipulation/constraint-set.hh>
 #include <hpp/manipulation/manipulation-planner.hh>
-#include <hpp/manipulation/graph/node.hh>
+#include <hpp/manipulation/graph/state.hh>
 #include <hpp/manipulation/graph/edge.hh>
+#include <hpp/manipulation/graph/validation.hh>
 #include <hpp/manipulation/steering-method/graph.hh>
+
+#include "hpp/manipulation_idl/_graph.hh"
 
 #include "tools.hh"
 
@@ -627,6 +632,19 @@ namespace hpp {
 	catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
+      }
+
+      hpp::manipulation_idl::graph_idl::Validation_ptr Problem::createGraphValidation () throw (Error)
+      {
+        core::ProblemSolverPtr_t ps = problemSolver();
+        graph::ValidationPtr_t validation (new graph::Validation (ps->problem()));
+
+        typedef corbaServer::manipulation_impl::graph_impl::Validation Validation_impl;
+
+        hpp::manipulation_idl::graph_idl::Validation_var validation_idl =
+          corbaServer::makeServantDownCast <Validation_impl> (server_->parent(),
+              Validation_impl::Storage (validation));
+        return validation_idl._retn();
       }
     } // namespace impl
   } // namespace manipulation
