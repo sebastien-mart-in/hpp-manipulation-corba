@@ -42,17 +42,30 @@ module hpp {
       typedef sequence<State> States;
       interface Edge;
       typedef sequence<Edge> Edges;
+      interface Graph;
 
       interface GraphComponent {
         string name () raises (Error);
         size_t id () raises (Error);
 
+        Graph parentGraph () raises (Error);
+
+        void addNumericalConstraint (in constraints_idl::Implicit nm) raises (Error);
+        void addLockedJointConstraint (in constraints_idl::LockedJoint lj) raises (Error);
+
         constraints_idl::Implicits numericalConstraints () raises (Error);
-        constraints_idl::LockedJoints lockedJoints () raises (Error);
+        constraints_idl::Implicits lockedJoints () raises (Error);
+
+        void resetNumericalConstraints () raises (Error);
+        void resetLockedJoints () raises (Error);
       }; // interface GraphComponent
 
-      interface StateSelector : GraphComponent
+      interface StateSelector
       {
+        string name () raises (Error);
+
+        Graph parentGraph () raises (Error);
+
         States getStates () raises (Error);
       }; // interface StateSelector
 
@@ -63,12 +76,20 @@ module hpp {
         GraphComponent get (in size_t id) raises (Error);
         size_t nbComponents () raises (Error);
         void initialize () raises (Error);
+
+        State getState (in floatSeq config) raises (Error);
+        Edges getEdges (in State from, in State to) raises (Error);
       }; // interface Graph
 
       interface State : GraphComponent
       {
+        boolean contains (in floatSeq config) raises (Error);
+        Edge linkTo (in string name, in State to, in size_type weight) raises (Error);
+
         Edges neighborEdges () raises (Error);
         Edges hiddenNeighbors () raises (Error);
+
+        core_idl::ConstraintSet configConstraint () raises (Error);
       }; // interface State
 
       interface Edge : GraphComponent

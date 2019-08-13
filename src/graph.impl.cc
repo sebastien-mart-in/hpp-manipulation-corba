@@ -69,8 +69,6 @@ namespace hpp {
         template <> std::string toStr <graph::State> () { return "Node"; }
         template <> std::string toStr <graph::Edge> () { return "Edge"; }
         template <> std::string toStr <graph::Graph> () { return "Graph"; }
-        template <> std::string toStr <graph::StateSelector> () { return "SubGraph"; }
-        template <> std::string toStr <graph::GuidedStateSelector> () { return "Guided Node Selector"; }
         template <> std::string toStr <graph::LevelSetEdge> () { return "LevelSetEdge"; }
         template <> std::string toStr <graph::WaypointEdge> () { return "WaypointEdge"; }
 
@@ -140,7 +138,7 @@ namespace hpp {
       }
 
       template <typename T> boost::shared_ptr<T> Graph::getComp (ID id, bool throwIfWrongType)
-      { 
+      {
         boost::shared_ptr <T> comp;
         try {
           comp = HPP_DYNAMIC_PTR_CAST(T, graph()->get(id).lock());
@@ -205,19 +203,22 @@ namespace hpp {
         }
       }
 
-      Long Graph::createSubGraph(const char* subgraphName)
+      void Graph::createSubGraph(const char* subgraphName)
         throw (hpp::Error)
       {
         graph::GuidedStateSelectorPtr_t ns = graph::GuidedStateSelector::create
           (subgraphName, problemSolver()->roadmap ());
         graph()->stateSelector(ns);
-        return (Long) ns->id ();
       }
 
-      void Graph::setTargetNodeList(const ID subgraph, const hpp::IDseq& nodes)
+      void Graph::setTargetNodeList(const ID graphId, const hpp::IDseq& nodes)
         throw (hpp::Error)
       {
-        graph::GuidedStateSelectorPtr_t ns = getComp <graph::GuidedStateSelector> (subgraph);
+        graph::GraphPtr_t graph = getComp <graph::Graph> (graphId);
+        graph::GuidedStateSelectorPtr_t ns =
+          HPP_DYNAMIC_PTR_CAST (graph::GuidedStateSelector, graph->stateSelector());
+        if (!ns)
+          throw Error ("The state selector is not of type GuidedStateSelector.");
         try {
           graph::States_t nl;
           for (unsigned int i = 0; i < nodes.length(); ++i)
@@ -228,13 +229,13 @@ namespace hpp {
         }
       }
 
-      Long Graph::createNode(const Long subgraphId, const char* nodeName,
+      Long Graph::createNode(const Long graphId, const char* nodeName,
           const bool waypoint, const Long priority)
         throw (hpp::Error)
       {
-        graph::StateSelectorPtr_t ns = getComp <graph::StateSelector> (subgraphId);
+        graph::GraphPtr_t graph = getComp <graph::Graph> (graphId);
 
-        graph::StatePtr_t state = ns->createState (nodeName, waypoint, priority);
+        graph::StatePtr_t state = graph->stateSelector()->createState (nodeName, waypoint, priority);
         return (Long) state->id ();
       }
 
@@ -886,7 +887,7 @@ namespace hpp {
 	}
       }
 
-      intSeq* Graph::autoBuild (
+      Long Graph::autoBuild (
           const char* graphName,
           const Names_t& grippers,
           const Names_t& objects,
@@ -911,10 +912,7 @@ namespace hpp {
               rules
               );
 
-          std::vector<std::size_t> ids (2);
-          ids[0] = g->id();
-          ids[1] = g->stateSelector()->id();
-          return toIntSeq (ids.begin(), ids.end());
+          return (Long) g->id();
         } catch (const std::exception& exc) {
           throw Error (exc.what ());
         }

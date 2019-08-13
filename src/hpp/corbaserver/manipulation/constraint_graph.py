@@ -67,13 +67,11 @@ class ConstraintGraph (object):
         self.edges = dict ()
         if makeGraph:
             self.graphId = self.graph.createGraph (graphName)
-            self.subGraphId = self.graph.createSubGraph (graphName + "_sg")
         else:
             # fetch graph
             try:
                 g = self.graph.getGraph ()
                 self.graphId = g[0].id
-                self.subGraphId = self.graphId + 1
                 for n in g[1].nodes:
                     if n.name in self.nodes:
                         print("Erasing node", n.name, "id", self.nodes[n.name])
@@ -106,7 +104,7 @@ class ConstraintGraph (object):
         elif isinstance(priority, int):
             priority = [priority]
         for n, p in zip(node, priority):
-            self.nodes [n] = self.graph.createNode (self.subGraphId, self._(n), waypoint, p)
+            self.nodes [n] = self.graph.createNode (self.graphId, self._(n), waypoint, p)
 
     ### Create an edge
     ## \param nodeFrom, nodeTo the extremities of the edge,
@@ -204,7 +202,7 @@ class ConstraintGraph (object):
             n = waypoints[-1][1]
             e = waypoints[-1][0]
             newN = self.nodes[n] = \
-                    self.graph.createNode (self.subGraphId, self._(n), True)
+                    self.graph.createNode (self.graphId, self._(n), True)
             newE = self.edges[e] = \
                     self.createEdge (previous, n, self._(e), -1,
                                      isInNode)

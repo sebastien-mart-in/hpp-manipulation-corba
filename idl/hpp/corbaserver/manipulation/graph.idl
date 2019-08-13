@@ -49,20 +49,20 @@ module hpp {
           raises (Error);
 
         /// Create a subgraph of the constraint graph for one particular end-effector.
-        long createSubGraph(in string subgraphName)
+        void createSubGraph(in string subgraphName)
           raises (Error);
 
-        void setTargetNodeList(in ID subgraph, in IDseq nodes)
+        void setTargetNodeList(in ID graphId, in IDseq nodes)
           raises (Error);
 
         /// Add a node to the graph.
-        /// \param subGraphId is the ID of the subgraph to which the node should be added.
+        /// \param graphId is the ID of the graph to which the node should be added.
         /// \param nodeName the name of the new node.
         /// \param waypoint true when the node is a waypoint
         /// \param priority integer used to order the states. If two states have
         ///                 the same priority, then the order is the order of
         ///                 creation.
-        long createNode (in long subGraphId, in string nodeName, in boolean waypoint, in long priority)
+        long createNode (in long graphId, in string nodeName, in boolean waypoint, in long priority)
           raises (Error);
 
         /// Add an edge between two nodes of the graph.
@@ -358,7 +358,7 @@ module hpp {
         ///       waypoint will be inserted in the graph. If constraint
         ///       "place_foo" is not defined, it will be created with selected
         ///       environment and object contact surface.
-        intSeq autoBuild (in string graphName,
+        long autoBuild (in string graphName,
             in Names_t grippers, in Names_t objects,
             in Namess_t handlesPerObject, in Namess_t contactsPerObject,
 	    in Names_t envNames, in Rules rulesList)

@@ -48,10 +48,10 @@ namespace hpp {
           virtual void selectGraph(const char* graphName)
             throw (hpp::Error);
 
-          virtual Long createSubGraph(const char* subgraphName)
+          virtual void createSubGraph(const char* subgraphName)
             throw (hpp::Error);
 
-          virtual void setTargetNodeList(const ID subgraph, const hpp::IDseq& nodes)
+          virtual void setTargetNodeList(const ID graphId, const hpp::IDseq& nodes)
             throw (hpp::Error);
 
           virtual Long createNode (const Long subGraphId,
@@ -225,7 +225,7 @@ namespace hpp {
           virtual bool isShort (ID edgeId)
             throw (hpp::Error);
 
-          virtual intSeq* autoBuild (const char* graphName,
+          virtual Long autoBuild (const char* graphName,
               const Names_t& grippers, const Names_t& objects,
               const Namess_t& handlesPerObject, const Namess_t& shapesPreObject,
 	      const Names_t& envNames, const Rules& rulesList)
