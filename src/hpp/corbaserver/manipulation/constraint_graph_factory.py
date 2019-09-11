@@ -344,7 +344,10 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                     ljs.append(n)
                     q = self.graph.clientBasic.robot.getJointConfig(n)
                     self.graph.clientBasic.problem.createLockedJoint(n, n, q)
-            return dict ( list(zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),))))
+            return dict ( list(zip (self.pfields,
+                                    (Constraints (),
+                                     Constraints (numConstraints = ljs),
+                                     Constraints (),))))
         if not placeAlreadyCreated:
             self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
         if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
@@ -372,15 +375,24 @@ class ConstraintFactory(ConstraintFactoryAbstract):
                 self.graph.clientBasic.problem.createLockedJoint(jn, jn, q)
         placeAlreadyCreated = n in self.graph.clientBasic.problem.getAvailable ("numericalconstraint")
         if (len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0) and not placeAlreadyCreated:
-            return dict ( list(zip (self.pfields, (Constraints (), Constraints (lockedJoints = ljs), Constraints (),))))
+            return dict ( list(zip (self.pfields,
+                                    (Constraints (),
+                                     Constraints (numConstraints = ljs),
+                                     Constraints (),))))
         if not placeAlreadyCreated:
             self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
         if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
             self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
-        return dict ( list(zip (self.pfields, (
-            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
-            Constraints (lockedJoints = ljs),
-            Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),))))
+        return dict ( list(zip (self.pfields,
+                                (Constraints (numConstraints = \
+                                              _removeEmptyConstraints\
+                                              (self.graph.clientBasic.problem,
+                                               [ n, ])),
+                                 Constraints (numConstraints = ljs),
+                                 Constraints (numConstraints = \
+                                              _removeEmptyConstraints\
+                                              (self.graph.clientBasic.problem,
+                                               [ pn, ])),))))
 
 ## Default implementation of ConstraintGraphFactory
 #

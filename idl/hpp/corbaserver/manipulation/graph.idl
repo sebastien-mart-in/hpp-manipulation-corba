@@ -137,17 +137,14 @@ module hpp {
         long createLevelSetEdge(in long nodeFromId, in long nodeToId, in string edgeName, in long weight, in ID isInNodeId)
           raises (Error);
 
-        /// \deprecated use addLevelSetFoliation
-        void setLevelSetFoliation (in long edgeId, in Names_t condNC, in Names_t condLJ, in Names_t paramNC, in Names_t paramPassiveJoints, in Names_t paramLJ)
-          raises (Error);
-
         /// Add the constraints to a LevelSetEdge that create the foliation.
         /// \param edgeId if of a LevelSetEdge of the graph.
-        /// \param condNC, condLJ numerical constraints and locked joints that define the foliated manifold
-        /// \param paramNC, paramPassiveJoints, paramLJ numerical constraints and locked joints that parametrize the foliation
-        /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
-        ///       which corresponds to an empty vector of passive dofs.
-        void addLevelSetFoliation (in long edgeId, in Names_t condNC, in Names_t condLJ, in Names_t paramNC, in Names_t paramPassiveJoints, in Names_t paramLJ)
+        /// \param condNC numerical constraints that define the foliated
+        ///        manifold
+        /// \param paramNC numerical constraints
+        ///        that parameterize the foliation
+        void addLevelSetFoliation (in long edgeId, in Names_t condNC,
+                                   in Names_t paramNC)
           raises (Error);
 
 	/// Reset the numerical constraints and the locked joints of a component.
@@ -173,12 +170,6 @@ module hpp {
 	void getNumericalConstraints (in long graphComponentId, out Names_t constraintNames)
 	  raises (Error);
 
-	/// Get the list of locked joints in a component.
-	/// \param graphComponentId Id of the component.
-	/// \return the list of joints name.
-	void getLockedJoints (in long graphComponentId, out Names_t constraintNames)
-	  raises (Error);
-
         /// \deprecated use addNumericalConstraintsForPath
         void setNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames, in Names_t passiveDofsNames)
           raises (Error);
@@ -190,16 +181,6 @@ module hpp {
         /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
         ///       which corresponds to an empty vector of passive dofs.
         void addNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames, in Names_t passiveDofsNames)
-          raises (Error);
-
-        /// \deprecated use addLockedDofConstraints
-        void setLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
-          raises (Error);
-
-        /// Add the LockedDof constraints to a component.
-        /// \param graphComponentId ID of the component.
-        /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
-        void addLockedDofConstraints (in long graphComponentId, in Names_t constraintNames)
           raises (Error);
 
 	/// Remove collision pairs from an edge

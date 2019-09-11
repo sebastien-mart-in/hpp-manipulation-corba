@@ -337,12 +337,11 @@ class ConstraintGraph (object):
             (graph = graph, node = node, edge = edge,
              grasps = constraints.grasps,
              pregrasps = constraints.pregrasps,
-             lockDof = constraints.lockedJoints,
              numConstraints = constraints.numConstraints,
              passiveJoints = passiveJoints)
 
     def _addConstraints (self, graph = False, node = None, edge = None,
-                         grasps = None, pregrasps = None, lockDof = [],
+                         grasps = None, pregrasps = None,
                          numConstraints = [], passiveJoints = []):
         if not type (graph) is bool:
             raise TypeError ("ConstraintGraph.addConstraints: " +\
@@ -372,13 +371,10 @@ class ConstraintGraph (object):
             self.graph.addNumericalConstraints (self.nodes [node], nc, nopdofs)
             self.graph.addNumericalConstraintsForPath (self.nodes [node], nc,
                                                        pdofs)
-            self.graph.addLockedDofConstraints (self.nodes [node], lockDof)
         elif edge is not None:
             self.graph.addNumericalConstraints (self.edges [edge], nc, nopdofs)
-            self.graph.addLockedDofConstraints (self.edges [edge], lockDof)
         elif graph:
             self.graph.addNumericalConstraints (self.graphId, nc, nopdofs)
-            self.graph.addLockedDofConstraints (self.graphId, lockDof)
 
     ## Remove collision pairs from an edge
     #
@@ -387,9 +383,6 @@ class ConstraintGraph (object):
     def removeCollisionPairFromEdge (self, edge, joint1, joint2):
         return self.graph.removeCollisionPairFromEdge \
             (self.edges [edge], joint1, joint2)
-
-    def setLevelSetFoliation (self, *args, **kwargs):
-        return self.addLevelSetFoliation (*args, **kwargs)
 
     ## Add the numerical constraints to a LevelSetEdge that create the foliation.
     #  \param edge name of a LevelSetEdge of the graph.
@@ -402,7 +395,16 @@ class ConstraintGraph (object):
     def addLevelSetFoliation (self, edge,
             condGrasps = None, condPregrasps = None, condNC = [], condLJ = [],
             paramGrasps = None, paramPregrasps = None, paramNC = [], paramPassiveJoints = [], paramLJ = []):
-
+        if condLJ != []:
+            raise RuntimeError ("Locked joints are now handled as numerical" +
+                                " constraints. Please merge elements in list" +
+                                " condLJ with condNC")
+        if paramPassiveJoints != [] :
+            raise RuntimeError ("Passive dofs are not handled anymore.")
+        if paramLJ != []:
+            raise RuntimeError ("Locked joints are now handled as numerical" +
+                                " constraints. Please merge elements in list" +
+                                " paramLJ with paramNC")
         cond_nc = condNC [:]
         if condGrasps is not None:
             for g in condGrasps:
@@ -414,8 +416,6 @@ class ConstraintGraph (object):
                     cond_nc.append (pair.constraint)
 
         param_nc = paramNC [:]
-        pdofs = ["" for i in range (len(paramNC))]
-        pdofs [:len(paramPassiveJoints)] = paramPassiveJoints [:]
         if paramGrasps is not None:
             for g in paramGrasps:
                 for pair in self.grasps [g]:
@@ -425,9 +425,8 @@ class ConstraintGraph (object):
             for g in paramPregrasps:
                 for pair in self.pregrasps [g]:
                     param_nc.extend (pair.constraint)
-                    pdofs.extend (pair.passiveJoints)
 
-        self.graph.addLevelSetFoliation (self.edges [edge], cond_nc, condLJ, param_nc, pdofs, paramLJ)
+        self.graph.addLevelSetFoliation (self.edges [edge], cond_nc, param_nc)
 
     ## Get weight of an edge
     #

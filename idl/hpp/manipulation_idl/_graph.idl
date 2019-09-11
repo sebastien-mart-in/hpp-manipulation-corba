@@ -48,7 +48,6 @@ module hpp {
         size_t id () raises (Error);
 
         constraints_idl::Implicits numericalConstraints () raises (Error);
-        constraints_idl::LockedJoints lockedJoints () raises (Error);
       }; // interface GraphComponent
 
       interface StateSelector : GraphComponent

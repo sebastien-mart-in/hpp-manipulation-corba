@@ -110,23 +110,9 @@ namespace hpp {
           virtual char* getContainingNode (const ID edgeId)
             throw (hpp::Error);
 
-          virtual void setLevelSetFoliation (const Long edgeId,
-                                             const hpp::Names_t& condNC,
-                                             const hpp::Names_t& condLJ,
-                                             const hpp::Names_t& paramNC,
-                                             const hpp::Names_t& paramPDOF,
-                                             const hpp::Names_t& paramLJ)
-            throw (hpp::Error)
-          {
-            addLevelSetFoliation (edgeId, condNC, condLJ,
-                paramNC, paramPDOF, paramLJ);
-          }
           virtual void addLevelSetFoliation (const Long edgeId,
                                              const hpp::Names_t& condNC,
-                                             const hpp::Names_t& condLJ,
-                                             const hpp::Names_t& paramNC,
-                                             const hpp::Names_t& paramPDOF,
-                                             const hpp::Names_t& paramLJ)
+                                             const hpp::Names_t& paramNC)
             throw (hpp::Error);
 
           virtual void setNumericalConstraints (const Long graphComponentId,
@@ -145,9 +131,6 @@ namespace hpp {
 	  virtual void getNumericalConstraints(const Long elmtId, hpp::Names_t_out names)
 	    throw(hpp::Error);
 
-	  virtual void getLockedJoints(const Long elmtId, hpp::Names_t_out names)
-	    throw(hpp::Error);
-
 	  virtual void resetConstraints(const Long graphComponentId) 
 	    throw (hpp::Error);
 
@@ -164,17 +147,7 @@ namespace hpp {
               const hpp::Names_t& passiveDofsNames)
             throw (hpp::Error);
 
-          virtual void setLockedDofConstraints (const Long graphComponentId,
-                                       const hpp::Names_t& constraintNames)
-            throw (hpp::Error)
-          {
-            addLockedDofConstraints (graphComponentId, constraintNames);
-          }
-          virtual void addLockedDofConstraints (const Long graphComponentId,
-                                       const hpp::Names_t& constraintNames)
-            throw (hpp::Error);
-
-	  virtual void removeCollisionPairFromEdge
+          virtual void removeCollisionPairFromEdge
 	  (ID edgeId, const char* joint1, const char* joint2)
 	    throw (hpp::Error);
 

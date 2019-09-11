@@ -25,7 +25,6 @@ class Constraints (object):
       - grasps,
       - pregrasps.
       - numerical constraints,
-      - lockedJoints
     """
     def __init__ (self, grasps = [], pregrasps = [], numConstraints = [],
                   lockedJoints = []):
@@ -36,48 +35,45 @@ class Constraints (object):
         if type (numConstraints) is str:
             raise TypeError \
                 ("argument numConstraints should be a list of strings")
-        if type (lockedJoints) is str:
-            raise TypeError \
-                ("argument lockedJoints should be a list of strings")
+        if lockedJoints != []:
+            from warnings import warn
+            warn ("argument lockedJoints in constructor of class " +
+                  "hpp.corbaserver.manipulation.constraints.Constraints " +
+                  "is deprecated. Locked joints are handled as numerical " +
+                  "constraints.")
+            numConstraints.extend (lockedJoints)
         self._grasps = set (grasps)
         self._pregrasps = set (pregrasps)
         self._numConstraints = set (numConstraints)
-        self._lockedJoints = set (lockedJoints)
 
     def __add__ (self, other):
         res = Constraints (grasps = self._grasps | other._grasps,
                            pregrasps = self._pregrasps |  other._pregrasps,
                            numConstraints =
-                           self._numConstraints | other._numConstraints,
-                           lockedJoints =
-                           self._lockedJoints | other._lockedJoints)
+                           self._numConstraints | other._numConstraints)
         return res
 
     def __sub__ (self, other):
         res = Constraints (grasps = self._grasps - other._grasps,
                            pregrasps = self._pregrasps - other._pregrasps,
                            numConstraints = self._numConstraints - \
-                           other._numConstraints,
-                           lockedJoints = self._lockedJoints - \
-                           other._lockedJoints)
+                           other._numConstraints)
         return res
 
     def __iadd__ (self, other):
         self._grasps |= other._grasps
         self._pregrasps |= other._pregrasps
         self._numConstraints |= other._numConstraints
-        self._lockedJoints |= other._lockedJoints
         return self
 
     def __isub__ (self, other):
         self._grasps -= other._grasps
         self._pregrasps -= other._pregrasps
         self._numConstraints -= other._numConstraints
-        self._lockedJoints -= other._lockedJoints
         return self
 
     def empty (self):
-        for s in [ self._grasps, self._pregrasps, self._numConstraints, self._lockedJoints ]:
+        for s in [ self._grasps, self._pregrasps, self._numConstraints ]:
             if len(s) > 0: return False
         return True
 
@@ -93,10 +89,6 @@ class Constraints (object):
     def numConstraints (self):
         return list (self._numConstraints)
 
-    @property
-    def lockedJoints (self):
-        return list (self._lockedJoints)
-
     def __str__ (self):
         res = "constraints\n"
         res += "  grasps: "
@@ -107,8 +99,5 @@ class Constraints (object):
             res += c + ', '
         res += "\n  numConstraints: "
         for c in self._numConstraints:
-            res += c + ', '
-        res += "\n  lockedJoints: "
-        for c in self._lockedJoints:
             res += c + ', '
         return res
