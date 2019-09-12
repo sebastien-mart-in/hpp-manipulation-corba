@@ -105,6 +105,8 @@ namespace hpp {
         }
       }
 
+      // Convert a sequence of strings to a vector of string
+      // Check that size of sequence is the same as expected.
       std::vector <std::string>
       convertPassiveDofNameVector (const hpp::Names_t& names, const size_t& s)
       {
@@ -472,9 +474,8 @@ namespace hpp {
       }
 
       void Graph::addLevelSetFoliation (const Long edgeId,
-          const hpp::Names_t& condNC, const hpp::Names_t& condLJ,
-          const hpp::Names_t& paramNC, const hpp::Names_t& paramPDOF,
-          const hpp::Names_t& paramLJ)
+                                        const hpp::Names_t& condNC,
+                                        const hpp::Names_t& paramNC)
         throw (hpp::Error)
       {
         graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge> (edgeId);
@@ -486,25 +487,12 @@ namespace hpp {
                                    problemSolver()->numericalConstraints.get
                                    (name)->copy ()));
           }
-          for (CORBA::ULong i=0; i<condLJ.length (); ++i) {
-            std::string name (condLJ [i]);
-            edge->insertConditionConstraint (
-                problemSolver()->lockedJoints.get (name));
-          }
-
-          std::vector <std::string> pdofNames = convertPassiveDofNameVector
-            (paramPDOF, paramNC.length ());
+          std::vector <std::string> pdofNames (paramNC.length ());
           for (CORBA::ULong i=0; i<paramNC.length (); ++i) {
             std::string name (paramNC [i]);
             edge->insertParamConstraint (
                 HPP_STATIC_PTR_CAST(Implicit,
-                problemSolver()->numericalConstraints.get(name)->copy ()),
-                problemSolver()->passiveDofs.get (pdofNames [i], core::segments_t()));
-          }
-          for (CORBA::ULong i=0; i<paramLJ.length (); ++i) {
-            std::string name (paramLJ [i]);
-            edge->insertParamConstraint
-              (problemSolver()->lockedJoints.get (name));
+                problemSolver()->numericalConstraints.get(name)->copy ()));
           }
 
           // edge->buildHistogram ();
@@ -579,27 +567,11 @@ namespace hpp {
 	}
       }
 
-      void Graph::getLockedJoints(const Long graphComponentId, hpp::Names_t_out names)
-	throw(hpp::Error)
-      {
-	graph::GraphComponentPtr_t elmt = getComp<graph::GraphComponent>(graphComponentId, true);
-	core::LockedJoints_t lockedJoints = elmt->lockedJoints();
-	names = new hpp::Names_t;
-	names->length((ULong)lockedJoints.size());
-	int i = 0;
-	for (core::LockedJoints_t::iterator it = lockedJoints.begin();
-	     it != lockedJoints.end(); ++it) {
-	  (*names)[i] = (*it)->jointName().c_str();
-	  i++;
-	}
-      }
-
       void Graph::resetConstraints(const Long graphComponentId) throw (hpp::Error)
       {
         graph::GraphComponentPtr_t component =
           getComp<graph::GraphComponent>(graphComponentId, true);
 	component->resetNumericalConstraints();
-	component->resetLockedJoints();
       }
 
       void Graph::addNumericalConstraintsForPath (const Long nodeId,
@@ -619,25 +591,6 @@ namespace hpp {
                 (problemSolver()->numericalConstraint(name)->copy (),
                  problemSolver()->passiveDofs.get (pdofNames [i],
                                                    core::segments_t()));
-            }
-          } catch (std::exception& err) {
-            throw Error (err.what());
-          }
-        }
-      }
-
-      void Graph::addLockedDofConstraints (const Long graphComponentId,
-          const hpp::Names_t& constraintNames)
-        throw (hpp::Error)
-      {
-        graph::GraphComponentPtr_t component = getComp<graph::GraphComponent>(graphComponentId, true);
-
-        if (constraintNames.length () > 0) {
-          try {
-            for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
-              std::string name (constraintNames [i]);
-              component->addLockedJointConstraint
-		(problemSolver()->lockedJoints.get (name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());

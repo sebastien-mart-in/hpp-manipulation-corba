@@ -1,4 +1,5 @@
                                                                 -*- outline -*-
+* In graph component classes (State, Edge, Graph) locked joints are handled as other numerical constraints.
 New in v4.6.1
 * Remove deprecated methods and functions.
 New in v4.6.0
