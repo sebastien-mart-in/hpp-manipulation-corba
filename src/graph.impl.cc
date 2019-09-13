@@ -236,9 +236,13 @@ namespace hpp {
         throw (hpp::Error)
       {
         graph::GraphPtr_t graph = getComp <graph::Graph> (graphId);
-
-        graph::StatePtr_t state = graph->stateSelector()->createState (nodeName, waypoint, priority);
-        return (Long) state->id ();
+        if (graph->stateSelector ()) {
+          graph::StatePtr_t state = graph->stateSelector()->createState
+            (nodeName, waypoint, priority);
+          return (Long) state->id ();
+        } else {
+          throw Error ("Graph has no state selector.");
+        }
       }
 
       Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const Long isInNodeId)
