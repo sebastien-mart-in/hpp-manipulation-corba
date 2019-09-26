@@ -23,7 +23,7 @@ SET(CXX_DISABLE_WERROR true)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/hpp.cmake)
 INCLUDE(cmake/idl.cmake)
-INCLUDE(cmake/hpp/python.cmake)
+INCLUDE(cmake/python.cmake)
 
 SET(PROJECT_NAME hpp-manipulation-corba)
 SET(PROJECT_DESCRIPTION "Corba server for manipulation planning")
@@ -49,7 +49,7 @@ IF (NOT CLIENT_ONLY)
 ENDIF (NOT CLIENT_ONLY)
 
 # search for python
-HPP_FINDPYTHON()
+FINDPYTHON()
 
 ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
 IF (NOT CLIENT_ONLY)
