@@ -526,10 +526,14 @@ namespace hpp {
           }
 	  // If steering method is not completely set in the graph, create
 	  // one.
-	  if (!edge->parentGraph ()->problem ()->steeringMethod () ||
-	      !edge->parentGraph ()->problem ()->steeringMethod ()
+	  if (!edge->parentGraph ()->problem ()->manipulationSteeringMethod () ||
+	      !edge->parentGraph ()->problem ()->manipulationSteeringMethod ()
 	      ->innerSteeringMethod()) {
 	    problemSolver ()->initSteeringMethod ();
+            if (!edge->parentGraph ()->problem ()->manipulationSteeringMethod () ||
+                !edge->parentGraph ()->problem ()->manipulationSteeringMethod ()
+                ->innerSteeringMethod())
+              throw Error ("Could not initialize the steering method.");
 	  }
 	  bool success = false;
           DevicePtr_t robot = getRobotOrThrow (problemSolver());

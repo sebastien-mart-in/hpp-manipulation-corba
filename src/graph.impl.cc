@@ -749,10 +749,14 @@ namespace hpp {
 	  graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	  // If steering method is not completely set in the graph, create
 	  // one.
-	  if (!edge->parentGraph ()->problem ()->steeringMethod () ||
-	      !edge->parentGraph ()->problem ()->steeringMethod ()
+	  if (!edge->parentGraph ()->problem ()->manipulationSteeringMethod () ||
+	      !edge->parentGraph ()->problem ()->manipulationSteeringMethod ()
 	      ->innerSteeringMethod()) {
 	    problemSolver ()->initSteeringMethod ();
+            if (!edge->parentGraph ()->problem ()->manipulationSteeringMethod () ||
+                !edge->parentGraph ()->problem ()->manipulationSteeringMethod ()
+                ->innerSteeringMethod())
+              throw Error ("Could not initialize the steering method.");
 	  }
 	  vector_t err;
           Configuration_t config (floatSeqToConfig (robot, dofArray, true));
@@ -779,10 +783,14 @@ namespace hpp {
 	  graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	  // If steering method is not completely set in the graph, create
 	  // one.
-	  if (!edge->parentGraph ()->problem ()->steeringMethod () ||
-	      !edge->parentGraph ()->problem ()->steeringMethod ()
+	  if (!edge->parentGraph ()->problem ()->manipulationSteeringMethod () ||
+	      !edge->parentGraph ()->problem ()->manipulationSteeringMethod ()
 	      ->innerSteeringMethod()) {
 	    problemSolver ()->initSteeringMethod ();
+            if (!edge->parentGraph ()->problem ()->manipulationSteeringMethod () ||
+                !edge->parentGraph ()->problem ()->manipulationSteeringMethod ()
+                ->innerSteeringMethod())
+              throw Error ("Could not initialize the steering method.");
 	  }
 	  vector_t err;
           Configuration_t leafConfig (floatSeqToConfig (robot, leafDofArray, true));
@@ -811,10 +819,14 @@ namespace hpp {
 	  graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	  // If steering method is not completely set in the graph, create
 	  // one.
-	  if (!edge->parentGraph ()->problem ()->steeringMethod () ||
-	      !edge->parentGraph ()->problem ()->steeringMethod ()
+	  if (!edge->parentGraph ()->problem ()->manipulationSteeringMethod () ||
+	      !edge->parentGraph ()->problem ()->manipulationSteeringMethod ()
 	      ->innerSteeringMethod()) {
 	    problemSolver ()->initSteeringMethod ();
+            if (!edge->parentGraph ()->problem ()->manipulationSteeringMethod () ||
+                !edge->parentGraph ()->problem ()->manipulationSteeringMethod ()
+                ->innerSteeringMethod())
+              throw Error ("Could not initialize the steering method.");
 	  }
 	  vector_t err;
           Configuration_t leafConfig (floatSeqToConfig (robot, leafDofArray, true));
