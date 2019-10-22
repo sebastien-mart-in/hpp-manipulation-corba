@@ -196,6 +196,28 @@ module hpp {
         void getNode (in floatSeq dofArray, out ID nodeId)
           raises (Error);
 
+        /// Apply constaints of a state to a configuration
+        ///
+        /// \param idComp ID of a state (node of the constraint graph)
+        /// \param input input configuration,
+        /// \retval output output configuration,
+        /// \retval error norm of the residual error.
+        boolean applyNodeConstraints (in ID idComp, in floatSeq input, out floatSeq output,
+            out double residualError)
+          raises (Error);
+
+        /// Generate configuration in target state of a transition reachable from a configuration
+        ///
+        /// \param IDedge ID of a transition (edge of the constraint graph)
+        /// \param qleaf configuration defining the leaf of the transition
+        /// \param input input configuration to be projected
+        /// \retval output output configuration,
+        /// \retval error norm of the residual error.
+        boolean generateTargetConfig (in ID IDedge, in floatSeq qleaf,
+                                      in floatSeq input, out floatSeq output,
+                                      out double residualError)
+          raises (Error);
+
 	/// Get error of a config with respect to a node constraint
 	///
 	/// \param nodeId id of the node.

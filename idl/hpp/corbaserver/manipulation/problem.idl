@@ -163,6 +163,7 @@ module hpp {
         /// \param input input configuration,
         /// \retval output output configuration,
         /// \retval error norm of the residual error.
+        /// \deprecated Use Graph::applyNodeConstraints instead
         boolean applyConstraints (in ID idComp, in floatSeq input, out floatSeq output,
             out double residualError)
           raises (Error);
@@ -176,6 +177,7 @@ module hpp {
         /// \retval error norm of the residual error.
 	///
 	/// Call method using hpp::manipulation::graph::Edge::applyConstraints.
+        /// \deprecated Use Graph::generateTargetConfig instead.
         boolean applyConstraintsWithOffset (in ID IDedge, in floatSeq qnear, in floatSeq input, out floatSeq output,
             out double residualError)
           raises (Error);

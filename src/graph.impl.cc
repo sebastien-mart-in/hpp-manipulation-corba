@@ -44,6 +44,7 @@
 
 #include <hpp/constraints/locked-joint.hh>
 
+#include <hpp/corbaserver/conversions.hh>
 #include <hpp/corbaserver/manipulation/server.hh>
 
 #include "tools.hh"
@@ -59,8 +60,8 @@ namespace hpp {
       using graph::EdgePtr_t;
       using graph::LevelSetEdgePtr_t;
       using graph::WaypointEdgePtr_t;
-
       using corbaServer::floatSeqToConfig;
+      using corbaServer::floatSeqToConfigPtr;
 
       namespace {
         typedef core::ProblemSolver CPs_t;
@@ -631,6 +632,95 @@ namespace hpp {
         } catch (std::exception& e) {
           throw Error (e.what());
         }
+      }
+
+      bool Graph::applyNodeConstraints
+      (hpp::ID id, const hpp::floatSeq& input, hpp::floatSeq_out output,
+       double& residualError) throw (hpp::Error)
+      {
+        /// First get the constraint.
+        ConstraintSetPtr_t constraint;
+        try {
+          graph::GraphComponentPtr_t comp = graph()->get ((size_t)id).lock ();
+          graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
+          graph::StatePtr_t state = HPP_DYNAMIC_PTR_CAST(graph::State, comp);
+          if (edge) {
+            constraint = graph(false)->configConstraint (edge);
+            DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	    if (core::ConfigProjectorPtr_t cp =
+		constraint->configProjector ()) {
+	      cp->rightHandSideFromConfig (robot->currentConfiguration());
+	    }
+          } else if (state)
+            constraint = graph(false)->configConstraint (state);
+          else {
+            std::stringstream ss;
+            ss << "ID " << id << " is neither an edge nor a state";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
+          }
+	  bool success = false;
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	  ConfigurationPtr_t config = floatSeqToConfigPtr (robot, input, true);
+	  success = constraint->apply (*config);
+	  if (hpp::core::ConfigProjectorPtr_t configProjector =
+	      constraint ->configProjector ()) {
+	    residualError = configProjector->residualError ();
+	  }
+	  output = vectorToFloatSeq(*config);
+	  return success;
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
+      bool Graph::generateTargetConfig
+      (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
+       hpp::floatSeq_out output, double& residualError)
+        throw (hpp::Error)
+      {
+        /// First get the constraint.
+        graph::EdgePtr_t edge;
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST
+            (graph::Edge, graph()->get((size_t)IDedge).lock ());
+          if (!edge) {
+            std::stringstream ss;
+            ss << "ID " << IDedge << " is not an edge";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
+          }
+	  bool success = false;
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	  ConfigurationPtr_t config = floatSeqToConfigPtr (robot, input, true);
+	  ConfigurationPtr_t qoffset = floatSeqToConfigPtr (robot, qleaf, true);
+          value_type dist = 0;
+          core::NodePtr_t nNode = problemSolver()->roadmap()->nearestNode
+	    (qoffset, dist);
+          if (dist < 1e-8)
+            success = edge->applyConstraints (nNode, *config);
+          else
+            success = edge->applyConstraints (*qoffset, *config);
+
+	  hpp::core::ConfigProjectorPtr_t configProjector
+	    (edge->configConstraint ()->configProjector ());
+	  if (configProjector) {
+	    residualError = configProjector->residualError ();
+	  } else {
+	    hppDout (info, "No config projector.");
+	  }
+	  ULong size = (ULong) config->size ();
+	  hpp::floatSeq* q_ptr = new hpp::floatSeq ();
+	  q_ptr->length (size);
+
+	  for (std::size_t i=0; i<size; ++i) {
+	    (*q_ptr) [(ULong) i] = (*config) [i];
+	  }
+	  output = q_ptr;
+	  return success;
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
       }
 
       CORBA::Boolean Graph::getConfigErrorForNode

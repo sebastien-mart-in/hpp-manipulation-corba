@@ -154,6 +154,16 @@ namespace hpp {
           virtual void getNode (const hpp::floatSeq& dofArray, ID_out output)
             throw (hpp::Error);
 
+        virtual bool applyNodeConstraints
+        (hpp::ID id, const hpp::floatSeq& input,
+         hpp::floatSeq_out output, double& residualError)
+          throw (hpp::Error);
+
+        virtual bool generateTargetConfig
+        (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
+         hpp::floatSeq_out output, double& residualError)
+          throw (hpp::Error);
+
 	virtual CORBA::Boolean getConfigErrorForNode
 	(ID nodeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
 	  throw (hpp::Error);
