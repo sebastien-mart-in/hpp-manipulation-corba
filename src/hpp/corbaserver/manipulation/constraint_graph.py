@@ -498,8 +498,8 @@ class ConstraintGraph (object):
     #  \retval output output configuration,
     #  \retval error norm of the residual error.
     def  applyNodeConstraints (self, node,  input) :
-        return self.client.problem.applyConstraints (self.nodes [node],
-                                                     input)
+        return self.client.graph.applyNodeConstraints (self.nodes [node],
+                                                       input)
 
     ## Apply edge constaints to a configuration
     #
@@ -513,7 +513,7 @@ class ConstraintGraph (object):
     #  Compute a configuration in the destination node of the edge,
     #  reachable from qFrom.
     def generateTargetConfig (self, edge, qfrom, input) :
-        return self.client.problem.applyConstraintsWithOffset \
+        return self.client.graph.generateTargetConfig \
             (self.edges [edge], qfrom, input)
 
     ## Build a path from qb to qe using the Edge::build.
