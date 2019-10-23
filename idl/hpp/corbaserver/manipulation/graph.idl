@@ -206,13 +206,24 @@ module hpp {
             out double residualError)
           raises (Error);
 
+        /// Apply constraints of an edge leaf to a configuration
+        ///
+        /// \param id IDedge of the edge
+        /// \param qleaf Configuration defining the leaf
+        /// \param input input configuration to be projected
+        /// \retval output Output configuration,
+        /// \retval residualError norm of the residual error
+        boolean applyEdgeLeafConstraints
+        (in ID idedge, in floatSeq qleaf, in floatSeq input,
+         out floatSeq output, out double residualError) raises (Error);
+
         /// Generate configuration in target state of a transition reachable from a configuration
         ///
         /// \param IDedge ID of a transition (edge of the constraint graph)
         /// \param qleaf configuration defining the leaf of the transition
         /// \param input input configuration to be projected
         /// \retval output output configuration,
-        /// \retval error norm of the residual error.
+        /// \retval residualError norm of the residual error.
         boolean generateTargetConfig (in ID IDedge, in floatSeq qleaf,
                                       in floatSeq input, out floatSeq output,
                                       out double residualError)

@@ -674,6 +674,52 @@ namespace hpp {
 	}
       }
 
+      bool Graph::applyEdgeLeafConstraints
+      (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
+       hpp::floatSeq_out output, double& residualError)
+        throw (hpp::Error)
+      {
+        /// First get the constraint.
+        graph::EdgePtr_t edge;
+        try {
+          edge = HPP_DYNAMIC_PTR_CAST
+            (graph::Edge, graph()->get((size_t)IDedge).lock ());
+          if (!edge) {
+            std::stringstream ss;
+            ss << "ID " << IDedge << " is not an edge";
+            std::string errmsg = ss.str();
+            throw Error (errmsg.c_str());
+          }
+	  bool success = false;
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+	  ConfigurationPtr_t config = floatSeqToConfigPtr (robot, input, true);
+	  ConfigurationPtr_t qRhs = floatSeqToConfigPtr (robot, qleaf, true);
+          value_type dist = 0;
+          ConstraintSetPtr_t cs (edge->pathConstraint ());
+          assert (cs);
+
+          if (cs->configProjector ()) {
+            cs->configProjector ()->rightHandSideFromConfig (*qRhs);
+            success = cs->apply (*config);
+	    residualError = cs->configProjector ()->residualError ();
+          } else {
+            residualError = 0;
+          }
+
+	  ULong size = (ULong) config->size ();
+	  hpp::floatSeq* q_ptr = new hpp::floatSeq ();
+	  q_ptr->length (size);
+
+	  for (std::size_t i=0; i<size; ++i) {
+	    (*q_ptr) [(ULong) i] = (*config) [i];
+	  }
+	  output = q_ptr;
+	  return success;
+	} catch (const std::exception& exc) {
+	  throw hpp::Error (exc.what ());
+	}
+      }
+
       bool Graph::generateTargetConfig
       (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
        hpp::floatSeq_out output, double& residualError)
@@ -693,14 +739,14 @@ namespace hpp {
 	  bool success = false;
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  ConfigurationPtr_t config = floatSeqToConfigPtr (robot, input, true);
-	  ConfigurationPtr_t qoffset = floatSeqToConfigPtr (robot, qleaf, true);
+	  ConfigurationPtr_t qRhs = floatSeqToConfigPtr (robot, qleaf, true);
           value_type dist = 0;
           core::NodePtr_t nNode = problemSolver()->roadmap()->nearestNode
-	    (qoffset, dist);
+	    (qRhs, dist);
           if (dist < 1e-8)
             success = edge->applyConstraints (nNode, *config);
           else
-            success = edge->applyConstraints (*qoffset, *config);
+            success = edge->applyConstraints (*qRhs, *config);
 
 	  hpp::core::ConfigProjectorPtr_t configProjector
 	    (edge->configConstraint ()->configProjector ());

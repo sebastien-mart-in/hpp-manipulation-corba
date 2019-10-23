@@ -512,6 +512,21 @@ class ConstraintGraph (object):
     #
     #  Compute a configuration in the destination node of the edge,
     #  reachable from qFrom.
+    def applyEdgeLeafConstraints (self, edge, qfrom, input) :
+        return self.client.graph.applyEdgeLeafConstraints \
+            (self.edges [edge], qfrom, input)
+
+    ## Generate configuration in destination state on a given leaf
+    #
+    #  \param edge name of the edge
+    #  \param qfrom configuration defining the right hand side of the edge
+    #         constraint,
+    #  \param input input configuration,
+    #  \retval output output configuration,
+    #  \retval error norm of the residual error.
+    #
+    #  Compute a configuration in the destination node of the edge,
+    #  reachable from qFrom.
     def generateTargetConfig (self, edge, qfrom, input) :
         return self.client.graph.generateTargetConfig \
             (self.edges [edge], qfrom, input)

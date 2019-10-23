@@ -159,6 +159,11 @@ namespace hpp {
          hpp::floatSeq_out output, double& residualError)
           throw (hpp::Error);
 
+        virtual bool applyEdgeLeafConstraints
+        (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
+         hpp::floatSeq_out output, double& residualError)
+          throw (hpp::Error);
+
         virtual bool generateTargetConfig
         (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
          hpp::floatSeq_out output, double& residualError)
