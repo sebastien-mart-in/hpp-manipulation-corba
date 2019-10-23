@@ -510,8 +510,8 @@ class ConstraintGraph (object):
     #  \retval output output configuration,
     #  \retval error norm of the residual error.
     #
-    #  Compute a configuration in the destination node of the edge,
-    #  reachable from qFrom.
+    #  If success, the output configuration is reachable from qfrom along
+    #  the transition.
     def applyEdgeLeafConstraints (self, edge, qfrom, input) :
         return self.client.graph.applyEdgeLeafConstraints \
             (self.edges [edge], qfrom, input)
