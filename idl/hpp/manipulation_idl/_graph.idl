@@ -103,6 +103,10 @@ module hpp {
         //-> steeringMethod
         core_idl::PathValidation getPathValidation () raises (Error);
         //-> pathValidation
+
+        core_idl::ConstraintSet configConstraint () raises (Error);
+
+        core_idl::ConstraintSet pathConstraint () raises (Error);
       }; // interface Edge
 
       interface Validation
