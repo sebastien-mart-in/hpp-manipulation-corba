@@ -368,7 +368,8 @@ namespace hpp {
           QPStaticStabilityPtr_t c = QPStaticStability::create (placName, robot,
               fds, com);
           problemSolver()->addNumericalConstraint (placName,
-              Implicit::create (c, core::EqualToZero::create())
+              Implicit::create (c,
+                constraints::ComparisonTypes_t(1, constraints::EqualToZero))
               );
 #else
           // Avoid unused-variable compilation warnings
