@@ -16,23 +16,23 @@
 # <http://www.gnu.org/licenses/>.
 
 # Requires at least CMake 2.6 to configure the package.
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
-SET(CXX_DISABLE_WERROR true)
-
-INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/hpp.cmake)
-INCLUDE(cmake/idl.cmake)
-INCLUDE(cmake/python.cmake)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(PROJECT_NAME hpp-manipulation-corba)
 SET(PROJECT_DESCRIPTION "Corba server for manipulation planning")
+
+SET(CXX_DISABLE_WERROR true)
+
+INCLUDE(cmake/hpp.cmake)
+INCLUDE(cmake/idl.cmake)
+INCLUDE(cmake/python.cmake)
 
 SET(CLIENT_ONLY FALSE CACHE BOOL "Set to true to install the client only")
 
 SET(CUSTOM_HEADER_DIR hpp/corbaserver/manipulation)
 
-SETUP_HPP_PROJECT ()
+COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
+PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
 
 LIST(APPEND PKG_CONFIG_ADDITIONAL_VARIABLES cmake_plugin)
 CONFIG_FILES (doc/main.hh)
@@ -63,5 +63,3 @@ ADD_REQUIRED_DEPENDENCY("omniORB4 >= 4.1.4")
 ADD_SUBDIRECTORY(src)
 
 PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
-
-SETUP_HPP_PROJECT_FINALIZE()
