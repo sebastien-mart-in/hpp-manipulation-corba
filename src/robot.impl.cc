@@ -116,19 +116,17 @@ namespace hpp {
       }
 
       void Robot::insertRobotModel (const char* robotName,
-          const char* rootJointType, const char* packageName,
-          const char* modelName, const char* urdfSuffix,
-          const char* srdfSuffix)
+          const char* rootJointType, const char* urdfName,
+          const char* srdfName)
 	throw (Error)
       {
         insertRobotModelOnFrame (robotName, "universe", rootJointType,
-            packageName, modelName, urdfSuffix, srdfSuffix);
+                                 urdfName, srdfName);
       }
 
       void Robot::insertRobotModelOnFrame (const char* robotName,
           const char* frameName, const char* rootJointType,
-          const char* packageName, const char* modelName,
-          const char* urdfSuffix, const char* srdfSuffix)
+          const char* urdfName, const char* srdfName)
         throw (hpp::Error)
       {
 	try {
@@ -138,10 +136,9 @@ namespace hpp {
           if (!robot->model().existFrame (frameName))
             HPP_THROW(std::invalid_argument, "No frame named " << frameName << ".");
           pinocchio::FrameIndex frame = robot->model().getFrameId(frameName);
-          pinocchio::urdf::loadRobotModel (robot, frame, robotName, rootJointType,
-              packageName, modelName, urdfSuffix, srdfSuffix);
-	  srdf::loadModelFromFile (robot, robotName,
-              packageName, modelName, srdfSuffix);
+          pinocchio::urdf::loadModel (robot, frame, robotName, rootJointType,
+                                      urdfName, srdfName);
+	  srdf::loadModelFromFile (robot, robotName, srdfName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -185,20 +182,18 @@ namespace hpp {
       }
 
       void Robot::insertHumanoidModel (const char* robotName,
-          const char* rootJointType, const char* packageName,
-          const char* modelName, const char* urdfSuffix,
-          const char* srdfSuffix)
+          const char* rootJointType, const char* urdfName,
+          const char* srdfName)
 	throw (Error)
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
           if (robot->robotFrames(robotName).size() > 0)
             HPP_THROW(std::invalid_argument, "A robot named " << robotName << " already exists");
-          pinocchio::urdf::loadRobotModel (robot, 0, robotName, rootJointType,
-              packageName, modelName, urdfSuffix, srdfSuffix);
+          pinocchio::urdf::loadModel (robot, 0, robotName, rootJointType,
+              urdfName, srdfName);
           pinocchio::urdf::setupHumanoidRobot (robot, robotName);
-          srdf::loadModelFromFile (robot, robotName,
-              packageName, modelName, srdfSuffix);
+          srdf::loadModelFromFile (robot, robotName, srdfName);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
@@ -225,21 +220,17 @@ namespace hpp {
 	}
       }
 
-      void Robot::loadEnvironmentModel (const char* package,
-          const char* envModelName, const char* urdfSuffix,
-          const char* srdfSuffix, const char* prefix)
+      void Robot::loadEnvironmentModel (const char* urdfName,
+          const char* srdfName, const char* prefix)
 	throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
 
-          std::string modelName (envModelName); 
           std::string p (prefix);
           DevicePtr_t object = Device::create (p);
-          pinocchio::urdf::loadUrdfModel (object, "anchor",
-              package, modelName + std::string(urdfSuffix));
-          srdf::loadModelFromFile (object, "",
-              package, envModelName, srdfSuffix);
+          pinocchio::urdf::loadModel (object, 0, "", "anchor", urdfName, "");
+          srdf::loadModelFromFile (object, "", srdfName);
           object->controlComputation(hpp::pinocchio::JOINT_POSITION);
           object->computeForwardKinematics();
           object->updateGeometryPlacements();

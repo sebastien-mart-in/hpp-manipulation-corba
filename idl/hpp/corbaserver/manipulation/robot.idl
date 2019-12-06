@@ -32,23 +32,18 @@ module hpp
     ///        (see hpp::manipulation::ProblemSolver::addRobot)
     /// \param rootJointType type of root joint among "anchor", "freeflyer",
     /// "planar",
-    /// \param packageName Name of the ROS package containing the model,
-    /// \param modelName Name of the package containing the model
-    /// \param urdfSuffix suffix for urdf file,
-    ///
-    /// The ros url are built as follows:
-    /// "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-    /// "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
+    /// \param urdfName name of the urdf file. It may contain
+    ///        "file://", or "package://" prefixes.
+    /// \param srdfName name of the srdf file. It may contain
+    ///        "file://", or "package://" prefixes.
     ///
     void insertRobotModel (in string robotName, in string rootJointType,
-        in string packageName, in string modelName, in string urdfSuffix,
-        in string srdfSuffix)
+        in string urdfname, in string srdfname)
       raises (Error);
 
     /// \copydoc hpp::corbaserver::manipulation::robot::Robot::insertRobotModelOnFrame
     void insertRobotModelOnFrame (in string robotName, in string frameName,
-        in string rootJointType, in string packageName, in string modelName,
-        in string urdfSuffix, in string srdfSuffix)
+        in string rootJointType, in string urdfname, in string srdfname)
       raises (Error);
 
     ///  Insert robot model as a child of the root joint of the Device
@@ -75,17 +70,13 @@ module hpp
     ///        (see hpp::manipulation::ProblemSolver::addRobot)
     /// \param rootJointType type of root joint among "anchor", "freeflyer",
     /// "planar",
-    /// \param packageName Name of the ROS package containing the model,
-    /// \param modelName Name of the package containing the model
-    /// \param urdfSuffix suffix for urdf file,
-    ///
-    /// The ros url are built as follows:
-    /// "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-    /// "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
+    /// \param urdfName name of the urdf file. It may contain
+    ///        "file://", or "package://" prefixes.
+    /// \param srdfName name of the srdf file. It may contain
+    ///        "file://", or "package://" prefixes.
     ///
     void insertHumanoidModel (in string robotName, in string rootJointType,
-        in string packageName, in string modelName, in string urdfSuffix,
-        in string srdfSuffix)
+        in string urdfname, in string srdfname)
       raises (Error);
 
     ///  Insert humanoid robot model as a child of the root joint of the Device

@@ -38,15 +38,13 @@ namespace hpp {
           }
 
           virtual void insertRobotModel (const char* robotName,
-              const char* rootJointType, const char* packageName,
-              const char* modelName, const char* urdfSuffix,
-              const char* srdfSuffix)
+              const char* rootJointType, const char* urdfName,
+              const char* srdfName)
             throw (hpp::Error);
 
           virtual void insertRobotModelOnFrame (const char* robotName,
               const char* frameName, const char* rootJointType,
-              const char* packageName, const char* modelName,
-              const char* urdfSuffix, const char* srdfSuffix)
+              const char* urdfName, const char* srdfName)
             throw (hpp::Error);
 
           virtual void insertRobotModelFromString (const char* robotName,
@@ -61,9 +59,8 @@ namespace hpp {
             throw (hpp::Error);
 
           virtual void insertHumanoidModel (const char* robotName,
-              const char* rootJointType, const char* packageName,
-              const char* modelName, const char* urdfSuffix,
-              const char* srdfSuffix)
+              const char* rootJointType, const char* urdfName,
+              const char* srdfName)
             throw (hpp::Error);
 
           virtual void insertHumanoidModelFromString (const char* robotName,
@@ -72,9 +69,8 @@ namespace hpp {
               const char* srdfString)
             throw (hpp::Error);
 
-          virtual void loadEnvironmentModel (const char* package,
-              const char* envModelName, const char* urdfSuffix,
-              const char* srdfSuffix, const char* prefix)
+          virtual void loadEnvironmentModel (const char* urdfName,
+              const char* srdfName, const char* prefix)
             throw (hpp::Error);
 
           virtual void loadEnvironmentModelFromString (const char* urdfString,
