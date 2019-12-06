@@ -694,7 +694,6 @@ namespace hpp {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	  ConfigurationPtr_t config = floatSeqToConfigPtr (robot, input, true);
 	  ConfigurationPtr_t qRhs = floatSeqToConfigPtr (robot, qleaf, true);
-          value_type dist = 0;
           ConstraintSetPtr_t cs (edge->pathConstraint ());
           assert (cs);
 
