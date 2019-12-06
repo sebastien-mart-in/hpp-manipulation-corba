@@ -184,15 +184,6 @@ namespace hpp {
 	}
       }
 
-      void Robot::insertObjectModel (const char* objectName,
-          const char* rootJointType, const char* packageName,
-          const char* modelName, const char* urdfSuffix,
-          const char* srdfSuffix)
-	throw (Error)
-      {
-        insertRobotModel (objectName, rootJointType, packageName, modelName, urdfSuffix, srdfSuffix);
-      }
-
       void Robot::insertHumanoidModel (const char* robotName,
           const char* rootJointType, const char* packageName,
           const char* modelName, const char* urdfSuffix,

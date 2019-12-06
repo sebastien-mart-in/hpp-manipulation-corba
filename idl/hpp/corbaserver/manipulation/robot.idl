@@ -101,14 +101,13 @@ module hpp
         in string urdfString, in string srdfString)
       raises (Error);
 
-    /// \deprecated use insertRobotModel(in string, in string, in string, in string, in string, in string) instead
-    void insertObjectModel (in string objectName, in string rootJointType,
-        in string packageName, in string modelName, in string urdfSuffix,
-        in string srdfSuffix)
-      raises (Error);
-
-    void loadEnvironmentModel (in string packageName, in string envModelName,
-        in string urdfSuffix, in string srdfSuffix, in string prefix)
+    /// Load model of the environment
+    ///
+    /// urdfName name of the urdf file describing the environment
+    /// srdfName name of the srdf file describing the environment,
+    /// prefix string added in front of object names.
+    void loadEnvironmentModel (in string urdfName, in string srdfName,
+                               in string prefix)
       raises (Error);
 
     /// Get the position of root joint of a robot in world frame
