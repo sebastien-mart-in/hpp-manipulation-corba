@@ -65,8 +65,9 @@ class Robot (Parent):
     def loadModel (self, robotName, rootJointType):
         if self.load:
             self.client.basic.robot.createRobot (self.name)
-        self.insertRobotModel (robotName, rootJointType, self.packageName,
-                               self.urdfName, self.urdfSuffix, self.srdfSuffix)
+        urdfFilename, srdfFilename = self.urdfSrdfFilenames ()
+        self.insertRobotModel (robotName, rootJointType, urdfFilename,
+                               srdfFilename)
 
     ## Load robot model and insert it in the device
     #
@@ -74,19 +75,13 @@ class Robot (Parent):
     #         map (see hpp::manipulation::ProblemSolver::addRobot)
     #  \param rootJointType type of root joint among "anchor", "freeflyer",
     #         "planar",
-    #  \param packageName Name of the ROS package containing the model,
-    #  \param modelName Name of the package containing the model
-    #  \param urdfSuffix suffix for urdf file,
+    #  \param urdfName name of the urdf file
+    #  \param srdfName name of the srdf file
     #
-    #  The ros url are built as follows:
-    #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-    def insertRobotModel (self, robotName, rootJointType, packageName,
-            modelName, urdfSuffix, srdfSuffix):
+    def insertRobotModel (self, robotName, rootJointType, urdfName, srdfName):
         if self.load:
-            self.client.manipulation.robot.insertRobotModel (robotName,
-                    rootJointType, packageName, modelName, urdfSuffix,
-                    srdfSuffix)
+            self.client.manipulation.robot.insertRobotModel \
+                (robotName, rootJointType, urdfName, srdfName)
         self.robotNames.append (robotName)
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
@@ -98,20 +93,14 @@ class Robot (Parent):
     # \param frameName name of the existing frame that will the root of the added robot,
     # \param rootJointType type of root joint among "anchor", "freeflyer",
     # "planar",
-    # \param packageName Name of the ROS package containing the model,
-    # \param modelName Name of the package containing the model
-    # \param urdfSuffix suffix for urdf file,
-    #
-    # The ros url are built as follows:
-    # "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-    # "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
+    #  \param urdfName name of the urdf file
+    #  \param srdfName name of the srdf file
     #
     def insertRobotModelOnFrame (self, robotName, frameName, rootJointType,
-            packageName, modelName, urdfSuffix, srdfSuffix):
+                                 urdfName, srdfName):
         if self.load:
-            self.client.manipulation.robot.insertRobotModelOnFrame (robotName,
-                    frameName, rootJointType, packageName, modelName,
-                    urdfSuffix, srdfSuffix)
+            self.client.manipulation.robot.insertRobotModelOnFrame \
+                (robotName, frameName, rootJointType, urdfName, srdfName)
         self.robotNames.append (robotName)
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
@@ -146,31 +135,26 @@ class Robot (Parent):
 
     ## Load humanoid robot model and insert it in the device
     #
-    #  \param robotName key of the robot in ProblemSolver object map
-    #         (see hpp::manipulation::ProblemSolver::addRobot)
+    #  \param robotName key of the robot in hpp::manipulation::ProblemSolver object
+    #         map (see hpp::manipulation::ProblemSolver::addRobot)
     #  \param rootJointType type of root joint among "anchor", "freeflyer",
     #         "planar",
-    #  \param packageName Name of the ROS package containing the model,
-    #  \param modelName Name of the package containing the model
-    #  \param urdfSuffix suffix for urdf file,
+    #  \param urdfName name of the urdf file
+    #  \param srdfName name of the srdf file
     #
-    #  The ros url are built as follows:
-    #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-    def insertHumanoidModel (self, robotName, rootJointType, packageName,
-                           modelName, urdfSuffix, srdfSuffix):
+    def insertHumanoidModel (self, robotName, rootJointType, urdfName,
+                             srdfName) :
         if self.load:
             self.client.manipulation.robot.insertHumanoidModel \
-                (robotName, rootJointType, packageName, modelName,
-                 urdfSuffix, srdfSuffix)
+                (robotName, rootJointType, urdfName, srdfName)
         self.robotNames.append (robotName)
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
 
-    def loadHumanoidModel (self, robotName, rootJointType, packageName,
-                           modelName, urdfSuffix, srdfSuffix):
-        self.insertHumanoidModel (robotName, rootJointType, packageName,
-                           modelName, urdfSuffix, srdfSuffix)
+    def loadHumanoidModel (self, robotName, rootJointType, urdfName,
+                           srdfName):
+        self.insertHumanoidModel (robotName, rootJointType, urdfName,
+                                  srdfName)
 
     ## Load environment model and store in local map.
     #  Contact surfaces are build from the corresping srdf file.
@@ -179,19 +163,13 @@ class Robot (Parent):
     #
     #  \param envName key of the object in ProblemSolver object map
     #         (see hpp::manipulation::ProblemSolver::addRobot)
-    #  \param packageName Name of the ROS package containing the model,
-    #  \param modelName Name of the package containing the model
-    #  \param urdfSuffix suffix for urdf file,
-    #  \param srdfSuffix suffix for srdf file.
+    #  \param urdfName name of the urdf file,
+    #  \param srdfName name of the srdf file.
     #
-    #  The ros url are built as follows:
-    #  \li "package://${packageName}/urdf/${modelName}${urdfSuffix}.urdf"
-    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-    def loadEnvironmentModel (self, packageName, modelName,
-                         urdfSuffix, srdfSuffix, envName):
+    def loadEnvironmentModel (self, urdfName, srdfName, envName):
         if self.load:
-            self.client.manipulation.robot.loadEnvironmentModel (packageName,
-                    modelName, urdfSuffix, srdfSuffix, envName)
+            self.client.manipulation.robot.loadEnvironmentModel \
+                (urdfName, srdfName, envName)
         self.rootJointType[envName] = "Anchor"
 
     ## \name Joints
@@ -232,7 +210,8 @@ class HumanoidRobot (Robot, StaticStabilityConstraintsFactory):
         Robot.__init__ (self, compositeName, robotName, rootJointType, load, client)
 
     def loadModel (self, robotName, rootJointType):
-        self.client.basic.robot.createRobot (self.name)
+        if self.load:
+            self.client.basic.robot.createRobot (self.name)
+        urdfFilename, srdfFilename = self.urdfSrdfFilenames ()
         self.insertHumanoidModel \
-            (robotName, rootJointType, self.packageName, self.urdfName,
-             self.urdfSuffix, self.srdfSuffix)
+            (robotName, rootJointType, urdfFilename, srdfFilename)
