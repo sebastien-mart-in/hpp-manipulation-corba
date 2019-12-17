@@ -50,30 +50,13 @@ namespace hpp {
     void Server::startCorbaServer(const std::string& contextId,
 				  const std::string& contextKind)
     {
-      bool mThd = parent()->multiThread();
-      graphImpl_   = new corba::Server <impl::Graph>   (0, NULL, mThd, "child");
-      problemImpl_ = new corba::Server <impl::Problem> (0, NULL, mThd, "child");
-      robotImpl_   = new corba::Server <impl::Robot>   (0, NULL, mThd, "child");
+      initializeTplServer(graphImpl_  , contextId, contextKind, name(), "graph");
+      initializeTplServer(problemImpl_, contextId, contextKind, name(), "problem");
+      initializeTplServer(robotImpl_  , contextId, contextKind, name(), "robot");
 
       graphImpl_  ->implementation ().setServer (this);
       problemImpl_->implementation ().setServer (this);
       robotImpl_  ->implementation ().setServer (this);
-
-      if (graphImpl_->startCorbaServer(contextId, contextKind,
-				       "manipulation", "graph") != 0) {
-	HPP_THROW_EXCEPTION (hpp::Exception,
-			     "Failed to start corba graph server.");
-      }
-      if (robotImpl_->startCorbaServer(contextId, contextKind,
-				       "manipulation", "robot") != 0) {
-	HPP_THROW_EXCEPTION (hpp::Exception,
-			     "Failed to start corba robot server.");
-      }
-      if (problemImpl_->startCorbaServer(contextId, contextKind,
-					 "manipulation", "problem") != 0) {
-	HPP_THROW_EXCEPTION (hpp::Exception,
-			     "Failed to start corba problem server.");
-      }
     }
 
     ProblemSolverPtr_t Server::problemSolver ()
@@ -84,6 +67,14 @@ namespace hpp {
       if (psm == NULL)
         throw std::logic_error ("ProblemSolver is not a manipulation problem");
       return psm;
+    }
+
+    ::CORBA::Object_ptr Server::servant(const std::string& name) const
+    {
+      if (name == "graph"  ) return graphImpl_  ->implementation()._this();
+      if (name == "problem") return problemImpl_->implementation()._this();
+      if (name == "robot"  ) return robotImpl_  ->implementation()._this();
+      throw std::invalid_argument ("No servant " + name);
     }
   } // namespace manipulation
 } // namespace hpp
