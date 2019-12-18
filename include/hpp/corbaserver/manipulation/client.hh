@@ -13,6 +13,7 @@
 
 # include <omniORB4/CORBA.h>
 
+# include <hpp/corbaserver/client.hh>
 # include <hpp/corbaserver/manipulation/robot-idl.hh>
 # include <hpp/corbaserver/manipulation/problem-idl.hh>
 # include <hpp/corbaserver/manipulation/graph-idl.hh>
@@ -26,16 +27,16 @@ namespace hpp
   {
     namespace manipulation
     {
-      class HPP_MANIPULATION_CORBA_DLLAPI Client
+      class HPP_MANIPULATION_CORBA_DLLAPI Client : public ClientBase
       {
         public:
           Client (int argc, char* argv[]);
 
           ~Client ();
 
-          /// \param iiop address of the namesever
+          /// \param iiop base address
           /// \param context the hpp context name (passed to the server)
-          void connect (const char* iiop = "corbaloc:rir:/NameService",
+          void connect (const char* iiop = "corbaloc:iiop:",
               const char* context = "corbaserver");
 
 
@@ -55,8 +56,6 @@ namespace hpp
           hpp::corbaserver::manipulation::Robot_var robot_;
           hpp::corbaserver::manipulation::Problem_var problem_;
           hpp::corbaserver::manipulation::Graph_var graph_;
-
-          CORBA::ORB_var orb_;
       };
     } // end of namespace manipulation.
   } // end of namespace corbaServer.
