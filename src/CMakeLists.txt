@@ -35,6 +35,8 @@ FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation)
 FOREACH(IDL ${IDL_SOURCES})
   GENERATE_IDL_CPP (hpp/corbaserver/manipulation/${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
+    ARGUMENTS
+    -Wbguard_prefix=hpp_manipulation_corba_idl
     HEADER_SUFFIX -idl.hh)
   GENERATE_IDL_PYTHON (${IDL} ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
     ENABLE_DOCSTRING

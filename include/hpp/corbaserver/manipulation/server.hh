@@ -48,6 +48,8 @@ namespace hpp {
       void startCorbaServer(const std::string& contextId,
 			    const std::string& contextKind);
 
+      ::CORBA::Object_ptr servant (const std::string& name) const;
+
       std::string name () const;
 
       ProblemSolverPtr_t problemSolver () throw (std::logic_error);
