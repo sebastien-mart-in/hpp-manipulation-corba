@@ -1,0 +1,57 @@
+// Copyright (C) 2020 by Joseph Mirabel, LAAS-CNRS.
+//
+// This file is part of the hpp-manipulation-planner.
+//
+// This software is provided "as is" without warranty of any kind,
+// either expressed or implied, including but not limited to the
+// implied warranties of fitness for a particular purpose.
+//
+// See the COPYING file for more information.
+
+#ifndef HPP_MANIPULATION_CORBA_PATH_PLANNERS_IDL
+#define HPP_MANIPULATION_CORBA_PATH_PLANNERS_IDL
+#include <hpp/common.idl>
+
+#include <hpp/core_idl/path_planners.idl>
+
+module hpp
+{
+  module core_idl {
+    interface PathPlanner;
+  }; // module core
+
+  module manipulation_idl {
+    module pathPlanner_idl {
+      interface IkSolverInitialization
+      {
+      }; // interface IkSolverInitialization
+
+      interface EndEffectorTrajectory : core_idl::PathPlanner
+      {
+        long getNRandomConfig (         ) raises (Error);
+        //-> nRandomConfig
+        void setNRandomConfig (in long n) raises (Error);
+        //-> nRandomConfig
+
+        long getNDiscreteSteps (         ) raises (Error);
+        //-> nDiscreteSteps
+        void setNDiscreteSteps (in long n) raises (Error);
+        //-> nDiscreteSteps
+
+        boolean getCheckFeasibilityOnly (            ) raises (Error);
+        //-> checkFeasibilityOnly
+        void    setCheckFeasibilityOnly (in boolean n) raises (Error);
+        //-> checkFeasibilityOnly
+
+        void setIkSolverInitialization (in IkSolverInitialization solver);
+        //-> ikSolverInitialization
+      }; // interface EndEffectorTrajectory
+    }; // module pathPlanner_idl
+  }; // module manipulation_idl
+}; // module hpp
+
+//* #include <hpp/manipulation/path-planner/end-effector-trajectory.hh>
+//* #include <hpp/core_idl/paths.hh>
+//* #include <hpp/core_idl/path_planners.hh>
+
+#endif // HPP_MANIPULATION_CORBA_PATH_PLANNERS_IDL

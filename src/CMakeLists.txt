@@ -58,7 +58,7 @@ FOREACH(IDL ${IDL_SOURCES})
 ENDFOREACH()
 
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl)
-FOREACH(IDL steering_methods _graph _problem)
+FOREACH(IDL steering_methods _graph _problem _path_planners)
   GENERATE_IDL_CPP (hpp/manipulation_idl/${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
     ARGUMENTS
@@ -86,6 +86,7 @@ FOREACH(IDL steering_methods _graph _problem)
     -Wbextern=configuration_shooters:hpp_stubs.core
     -Wbextern=_constraints:hpp_stubs.core
     -Wbextern=_problem:hpp_stubs.core
+    -Wbextern=path_planners:hpp_stubs.core
     )
   INSTALL(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-idl.hh

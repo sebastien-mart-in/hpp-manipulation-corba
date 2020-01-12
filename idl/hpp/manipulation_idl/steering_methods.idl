@@ -35,6 +35,7 @@ module hpp {
     module steeringMethod {
       interface EndEffectorTrajectory : core_idl::SteeringMethod
       {
+        core_idl::Path makePiecewiseLinearTrajectory (in floatSeqSeq points);
         void trajectoryConstraint (in constraints_idl::Implicit c) raises (Error);
         void trajectory (in core_idl::Path eeTraj, in boolean se3Output) raises (Error);
       }; // interface SteeringMethod
