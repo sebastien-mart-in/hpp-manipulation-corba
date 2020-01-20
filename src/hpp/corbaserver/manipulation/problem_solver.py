@@ -95,10 +95,7 @@ class ProblemSolver (Parent):
     ## Get whether right hand side of a numerical constraint is constant
     #  \param constraintName Name of the numerical constraint,
     #  \return whether right hand side is constant
-    #  \note LockedJoint have non constant right hand side
     def getConstantRightHandSide (self, constraintName) :
-        if constraintName in self.getAvailable ('LockedJoint'):
-            return False
         return self.client.basic.problem.getConstantRightHandSide \
             (constraintName)
 
