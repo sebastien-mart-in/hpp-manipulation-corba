@@ -51,7 +51,6 @@ module hpp {
         Graph parentGraph () raises (Error);
 
         void addNumericalConstraint (in constraints_idl::Implicit nm) raises (Error);
-        void addLockedJointConstraint (in constraints_idl::LockedJoint lj) raises (Error);
 
         constraints_idl::Implicits numericalConstraints () raises (Error);
 
