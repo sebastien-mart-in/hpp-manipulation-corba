@@ -39,70 +39,55 @@ namespace hpp {
 
           virtual void insertRobotModel (const char* robotName,
               const char* rootJointType, const char* urdfName,
-              const char* srdfName)
-            throw (hpp::Error);
+              const char* srdfName);
 
           virtual void insertRobotModelOnFrame (const char* robotName,
               const char* frameName, const char* rootJointType,
-              const char* urdfName, const char* srdfName)
-            throw (hpp::Error);
+              const char* urdfName, const char* srdfName);
 
           virtual void insertRobotModelFromString (const char* robotName,
               const char* rootJointType,
               const char* urdfString,
-              const char* srdfString)
-            throw (hpp::Error);
+              const char* srdfString);
 
           virtual void insertRobotSRDFModel (const char* robotName,
               const char* packageName, const char* modelName,
-              const char* srdfSuffix)
-            throw (hpp::Error);
+              const char* srdfSuffix);
 
           virtual void insertHumanoidModel (const char* robotName,
               const char* rootJointType, const char* urdfName,
-              const char* srdfName)
-            throw (hpp::Error);
+              const char* srdfName);
 
           virtual void insertHumanoidModelFromString (const char* robotName,
               const char* rootJointType,
               const char* urdfString,
-              const char* srdfString)
-            throw (hpp::Error);
+              const char* srdfString);
 
           virtual void loadEnvironmentModel (const char* urdfName,
-              const char* srdfName, const char* prefix)
-            throw (hpp::Error);
+              const char* srdfName, const char* prefix);
 
           virtual void loadEnvironmentModelFromString (const char* urdfString,
-              const char* srdfString, const char* prefix)
-            throw (hpp::Error);
+              const char* srdfString, const char* prefix);
 
-          virtual Transform__slice* getRootJointPosition (const char* robotName)
-            throw (hpp::Error);
+          virtual Transform__slice* getRootJointPosition (const char* robotName);
 
           virtual void setRootJointPosition (const char* robotName,
-              const ::hpp::Transform_ position)
-            throw (hpp::Error);
+              const ::hpp::Transform_ position);
 
           virtual void addHandle (const char* linkName, const char* handleName,
-              const ::hpp::Transform_ localPosition)
-            throw (hpp::Error);
+              const ::hpp::Transform_ localPosition);
 
           virtual void addGripper(const char* linkName, const char* gripperName,
-              const ::hpp::Transform_ handlePositioninJoint)
-            throw (hpp::Error);
+              const ::hpp::Transform_ handlePositioninJoint);
 
           virtual void addAxialHandle (const char* linkName,
-              const char* handleName, const ::hpp::Transform_ localPosition)
-            throw (hpp::Error);
+              const char* handleName, const ::hpp::Transform_ localPosition);
 
           virtual char* getGripperPositionInJoint (const char* gripperName,
-              ::hpp::Transform__out position)
-            throw (hpp::Error);
+              ::hpp::Transform__out position);
 
           virtual char* getHandlePositionInJoint (const char* handleName,
-              ::hpp::Transform__out position)
-            throw (hpp::Error);
+              ::hpp::Transform__out position);
 
         private:
           ProblemSolverPtr_t problemSolver();

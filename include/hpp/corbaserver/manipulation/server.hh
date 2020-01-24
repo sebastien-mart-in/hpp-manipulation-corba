@@ -52,7 +52,7 @@ namespace hpp {
 
       std::string name () const;
 
-      ProblemSolverPtr_t problemSolver () throw (std::logic_error);
+      ProblemSolverPtr_t problemSolver ();
 
     private:
       corba::Server <impl::Graph>* graphImpl_;

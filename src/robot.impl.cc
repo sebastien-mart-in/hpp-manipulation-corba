@@ -118,7 +118,6 @@ namespace hpp {
       void Robot::insertRobotModel (const char* robotName,
           const char* rootJointType, const char* urdfName,
           const char* srdfName)
-	throw (Error)
       {
         insertRobotModelOnFrame (robotName, "universe", rootJointType,
                                  urdfName, srdfName);
@@ -127,7 +126,6 @@ namespace hpp {
       void Robot::insertRobotModelOnFrame (const char* robotName,
           const char* frameName, const char* rootJointType,
           const char* urdfName, const char* srdfName)
-        throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
@@ -149,7 +147,6 @@ namespace hpp {
               const char* rootJointType,
               const char* urdfString,
               const char* srdfString)
-	throw (Error)
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
@@ -168,7 +165,6 @@ namespace hpp {
       void Robot::insertRobotSRDFModel (const char* robotName,
           const char* packageName, const char* modelName,
           const char* srdfSuffix)
-	throw (Error)
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
@@ -184,7 +180,6 @@ namespace hpp {
       void Robot::insertHumanoidModel (const char* robotName,
           const char* rootJointType, const char* urdfName,
           const char* srdfName)
-	throw (Error)
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
@@ -204,7 +199,6 @@ namespace hpp {
           const char* rootJointType,
           const char* urdfString,
           const char* srdfString)
-	throw (Error)
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
@@ -222,7 +216,6 @@ namespace hpp {
 
       void Robot::loadEnvironmentModel (const char* urdfName,
           const char* srdfName, const char* prefix)
-	throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -266,7 +259,6 @@ namespace hpp {
 
       void Robot::loadEnvironmentModelFromString (const char* urdfString,
           const char* srdfString, const char* prefix)
-	throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -311,7 +303,6 @@ namespace hpp {
       }
 
       Transform__slice* Robot::getRootJointPosition (const char* robotName)
-        throw (Error)
       {
         try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -335,7 +326,6 @@ namespace hpp {
 
       void Robot::setRootJointPosition (const char* robotName,
                                         const ::hpp::Transform_ position)
-        throw (Error)
       {
         try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -351,7 +341,6 @@ namespace hpp {
 
       void Robot::addHandle (const char* linkName, const char* handleName,
           const ::hpp::Transform_ localPosition)
-	throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -368,7 +357,6 @@ namespace hpp {
 
       void Robot::addGripper(const char* linkName, const char* gripperName,
           const ::hpp::Transform_ p)
-	throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -391,7 +379,6 @@ namespace hpp {
 
       void Robot::addAxialHandle (const char* linkName, const char* handleName,
           const ::hpp::Transform_ localPosition)
-	throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -411,7 +398,6 @@ namespace hpp {
 
       char* Robot::getGripperPositionInJoint (const char* gripperName,
           ::hpp::Transform__out position)
-        throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -431,7 +417,6 @@ namespace hpp {
 
       char* Robot::getHandlePositionInJoint (const char* handleName,
           ::hpp::Transform__out position)
-        throw (hpp::Error)
       {
 	try {
           DevicePtr_t robot = getRobotOrThrow (problemSolver());

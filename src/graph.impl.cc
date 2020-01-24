@@ -157,7 +157,6 @@ namespace hpp {
       }
 
       Long Graph::createGraph(const char* graphName)
-        throw (hpp::Error)
       {
         try {
           std::string name (graphName);
@@ -183,7 +182,6 @@ namespace hpp {
       }
 
       void Graph::deleteGraph(const char* graphName)
-        throw (hpp::Error)
       {
         try {
           std::string name (graphName);
@@ -197,7 +195,6 @@ namespace hpp {
       }
 
       void Graph::selectGraph(const char* graphName)
-        throw (Error)
       {
         try {
           problemSolver()->constraintGraph (graphName);
@@ -207,7 +204,6 @@ namespace hpp {
       }
 
       void Graph::createSubGraph(const char* subgraphName)
-        throw (hpp::Error)
       {
         graph::GuidedStateSelectorPtr_t ns = graph::GuidedStateSelector::create
           (subgraphName, problemSolver()->roadmap ());
@@ -215,7 +211,6 @@ namespace hpp {
       }
 
       void Graph::setTargetNodeList(const ID graphId, const hpp::IDseq& nodes)
-        throw (hpp::Error)
       {
         graph::GraphPtr_t graph = getComp <graph::Graph> (graphId);
         graph::GuidedStateSelectorPtr_t ns =
@@ -234,7 +229,6 @@ namespace hpp {
 
       Long Graph::createNode(const Long graphId, const char* nodeName,
           const bool waypoint, const Long priority)
-        throw (hpp::Error)
       {
         graph::GraphPtr_t graph = getComp <graph::Graph> (graphId);
         if (graph->stateSelector ()) {
@@ -247,7 +241,6 @@ namespace hpp {
       }
 
       Long Graph::createEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const Long isInNodeId)
-        throw (hpp::Error)
       {
         graph::StatePtr_t from = getComp <graph::State> (nodeFromId),
 	  to = getComp <graph::State> (nodeToId),
@@ -263,7 +256,6 @@ namespace hpp {
       Long Graph::createWaypointEdge(const Long nodeFromId, const Long nodeToId,
           const char* edgeName, const Long nb, const Long w,
           const Long isInNodeId)
-        throw (hpp::Error)
       {
         graph::StatePtr_t from = getComp <graph::State> (nodeFromId),
 	  to = getComp <graph::State> (nodeToId),
@@ -282,7 +274,6 @@ namespace hpp {
 
       void Graph::setWaypoint (const ID waypointEdgeId, const Long index,
           const ID edgeId, const ID nodeId)
-        throw (hpp::Error)
       {
         WaypointEdgePtr_t we = getComp <graph::WaypointEdge> (waypointEdgeId);
         EdgePtr_t edge = getComp <Edge> (edgeId);
@@ -294,7 +285,6 @@ namespace hpp {
       }
 
       void Graph::getGraph (GraphComp_out graph_out, GraphElements_out elmts)
-        throw (hpp::Error)
       {
         GraphComps_t comp_n, comp_e;
         GraphComp comp_g, current;
@@ -350,7 +340,6 @@ namespace hpp {
       }
 
       void Graph::getEdgeStat (ID edgeId, Names_t_out reasons, intSeq_out freqs)
-        throw (hpp::Error)
       {
         try {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
@@ -374,7 +363,6 @@ namespace hpp {
       }
 
       Long Graph::getFrequencyOfNodeInRoadmap (ID nodeId, intSeq_out freqPerConnectedComponent)
-        throw (hpp::Error)
       {
         try {
         graph::StatePtr_t state = getComp <graph::State> (nodeId, true);
@@ -400,7 +388,6 @@ namespace hpp {
 
       bool Graph::getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
           ConfigProjStat_out path)
-        throw (hpp::Error)
       {
         try {
         graph::StatePtr_t state = getComp <graph::State> (elmt, false);
@@ -443,7 +430,6 @@ namespace hpp {
 
       Long Graph::getWaypoint (const Long edgeId, const Long index,
           hpp::ID_out nodeId)
-        throw (hpp::Error)
       {
         try {
         graph::WaypointEdgePtr_t edge = getComp <graph::WaypointEdge> (edgeId);
@@ -459,7 +445,6 @@ namespace hpp {
       }
 
       Long Graph::createLevelSetEdge(const Long nodeFromId, const Long nodeToId, const char* edgeName, const Long w, const ID isInNodeId)
-        throw (hpp::Error)
       {
         try {
         graph::StatePtr_t from      = getComp <graph::State> (nodeFromId),
@@ -481,7 +466,6 @@ namespace hpp {
       void Graph::addLevelSetFoliation (const Long edgeId,
                                         const hpp::Names_t& condNC,
                                         const hpp::Names_t& paramNC)
-        throw (hpp::Error)
       {
         graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge> (edgeId);
         try {
@@ -507,7 +491,6 @@ namespace hpp {
       }
 
       void Graph::setContainingNode (const ID edgeId, const ID nodeId)
-        throw (hpp::Error)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         graph::StatePtr_t state = getComp <graph::State> (nodeId);
@@ -519,7 +502,6 @@ namespace hpp {
       }
 
       char* Graph::getContainingNode (const ID edgeId)
-            throw (hpp::Error)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
@@ -535,7 +517,6 @@ namespace hpp {
       void Graph::addNumericalConstraints (const Long graphComponentId,
           const hpp::Names_t& constraintNames,
           const hpp::Names_t& passiveDofsNames)
-        throw (hpp::Error)
       {
         graph::GraphComponentPtr_t component = getComp<graph::GraphComponent>(graphComponentId, true);
 
@@ -558,7 +539,6 @@ namespace hpp {
       }
 
       void Graph::getNumericalConstraints(const Long graphComponentId, hpp::Names_t_out names)
-	throw(hpp::Error)
       {
 	graph::GraphComponentPtr_t elmt = getComp<graph::GraphComponent>(graphComponentId);
 	core::NumericalConstraints_t constraints = elmt->numericalConstraints();
@@ -572,7 +552,7 @@ namespace hpp {
 	}
       }
 
-      void Graph::resetConstraints(const Long graphComponentId) throw (hpp::Error)
+      void Graph::resetConstraints(const Long graphComponentId)
       {
         graph::GraphComponentPtr_t component =
           getComp<graph::GraphComponent>(graphComponentId, true);
@@ -582,7 +562,6 @@ namespace hpp {
       void Graph::addNumericalConstraintsForPath (const Long nodeId,
           const hpp::Names_t& constraintNames,
           const hpp::Names_t& passiveDofsNames)
-        throw (hpp::Error)
       {
         graph::StatePtr_t n = getComp <graph::State> (nodeId);
 
@@ -604,7 +583,7 @@ namespace hpp {
       }
 
       void Graph::removeCollisionPairFromEdge
-      (ID edgeId, const char* joint1, const char* joint2) throw (hpp::Error)
+      (ID edgeId, const char* joint1, const char* joint2)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 
@@ -622,7 +601,6 @@ namespace hpp {
       }
 
       void Graph::getNode (const hpp::floatSeq& dofArray, ID_out output)
-        throw (hpp::Error)
       {
         DevicePtr_t robot = getRobotOrThrow (problemSolver());
         try {
@@ -636,7 +614,7 @@ namespace hpp {
 
       bool Graph::applyNodeConstraints
       (hpp::ID id, const hpp::floatSeq& input, hpp::floatSeq_out output,
-       double& residualError) throw (hpp::Error)
+       double& residualError)
       {
         /// First get the constraint.
         ConstraintSetPtr_t constraint;
@@ -677,7 +655,6 @@ namespace hpp {
       bool Graph::applyEdgeLeafConstraints
       (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
        hpp::floatSeq_out output, double& residualError)
-        throw (hpp::Error)
       {
         /// First get the constraint.
         graph::EdgePtr_t edge;
@@ -715,7 +692,6 @@ namespace hpp {
       bool Graph::generateTargetConfig
       (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
        hpp::floatSeq_out output, double& residualError)
-        throw (hpp::Error)
       {
         /// First get the constraint.
         graph::EdgePtr_t edge;
@@ -763,7 +739,6 @@ namespace hpp {
 
       CORBA::Boolean Graph::getConfigErrorForNode
       (ID nodeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
-	throw (hpp::Error)
       {
 	graph::StatePtr_t state = getComp <graph::State> (nodeId);
         DevicePtr_t robot = getRobotOrThrow (problemSolver());
@@ -780,7 +755,6 @@ namespace hpp {
 
       CORBA::Boolean Graph::getConfigErrorForEdge
       (ID edgeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
-	throw (hpp::Error)
       {
         DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
@@ -814,7 +788,6 @@ namespace hpp {
       CORBA::Boolean Graph::getConfigErrorForEdgeLeaf
       (ID edgeId, const hpp::floatSeq& leafDofArray,
        const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
-	throw (hpp::Error)
       {
         DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
@@ -850,7 +823,6 @@ namespace hpp {
       CORBA::Boolean Graph::getConfigErrorForEdgeTarget
       (ID edgeId, const hpp::floatSeq& leafDofArray,
        const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
-	throw (hpp::Error)
       {
         DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	try {
@@ -884,7 +856,7 @@ namespace hpp {
       }
 
       void Graph::displayNodeConstraints
-      (hpp::ID nodeId, CORBA::String_out constraints) throw (Error)
+      (hpp::ID nodeId, CORBA::String_out constraints)
       {
 	graph::StatePtr_t state = getComp <graph::State> (nodeId);
 	ConstraintSetPtr_t cs (graph()->configConstraint (state));
@@ -894,7 +866,7 @@ namespace hpp {
       }
 
       void Graph::displayEdgeTargetConstraints
-      (hpp::ID edgeId, CORBA::String_out constraints) throw (Error)
+      (hpp::ID edgeId, CORBA::String_out constraints)
       {
 	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	ConstraintSetPtr_t cs (graph()->configConstraint (edge));
@@ -904,7 +876,7 @@ namespace hpp {
       }
 
       void Graph::displayEdgeConstraints
-      (hpp::ID edgeId, CORBA::String_out constraints) throw (Error)
+      (hpp::ID edgeId, CORBA::String_out constraints)
       {
 	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	ConstraintSetPtr_t cs (graph()->pathConstraint (edge));
@@ -915,7 +887,6 @@ namespace hpp {
 
        void Graph::getNodesConnectedByEdge
        (hpp::ID edgeId, CORBA::String_out from, CORBA::String_out to)
-	 throw (Error)
        {
 	 graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
 	 from = edge->from ()->name ().c_str ();
@@ -923,7 +894,6 @@ namespace hpp {
        }
 
       void Graph::display (const char* filename)
-        throw (hpp::Error)
       {
         std::cout << *graph();
         std::ofstream dotfile;
@@ -934,7 +904,6 @@ namespace hpp {
 
       void Graph::getHistogramValue (ID edgeId, hpp::floatSeq_out freq,
           hpp::floatSeqSeq_out values)
-        throw (hpp::Error)
       {
         graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge> (edgeId);
         try {
@@ -963,7 +932,6 @@ namespace hpp {
       }
 
       void Graph::setShort (ID edgeId, CORBA::Boolean isShort)
-        throw (hpp::Error)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
@@ -974,7 +942,6 @@ namespace hpp {
       }
 
       bool Graph::isShort (ID edgeId)
-        throw (hpp::Error)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
@@ -992,7 +959,6 @@ namespace hpp {
           const Namess_t& shapesPreObject,
           const Names_t& envNames,
 	  const Rules& rulesList)
-        throw (hpp::Error)
       {
 	std::vector<graph::helper::Rule> rules(rulesList.length());
 
@@ -1016,7 +982,6 @@ namespace hpp {
       }
 
       void Graph::setWeight (ID edgeId, const Long weight)
-        throw (hpp::Error)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
@@ -1027,7 +992,6 @@ namespace hpp {
       }
 
       Long Graph::getWeight (ID edgeId)
-        throw (hpp::Error)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
@@ -1038,7 +1002,6 @@ namespace hpp {
       }
 
       char* Graph::getName (ID elmtId)
-        throw (Error)
       {
         try {
           return corbaServer::c_str(graph()->get(elmtId).lock()->name());
@@ -1048,7 +1011,6 @@ namespace hpp {
       }
 
       void Graph::initialize ()
-        throw (hpp::Error)
       {
         try {
           problemSolver ()->initConstraintGraph ();
@@ -1058,7 +1020,6 @@ namespace hpp {
       }
 
       void Graph::getRelativeMotionMatrix (ID edgeId, intSeqSeq_out matrix)
-        throw (hpp::Error)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
         matrix = matrixToIntSeqSeq(edge->relativeMotion().cast<CORBA::Long>());

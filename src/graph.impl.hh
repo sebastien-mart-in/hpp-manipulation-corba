@@ -39,200 +39,156 @@ namespace hpp {
             server_ = server;
           }
 
-          virtual Long createGraph(const char* graphName)
-            throw (hpp::Error);
+          virtual Long createGraph(const char* graphName);
 
-          virtual void deleteGraph(const char* graphName)
-            throw (hpp::Error);
+          virtual void deleteGraph(const char* graphName);
 
-          virtual void selectGraph(const char* graphName)
-            throw (hpp::Error);
+          virtual void selectGraph(const char* graphName);
 
-          virtual void createSubGraph(const char* subgraphName)
-            throw (hpp::Error);
+          virtual void createSubGraph(const char* subgraphName);
 
-          virtual void setTargetNodeList(const ID graphId, const hpp::IDseq& nodes)
-            throw (hpp::Error);
+          virtual void setTargetNodeList(const ID graphId, const hpp::IDseq& nodes);
 
           virtual Long createNode (const Long subGraphId,
                                    const char* nodeName,
                                    const bool waypoint,
-                                   const Long priority)
-            throw (hpp::Error);
+                                   const Long priority);
 
           virtual Long createEdge (const Long nodeFromId,
                                    const Long nodeToId,
                                    const char* edgeName,
                                    const Long weight,
-                                   const Long isInNodeId)
-            throw (hpp::Error);
+                                   const Long isInNodeId);
 
           virtual Long createWaypointEdge (const Long nodeFromId,
                                            const Long nodeToId,
                                            const char* edgeBaseName,
                                            const Long number,
                                            const Long weight,
-                                           const Long isInNodeId)
-            throw (hpp::Error);
+                                           const Long isInNodeId);
 
           virtual void setWaypoint (const ID waypointEdgeId, const Long index,
-              const ID edgeId, const ID nodeId)
-            throw (hpp::Error);
+              const ID edgeId, const ID nodeId);
 
-          virtual void getGraph (GraphComp_out graph, GraphElements_out elmts)
-            throw (hpp::Error);
+          virtual void getGraph (GraphComp_out graph, GraphElements_out elmts);
 
           virtual void getEdgeStat (ID edgeId,
-              Names_t_out reasons, intSeq_out freqs)
-            throw (hpp::Error);
+              Names_t_out reasons, intSeq_out freqs);
 
-          virtual Long getFrequencyOfNodeInRoadmap (ID nodeId, intSeq_out freqPerConnectedComponent)
-            throw (hpp::Error);
+          virtual Long getFrequencyOfNodeInRoadmap (ID nodeId, intSeq_out freqPerConnectedComponent);
 
           virtual bool getConfigProjectorStats (ID elmt, ConfigProjStat_out config,
-              ConfigProjStat_out path)
-            throw (hpp::Error);
+              ConfigProjStat_out path);
 
           virtual Long getWaypoint (const Long edgeId, const Long index,
-              hpp::ID_out nodeId)
-            throw (hpp::Error);
+              hpp::ID_out nodeId);
 
           virtual Long createLevelSetEdge(const Long nodeFromId,
                                           const Long nodeToId,
                                           const char* edgeName,
                                           const Long w,
-                                          const Long isInNodeId)
-            throw (hpp::Error);
+                                          const Long isInNodeId);
 
-          virtual void setContainingNode (const ID edgeId, const ID nodeId)
-            throw (hpp::Error);
+          virtual void setContainingNode (const ID edgeId, const ID nodeId);
 
-          virtual char* getContainingNode (const ID edgeId)
-            throw (hpp::Error);
+          virtual char* getContainingNode (const ID edgeId);
 
           virtual void addLevelSetFoliation (const Long edgeId,
                                              const hpp::Names_t& condNC,
-                                             const hpp::Names_t& paramNC)
-            throw (hpp::Error);
+                                             const hpp::Names_t& paramNC);
 
           virtual void setNumericalConstraints (const Long graphComponentId,
                                        const hpp::Names_t& constraintNames,
                                        const hpp::Names_t& passiveDofsNames)
-            throw (hpp::Error)
           {
             addNumericalConstraints(graphComponentId,
                 constraintNames, passiveDofsNames);
           }
           virtual void addNumericalConstraints (const Long graphComponentId,
                                        const hpp::Names_t& constraintNames,
-                                       const hpp::Names_t& passiveDofsNames)
-            throw (hpp::Error);
+                                       const hpp::Names_t& passiveDofsNames);
 
-	  virtual void getNumericalConstraints(const Long elmtId, hpp::Names_t_out names)
-	    throw(hpp::Error);
+	  virtual void getNumericalConstraints(const Long elmtId, hpp::Names_t_out names);
 
-	  virtual void resetConstraints(const Long graphComponentId) 
-	    throw (hpp::Error);
+	  virtual void resetConstraints(const Long graphComponentId);
 
           virtual void setNumericalConstraintsForPath (const Long nodeId,
               const hpp::Names_t& constraintNames,
               const hpp::Names_t& passiveDofsNames)
-            throw (hpp::Error)
           {
             addNumericalConstraintsForPath(nodeId,
                 constraintNames, passiveDofsNames);
           }
           virtual void addNumericalConstraintsForPath (const Long nodeId,
               const hpp::Names_t& constraintNames,
-              const hpp::Names_t& passiveDofsNames)
-            throw (hpp::Error);
+              const hpp::Names_t& passiveDofsNames);
 
           virtual void removeCollisionPairFromEdge
-	  (ID edgeId, const char* joint1, const char* joint2)
-	    throw (hpp::Error);
+	  (ID edgeId, const char* joint1, const char* joint2);
 
-          virtual void getNode (const hpp::floatSeq& dofArray, ID_out output)
-            throw (hpp::Error);
+          virtual void getNode (const hpp::floatSeq& dofArray, ID_out output);
 
         virtual bool applyNodeConstraints
         (hpp::ID id, const hpp::floatSeq& input,
-         hpp::floatSeq_out output, double& residualError)
-          throw (hpp::Error);
+         hpp::floatSeq_out output, double& residualError);
 
         virtual bool applyEdgeLeafConstraints
         (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
-         hpp::floatSeq_out output, double& residualError)
-          throw (hpp::Error);
+         hpp::floatSeq_out output, double& residualError);
 
         virtual bool generateTargetConfig
         (hpp::ID IDedge, const hpp::floatSeq& qleaf, const hpp::floatSeq& input,
-         hpp::floatSeq_out output, double& residualError)
-          throw (hpp::Error);
+         hpp::floatSeq_out output, double& residualError);
 
 	virtual CORBA::Boolean getConfigErrorForNode
-	(ID nodeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
-	  throw (hpp::Error);
+	(ID nodeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error);
 
 	virtual CORBA::Boolean getConfigErrorForEdge
-	(ID edgeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
-	  throw (hpp::Error);
+	(ID edgeId, const hpp::floatSeq& dofArray, hpp::floatSeq_out error);
 
 	virtual CORBA::Boolean getConfigErrorForEdgeLeaf
 	(ID edgeId, const hpp::floatSeq& leafDofArray,
-	 const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
-	  throw (hpp::Error);
+	 const hpp::floatSeq& dofArray, hpp::floatSeq_out error);
 
 	virtual CORBA::Boolean getConfigErrorForEdgeTarget
 	(ID edgeId, const hpp::floatSeq& leafDofArray,
-	 const hpp::floatSeq& dofArray, hpp::floatSeq_out error)
-	  throw (hpp::Error);
+	 const hpp::floatSeq& dofArray, hpp::floatSeq_out error);
 
 	virtual void displayNodeConstraints
-	(hpp::ID nodeId, CORBA::String_out constraints) throw (Error);
+	(hpp::ID nodeId, CORBA::String_out constraints);
 
 	virtual void displayEdgeConstraints
-	(hpp::ID edgeId, CORBA::String_out constraints) throw (Error);
+	(hpp::ID edgeId, CORBA::String_out constraints);
 
 	virtual void displayEdgeTargetConstraints
-	(hpp::ID edgeId, CORBA::String_out constraints) throw (Error);
+	(hpp::ID edgeId, CORBA::String_out constraints);
 
 	virtual void getNodesConnectedByEdge
-	(hpp::ID edgeId, CORBA::String_out from, CORBA::String_out to)
-	  throw (Error);
+	(hpp::ID edgeId, CORBA::String_out from, CORBA::String_out to);
 
-          virtual void display (const char* filename)
-            throw (hpp::Error);
+          virtual void display (const char* filename);
 
           virtual void getHistogramValue (ID edgeId, hpp::floatSeq_out freq,
-              hpp::floatSeqSeq_out values)
-            throw (hpp::Error);
+              hpp::floatSeqSeq_out values);
 
-          virtual void setShort (ID edgeId, CORBA::Boolean isShort)
-            throw (hpp::Error);
+          virtual void setShort (ID edgeId, CORBA::Boolean isShort);
 
-          virtual bool isShort (ID edgeId)
-            throw (hpp::Error);
+          virtual bool isShort (ID edgeId);
 
           virtual Long autoBuild (const char* graphName,
               const Names_t& grippers, const Names_t& objects,
               const Namess_t& handlesPerObject, const Namess_t& shapesPreObject,
-	      const Names_t& envNames, const Rules& rulesList)
-            throw (hpp::Error);
+	      const Names_t& envNames, const Rules& rulesList);
 
-          virtual void setWeight (ID edgeId, const Long weight)
-            throw (hpp::Error);
+          virtual void setWeight (ID edgeId, const Long weight);
 
-          virtual Long getWeight (ID edgeId)
-            throw (hpp::Error);
+          virtual Long getWeight (ID edgeId);
 
-          virtual char* getName (ID elmtId)
-            throw (hpp::Error);
+          virtual char* getName (ID elmtId);
 
-          virtual void initialize ()
-            throw (hpp::Error);
+          virtual void initialize ();
 
-          virtual void getRelativeMotionMatrix (ID edgeID, intSeqSeq_out matrix)
-            throw (hpp::Error);
+          virtual void getRelativeMotionMatrix (ID edgeID, intSeqSeq_out matrix);
 
         private:
           template <typename T> boost::shared_ptr<T> getComp(ID id, bool throwIfWrongType = true);

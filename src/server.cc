@@ -60,7 +60,6 @@ namespace hpp {
     }
 
     ProblemSolverPtr_t Server::problemSolver ()
-        throw (std::logic_error)
     {
       ProblemSolverPtr_t psm = dynamic_cast <ProblemSolverPtr_t>
         (problemSolverMap_->selected());

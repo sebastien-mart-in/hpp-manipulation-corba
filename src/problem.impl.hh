@@ -42,75 +42,60 @@ namespace hpp {
           server_ = server;
         }
 
-        virtual bool selectProblem (const char* name) throw (hpp::Error);
+        virtual bool selectProblem (const char* name);
 
-        virtual void resetProblem () throw (hpp::Error);
+        virtual void resetProblem ();
 
-        virtual Names_t* getAvailable (const char* what) throw (hpp::Error);
+        virtual Names_t* getAvailable (const char* what);
 
-        virtual Names_t* getSelected (const char* what) throw (hpp::Error);
+        virtual Names_t* getSelected (const char* what);
 
         virtual void createGrasp (const char* graspName,
-            const char* gripperName, const char* handleName)
-	  throw (hpp::Error);
+            const char* gripperName, const char* handleName);
 
         virtual void createPreGrasp (const char* graspName,
-            const char* gripperName, const char* handleName)
-	  throw (hpp::Error);
+            const char* gripperName, const char* handleName);
 
-        virtual Names_t* getEnvironmentContactNames ()
-          throw (hpp::Error);
+        virtual Names_t* getEnvironmentContactNames ();
 
-        virtual Names_t* getRobotContactNames ()
-          throw (hpp::Error);
+        virtual Names_t* getRobotContactNames ();
 
         virtual Names_t* getEnvironmentContact (const char* name,
-            intSeq_out indexes, floatSeqSeq_out points)
-          throw (hpp::Error);
+            intSeq_out indexes, floatSeqSeq_out points);
 
         virtual Names_t* getRobotContact (const char* name,
-            intSeq_out indexes, floatSeqSeq_out points)
-          throw (hpp::Error);
+            intSeq_out indexes, floatSeqSeq_out points);
 
         virtual void createPlacementConstraint (const char* placName,
-            const Names_t& shapeName, const Names_t& envContactName)
-	  throw (hpp::Error);
+            const Names_t& shapeName, const Names_t& envContactName);
 
         virtual void createPrePlacementConstraint (const char* placName,
             const Names_t& shapeName, const Names_t& envContactName,
-            CORBA::Double width)
-	  throw (hpp::Error);
+            CORBA::Double width);
 
         virtual void createQPStabilityConstraint (const char* placName,
-            const Names_t& shapesName)
-          throw (hpp::Error);
+            const Names_t& shapesName);
 
-        virtual bool setConstraints (hpp::ID id, bool target)
-          throw (hpp::Error);
+        virtual bool setConstraints (hpp::ID id, bool target);
 
         virtual bool applyConstraints (hpp::ID id, const hpp::floatSeq& input,
-            hpp::floatSeq_out output, double& residualError)
-          throw (hpp::Error);
+            hpp::floatSeq_out output, double& residualError);
 
         virtual bool applyConstraintsWithOffset (hpp::ID IDedge,
             const hpp::floatSeq& qnear, const hpp::floatSeq& input,
-            hpp::floatSeq_out output, double& residualError)
-          throw (hpp::Error);
+            hpp::floatSeq_out output, double& residualError);
 
         virtual bool buildAndProjectPath (hpp::ID IDedge,
             const hpp::floatSeq& qb,
             const hpp::floatSeq& qe,
             CORBA::Long& indexNotProj,
-            CORBA::Long& indexProj)
-          throw (hpp::Error);
+            CORBA::Long& indexProj);
 
         virtual void setTargetState (hpp::ID IDstate);
 
-        virtual ID edgeAtParam (ULong pathId, Double param, String_out name)
-          throw (Error);
+        virtual ID edgeAtParam (ULong pathId, Double param, String_out name);
 
-        hpp::manipulation_idl::graph_idl::Validation_ptr createGraphValidation ()
-          throw (Error);
+        hpp::manipulation_idl::graph_idl::Validation_ptr createGraphValidation ();
 
       private:
         ProblemSolverPtr_t problemSolver();

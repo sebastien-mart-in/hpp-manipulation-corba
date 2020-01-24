@@ -124,7 +124,6 @@ namespace hpp {
       }
 
       bool Problem::selectProblem (const char* name)
-        throw (hpp::Error)
       {
         std::string psName (name);
         corbaServer::ProblemSolverMapPtr_t psMap (server_->problemSolverMap());
@@ -134,13 +133,13 @@ namespace hpp {
         return !has;
       }
 
-      void Problem::resetProblem () throw (hpp::Error)
+      void Problem::resetProblem ()
       {
         corbaServer::ProblemSolverMapPtr_t psMap (server_->problemSolverMap());
         psMap->replaceSelected (ProblemSolver::create ());
       }
 
-      Names_t* Problem::getAvailable (const char* what) throw (hpp::Error)
+      Names_t* Problem::getAvailable (const char* what)
       {
         std::string w (what);
         boost::algorithm::to_lower(w);
@@ -172,7 +171,7 @@ namespace hpp {
         return toNames_t (ret.begin(), ret.end());
       }
 
-      Names_t* Problem::getSelected (const char* what) throw (hpp::Error)
+      Names_t* Problem::getSelected (const char* what)
       {
         std::string w (what);
         boost::algorithm::to_lower(w);
@@ -199,7 +198,6 @@ namespace hpp {
       void Problem::createGrasp (const char* graspName,
 				 const char* gripperName,
 				 const char* handleName)
-	throw (hpp::Error)
       {
 	try {
           problemSolver()->createGraspConstraint
@@ -212,7 +210,6 @@ namespace hpp {
       void Problem::createPreGrasp (const char* graspName,
                                     const char* gripperName,
                                     const char* handleName)
-	throw (hpp::Error)
       {
 	try {
           problemSolver()->createPreGraspConstraint
@@ -223,7 +220,6 @@ namespace hpp {
       }
 
       Names_t* Problem::getEnvironmentContactNames ()
-        throw (hpp::Error)
       {
         try {
 	  typedef std::map<std::string, JointAndShapes_t> ShapeMap;
@@ -247,7 +243,6 @@ namespace hpp {
       }
 
       Names_t* Problem::getRobotContactNames ()
-        throw (hpp::Error)
       {
         try {
           typedef std::map<std::string, JointAndShapes_t> ShapeMap;
@@ -273,7 +268,6 @@ namespace hpp {
 
       Names_t* Problem::getEnvironmentContact (const char* name,
             intSeq_out indexes, floatSeqSeq_out points)
-        throw (hpp::Error)
       {
         try {
 	  const JointAndShapes_t& js =
@@ -287,7 +281,6 @@ namespace hpp {
 
       Names_t* Problem::getRobotContact (const char* name,
             intSeq_out indexes, hpp::floatSeqSeq_out points)
-        throw (hpp::Error)
       {
         try {
           DevicePtr_t r = getRobotOrThrow (problemSolver());
@@ -302,7 +295,6 @@ namespace hpp {
       void Problem::createPlacementConstraint (const char* placName,
 					       const Names_t& surface1,
 					       const Names_t& surface2)
-        throw (hpp::Error)
       {
 	try {
 	  problemSolver()->createPlacementConstraint (placName,
@@ -316,7 +308,6 @@ namespace hpp {
 					          const Names_t& surface1,
 					          const Names_t& surface2,
                                                   CORBA::Double width)
-        throw (hpp::Error)
       {
 	try {
 	  problemSolver()->createPrePlacementConstraint (placName,
@@ -328,7 +319,6 @@ namespace hpp {
 
       void Problem::createQPStabilityConstraint (const char* placName,
           const Names_t& shapesName)
-        throw (hpp::Error)
       {
 	try {
 #ifdef HPP_CONSTRAINTS_USE_QPOASES
@@ -384,7 +374,6 @@ namespace hpp {
       }
 
       bool Problem::setConstraints (hpp::ID id, bool target)
-        throw (hpp::Error)
       {
         /// First get the constraint.
         ConstraintSetPtr_t constraint;
@@ -420,7 +409,6 @@ namespace hpp {
           const hpp::floatSeq& input,
           hpp::floatSeq_out output,
           double& residualError)
-        throw (hpp::Error)
       {
         /// First get the constraint.
         ConstraintSetPtr_t constraint;
@@ -463,7 +451,6 @@ namespace hpp {
           const hpp::floatSeq& input,
           hpp::floatSeq_out output,
           double& residualError)
-        throw (hpp::Error)
       {
         /// First get the constraint.
         graph::EdgePtr_t edge;
@@ -513,7 +500,6 @@ namespace hpp {
           const hpp::floatSeq& qe,
           CORBA::Long& indexNotProj,
           CORBA::Long& indexProj)
-        throw (hpp::Error)
       {
         /// First get the constraint.
         graph::EdgePtr_t edge;
@@ -603,7 +589,6 @@ namespace hpp {
       }
 
       ID Problem::edgeAtParam (ULong pathId, Double param, String_out name)
-        throw (Error)
       {
 	try {
 	  if (pathId >= problemSolver()->paths ().size ()) {
@@ -639,7 +624,7 @@ namespace hpp {
 	}
       }
 
-      hpp::manipulation_idl::graph_idl::Validation_ptr Problem::createGraphValidation () throw (Error)
+      hpp::manipulation_idl::graph_idl::Validation_ptr Problem::createGraphValidation ()
       {
         core::ProblemSolverPtr_t ps = problemSolver();
         graph::ValidationPtr_t validation (new graph::Validation (ps->problem()));
