@@ -66,8 +66,12 @@ class Robot (Parent):
         if self.load:
             self.client.basic.robot.createRobot (self.name)
         urdfFilename, srdfFilename = self.urdfSrdfFilenames ()
-        self.insertRobotModel (robotName, rootJointType, urdfFilename,
-                               srdfFilename)
+        if self.urdfSrdfString():
+            self.insertRobotModelFromString (robotName, rootJointType,
+                                             urdfFilename, srdfFilename)
+        else:
+            self.insertRobotModel (robotName, rootJointType, urdfFilename,
+                                   srdfFilename)
 
     ## Load robot model and insert it in the device
     #
@@ -151,6 +155,19 @@ class Robot (Parent):
         self.rootJointType[robotName] = rootJointType
         self.rebuildRanks ()
 
+    ## Same as Robot.insertHumanoidModel
+    #
+    #  \param urdfString XML string of the URDF,
+    #  \param srdfString XML string of the SRDF
+    def insertHumanoidModelFromString (self, robotName, rootJointType,
+                                       urdfString, srdfString) :
+        if self.load:
+            self.client.manipulation.robot.insertHumanoidModelFromString \
+                (robotName, rootJointType, urdfString, srdfString)
+        self.robotNames.append (robotName)
+        self.rootJointType[robotName] = rootJointType
+        self.rebuildRanks ()
+
     def loadHumanoidModel (self, robotName, rootJointType, urdfName,
                            srdfName):
         self.insertHumanoidModel (robotName, rootJointType, urdfName,
@@ -213,5 +230,9 @@ class HumanoidRobot (Robot, StaticStabilityConstraintsFactory):
         if self.load:
             self.client.basic.robot.createRobot (self.name)
         urdfFilename, srdfFilename = self.urdfSrdfFilenames ()
-        self.insertHumanoidModel \
-            (robotName, rootJointType, urdfFilename, srdfFilename)
+        if self.urdfSrdfString():
+            self.insertHumanoidModelFromString \
+                (robotName, rootJointType, urdfFilename, srdfFilename)
+        else:
+            self.insertHumanoidModel \
+                (robotName, rootJointType, urdfFilename, srdfFilename)
