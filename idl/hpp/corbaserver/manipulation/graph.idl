@@ -400,6 +400,9 @@ module hpp {
         void initialize ()
           raises (Error);
 
+        /// Get the matrix of relative motions for an edge
+        /// \param edgeId index of the edge,
+        /// \retval matrix as defined in hpp::core::RelativeMotion::matrix_type.
         void getRelativeMotionMatrix (in ID edgeID, out intSeqSeq matrix)
           raises (Error);
       }; // interface Graph
