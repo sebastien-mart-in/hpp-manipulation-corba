@@ -71,6 +71,42 @@ else:
 # The behaviour can be tuned by setting the callback functions:
 # - \ref graspIsAllowed (redundant with \ref setRules)
 # - \ref constraint_graph_factory_algo_callbacks "Algorithm steps"
+#
+# <b>Sketch of the algorithm</b>
+#
+# Let
+#  \li \f$G\f$ be the set of grippers,
+#  \li \f$H\f$ be the set of handles.
+#
+#  A \b grasp is defined as a pair \f$(g,h)\in G\times H\f$.
+#
+#  Each \b state (excluding waypoint states) is defined by a set of grasps.
+#  Given a set of grasps, we define
+#  \li <b>available grippers</b> as the grippers that are not the first
+#      element of any pair of the set of grasps,
+#  \li <b>available handles</b> as the handles that are not the second element
+#     of any pair of the set of grasps.
+#
+#  The first node is defined by the empty set. The graph is built recursiveley
+#  as follows:
+#
+#  if the set of grasps defining the node is not allowed (method \link
+#      constraint_graph_factory.GraphFactoryAbstract.graspIsAllowed
+#      graspIsAllowed \endlink), return.
+#
+#  Otherwise, for any pair \f$(g,h)\f$ of available grippers and available
+#  handles,
+#  \li build a new state by adding grasp \f$(g,h)\f$ to the current set of
+#      grasps (method
+#      \link constraint_graph_factory.GraphFactoryAbstract.makeState
+#      makeState\endlink),
+#  \li build a transition from the current state to the new state (method \link
+#      constraint_graph_factory.GraphFactoryAbstract.makeTransition
+#      makeTransition \endlink)
+#  \li build a loopTransition from the current state to itself (method \link
+#      constraint_graph_factory.GraphFactoryAbstract.makeLoopTransition
+#      makeLoopTransition \endlink)
+#  \li repeat the two above states to the new state.
 class GraphFactoryAbstract(ABC):
     def __init__(self):
 
@@ -211,19 +247,43 @@ class GraphFactoryAbstract(ABC):
     def _loopTransitionName (self, grasps):
         return "Loop | " + self._stateName(grasps, True)
 
+    ## Recurse across all possible sets of grasps
+    #
+    #  This method visits all possible set of grasps and create states
+    #  and transitions between those states.
+    #
+    #  \param grippers list of names of available grippers: that do not hold
+    #         an handle yet,
+    #  \param handles list of names of available handles that are not hold yet
+    #         by a gripper.
+    #  \param grasps list of grasps already active. Grasps are represented by
+    #         a list of handle indices or None if the gripper is available.
+    #         the order in the list corresponds to the order of the gripper
+    #         in the list of all grippers.
+    #         For instance, if a robot has 3 grippers
+    #           ("g1", "g2", "g3"), and grasps is equal to
+    #           ("h2", "h1", None), then
+    #           \li "g1" holds "h2",
+    #           \li "g2" holds "h1", and
+    #           \li "g3" does not hold anything.
+    #
     def _recurse(self, grippers, handles, grasps, depth):
         isAllowed = self.graspIsAllowed (grasps)
         if isAllowed: current = self._makeState (grasps, depth)
 
         if len(grippers) == 0 or len(handles) == 0: return
         for ig, g in enumerate(grippers):
+            # ngrippers = { grippers } \ grippers[ig]
             ngrippers = grippers[:ig] + grippers[ig+1:]
-
+            # isg <- index of g in list of all grippers
             isg = self.grippers.index(g)
             for ih, h in enumerate(handles):
+                # nhandles = { handles } \ handles[ih]
                 nhandles = handles[:ih] + handles[ih+1:]
-
+                # ish <- index of h in all handles
                 ish = self.handles.index(h)
+                # nGrasp <- substitute current handle index at current gripper
+                # position.
                 nGrasps = grasps[:isg] + (ish, ) + grasps[isg+1:]
 
                 nextIsAllowed = self.graspIsAllowed (nGrasps)
