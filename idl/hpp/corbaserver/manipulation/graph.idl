@@ -405,6 +405,17 @@ module hpp {
         /// \retval matrix as defined in hpp::core::RelativeMotion::matrix_type.
         void getRelativeMotionMatrix (in ID edgeID, out intSeqSeq matrix)
           raises (Error);
+
+        /// Set collision security margin for a pair of joint along an edge
+        ///
+        /// \param edgeID index of the edge,
+        /// \param joint1, joint2 indices of joint1 and joint2 in robot
+        ///        (+1 since 0 stands for the environment),
+        /// \param margin security margin for collision tests between those
+        /// joints along the edge.
+        void setSecurityMarginForEdge(in ID edgeID, in long joint1,
+                                      in long joint2, in double margin)
+          raises(Error);
       }; // interface Graph
     }; // module manipulation
   }; // module corbaserver

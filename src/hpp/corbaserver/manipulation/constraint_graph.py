@@ -55,6 +55,7 @@ class ConstraintGraph (object):
             }
 
     def __init__ (self, robot, graphName, makeGraph = True):
+        self.robot = robot
         self.client = robot.client.manipulation
         self.clientBasic = robot.client.basic
         self.graph = robot.client.manipulation.graph
@@ -658,9 +659,25 @@ class ConstraintGraph (object):
 
     def initialize (self):
         self.graph.initialize()
-
     ##
     # \}
+
+    ## Set collision security margin for a pair of joints along an edge
+    #
+    #  \param edge name of the edge,
+    #  \param joint1, joint2 names of the joints or "environment",
+    #  \param margin security margin.
+    def setSecurityMarginForEdge(self, edge, joint1, joint2, margin):
+        names = self.robot.getJointNames()
+        if joint1 == "environment":
+            j1 = 0
+        else:
+            j1 = names.index(joint1) + 1 #first joint is universe
+        if joint2 == "environment":
+            j2 = 0
+        else:
+            j2 = names.index(joint2) + 1 #first joint is universe
+        self.graph.setSecurityMarginForEdge(self.edges[edge], j1, j2, margin)
 
     ## get the textToTex translation
     def _ (self, text):

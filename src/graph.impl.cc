@@ -1045,6 +1045,14 @@ namespace hpp {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
         matrix = matrixToIntSeqSeq(edge->relativeMotion().cast<CORBA::Long>());
       }
+
+      void Graph::setSecurityMarginForEdge
+      (ID edgeId, Long joint1, Long joint2, double margin)
+      {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
+        edge->securityMarginForPair(joint1, joint2, margin);
+        edge->securityMarginForPair(joint2, joint1, margin);
+      }
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp
