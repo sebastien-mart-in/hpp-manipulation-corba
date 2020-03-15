@@ -858,48 +858,68 @@ namespace hpp {
       void Graph::displayNodeConstraints
       (hpp::ID nodeId, CORBA::String_out constraints)
       {
-	graph::StatePtr_t state = getComp <graph::State> (nodeId);
-	ConstraintSetPtr_t cs (graph()->configConstraint (state));
-	std::ostringstream oss;
-	oss << (*cs);
-	constraints = oss.str ().c_str ();
+        try {
+          graph::StatePtr_t state = getComp <graph::State> (nodeId);
+          ConstraintSetPtr_t cs (graph()->configConstraint (state));
+          std::ostringstream oss;
+          oss << (*cs);
+          constraints = oss.str ().c_str ();
+        } catch (const std::exception& exc) {
+          throw Error (exc.what());
+        }
       }
 
       void Graph::displayEdgeTargetConstraints
       (hpp::ID edgeId, CORBA::String_out constraints)
       {
-	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-	ConstraintSetPtr_t cs (graph()->configConstraint (edge));
-	std::ostringstream oss;
-	oss << (*cs);
-	constraints = oss.str ().c_str ();
+        try {
+          graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+          ConstraintSetPtr_t cs (graph()->configConstraint (edge));
+          std::ostringstream oss;
+          oss << (*cs);
+          constraints = oss.str ().c_str ();
+        } catch (const std::exception& exc) {
+          throw Error (exc.what());
+        }
       }
 
       void Graph::displayEdgeConstraints
       (hpp::ID edgeId, CORBA::String_out constraints)
       {
-	graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-	ConstraintSetPtr_t cs (graph()->pathConstraint (edge));
-	std::ostringstream oss;
-	oss << (*cs);
-	constraints = oss.str ().c_str ();
+        try {
+          graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+          ConstraintSetPtr_t cs (graph()->pathConstraint (edge));
+          std::ostringstream oss;
+          oss << (*cs);
+          constraints = oss.str ().c_str ();
+        } catch (const std::exception& exc) {
+          throw Error (exc.what());
+        }
       }
 
        void Graph::getNodesConnectedByEdge
        (hpp::ID edgeId, CORBA::String_out from, CORBA::String_out to)
        {
-	 graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-	 from = edge->from ()->name ().c_str ();
-	 to = edge->to ()->name ().c_str ();
+        try {
+          graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
+          from = edge->from ()->name ().c_str ();
+          to = edge->to ()->name ().c_str ();
+        } catch (const std::exception& exc) {
+          throw Error (exc.what());
+        }
        }
 
       void Graph::display (const char* filename)
       {
-        std::cout << *graph();
-        std::ofstream dotfile;
-        dotfile.open (filename);
-        graph()->dotPrint (dotfile);
-        dotfile.close();
+        try {
+          std::cout << *graph();
+          std::ofstream dotfile;
+          dotfile.open (filename);
+          graph()->dotPrint (dotfile);
+          dotfile.close();
+        } catch (const std::exception& exc) {
+          throw Error (exc.what());
+        }
       }
 
       void Graph::getHistogramValue (ID edgeId, hpp::floatSeq_out freq,
