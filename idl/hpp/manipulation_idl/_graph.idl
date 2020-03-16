@@ -51,8 +51,11 @@ module hpp {
         Graph parentGraph () raises (Error);
 
         void addNumericalConstraint (in constraints_idl::Implicit nm) raises (Error);
+        void addNumericalCost (in constraints_idl::Implicit nm) raises (Error);
 
         constraints_idl::Implicits numericalConstraints () raises (Error);
+
+        constraints_idl::Implicits numericalCosts () raises (Error);
 
         void resetNumericalConstraints () raises (Error);
       }; // interface GraphComponent
