@@ -69,6 +69,30 @@ class ProblemSolver (Parent):
         except:
             return self.client.manipulation.problem.getSelected (type)
 
+    ## \name Contact surfaces
+    #
+    #  In placement states, objects are in contact with other objects or with
+    #  the environment through contact surfaces.
+    #  \{
+
+    ##  \copydoc hpp::corbaserver::manipulation::Problem::getEnvironmentContactNames
+    def getEnvironmentContactNames(self):
+        return self.client.manipulation.problem.getEnvironmentContactNames()
+
+    ##  \copydoc hpp::corbaserver::manipulation::Problem::getRobotContactNames
+    def getRobotContactNames(self):
+        return self.client.manipulation.problem.getRobotContactNames()
+
+    ##  \copydoc hpp::corbaserver::manipulation::Problem::getEnvironmentContact
+    def getEnvironmentContact(self, name):
+        return self.client.manipulation.problem.getEnvironmentContact(name)
+
+    ##  \copydoc hpp::corbaserver::manipulation::Problem::getRobotContact
+    def getRobotContact(self, name):
+        return self.client.manipulation.problem.getRobotContact(name)
+
+    ## \}
+
     ## \name Constraints
     #  \{
 

@@ -95,16 +95,42 @@ module hpp {
 	void createPreGrasp (in string name, in string gripper,
 			     in string handle) raises (Error);
 
+        /// Get names of environment contact surfaces
+        /// \sa class hpp::core::Shape_t
+        /// \note they are also accessible with getAvailable("EnvContact").
         Names_t getEnvironmentContactNames ()
           raises (Error);
 
+        /// Get names of environment contact surfaces on robot
+        /// \sa class hpp::core::Shape_t
+        /// \note those are also accessible with getAvailable("RobotContact").
         Names_t getRobotContactNames ()
           raises (Error);
 
-        Names_t getEnvironmentContact (in string name, out intSeq indexes,
+        /// Get environment contact from name
+        ///
+        /// A contact surface may be composed of several convex polygons.
+        /// Let us denote by n the number of polygons.
+        /// \param name name of the contact surface
+        /// \return a list of n times the same joint name
+        /// \retval indices sequence of n numbers of vertices one for each
+        ///         polygon,
+        /// \retval points sequence of vertices. The number should be the
+        ///         sum of the elements of indices.
+        Names_t getEnvironmentContact (in string name, out intSeq indices,
                                        out floatSeqSeq points)
           raises (Error);
 
+        /// Get robot contact from name
+        ///
+        /// A contact surface may be composed of several convex polygons.
+        /// Let us denote by n the number of polygons.
+        /// \param name name of the contact surface
+        /// \return a list of n times the same joint name
+        /// \retval indices sequence of n numbers of vertices one for each
+        ///         polygon,
+        /// \retval points sequence of vertices. The number should be the
+        ///         sum of the elements of indices.
         Names_t getRobotContact (in string name, out intSeq indexes,
                                  out floatSeqSeq points)
           raises (Error);
