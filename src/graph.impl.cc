@@ -321,12 +321,13 @@ namespace hpp {
               if (we) {
                 current.waypoints.length((ULong)we->nbWaypoints());
                 for (std::size_t i = 0; i < we->nbWaypoints(); ++i)
-                  current.waypoints[(ULong)i] = (ID)we->waypoint(i)->to()->id();
+                  current.waypoints[(ULong)i] =
+                    (ID)we->waypoint(i)->stateTo()->id();
               } else {
                 current.waypoints.length(0);
               }
-              current.start = (Long) e->from ()->id ();
-              current.end = (Long) e->to ()->id ();
+              current.start = (Long) e->stateFrom()->id();
+              current.end = (Long) e->stateTo()->id();
               comp_e[len_edges] = current;
               len_edges++;
             }
@@ -437,7 +438,7 @@ namespace hpp {
         if (index < 0 || (std::size_t)index > edge->nbWaypoints ())
           throw Error ("Invalid index");
         graph::EdgePtr_t waypoint = edge->waypoint (index);
-        nodeId = (Long) waypoint->to ()->id ();
+        nodeId = (Long) waypoint->stateTo()->id();
         return (Long) waypoint->id ();
         } catch (std::out_of_range& e) {
           throw Error (e.what());
@@ -902,8 +903,8 @@ namespace hpp {
        {
         try {
           graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-          from = edge->from ()->name ().c_str ();
-          to = edge->to ()->name ().c_str ();
+          from = edge->stateFrom()->name().c_str();
+          to = edge->stateTo()->name().c_str();
         } catch (const std::exception& exc) {
           throw Error (exc.what());
         }
@@ -1005,7 +1006,7 @@ namespace hpp {
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
-          edge->from()->updateWeight (edge, weight);
+          edge->stateFrom()->updateWeight (edge, weight);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
@@ -1015,7 +1016,7 @@ namespace hpp {
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
         try {
-          return (Long) edge->from ()->getWeight (edge);
+          return (Long) edge->stateFrom()->getWeight(edge);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}
