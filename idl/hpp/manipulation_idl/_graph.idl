@@ -94,8 +94,8 @@ module hpp {
 
       interface Edge : GraphComponent
       {
-        State from () raises (Error);
-        State to () raises (Error);
+        State stateFrom () raises (Error);
+        State stateTo () raises (Error);
         State getState () raises (Error);
         //-> state
         void setState (in State st) raises (Error);
