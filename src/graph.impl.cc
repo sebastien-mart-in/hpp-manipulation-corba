@@ -1047,11 +1047,13 @@ namespace hpp {
       }
 
       void Graph::setSecurityMarginForEdge
-      (ID edgeId, Long joint1, Long joint2, double margin)
+      (ID edgeId, const char* joint1, const char* joint2, double margin)
       {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
-        edge->securityMarginForPair(joint1, joint2, margin);
-        edge->securityMarginForPair(joint2, joint1, margin);
+        DevicePtr_t robot(edge->parentGraph()->robot());
+        JointPtr_t j1 (robot->getJointByName(joint1));
+        JointPtr_t j2 (robot->getJointByName(joint2));
+        edge->securityMarginForPair(j1->index(), j2->index(), margin);
       }
     } // namespace impl
   } // namespace manipulation
