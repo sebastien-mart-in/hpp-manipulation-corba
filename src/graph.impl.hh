@@ -189,7 +189,8 @@ namespace hpp {
           virtual void initialize ();
 
           virtual void getRelativeMotionMatrix (ID edgeID, intSeqSeq_out matrix);
-
+          virtual void setSecurityMarginForEdge
+          (ID edgeId, const char* joint1, const char* joint2, double margin);
         private:
           template <typename T> boost::shared_ptr<T> getComp(ID id, bool throwIfWrongType = true);
           ProblemSolverPtr_t problemSolver();
