@@ -48,15 +48,20 @@
 ///
 /// Some python classes are provided that embed corba clients and
 /// that forward corba resquest to the server side:
-///   \li manipulation.robot.Robot to load and handle a manipulation robot,
-///   \li manipulation.robot.HumanoidRobot to load and handle a manipulation
-///       robot, containing a humanoid robot at first place,
-///   \li manipulation.problem_solver.ProblemSolver to set and solve a
-///       manipulation planning problem.
-///   \li manipulation.constraint_graph.ConstraintGraph to manipulate the
-///       graph of constraint.
-///   \li manipulation.constraint_graph_factory.ConstraintGraphFactory to
-///       create a graph of constraints
+///   \li \link manipulation.robot.Robot Robot\endlink to load and
+///       handle a manipulation robot,
+///   \li \link manipulation.robot.HumanoidRobot HumanoidRobot\endlink to load
+///       and handle a manipulation robot, containing a humanoid robot at first
+///       place,
+///   \li \link manipulation.problem_solver.ProblemSolver ProblemSolver\endlink
+///       to set and solve a manipulation planning problem.
+///   \li \link manipulation.constraint_graph.ConstraintGraph ConstraintGraph
+///       \endlink to manipulate the graph of constraint.
+///   \li \link manipulation.constraint_graph_factory.ConstraintGraphFactory
+///       ConstraintGraphFactory\endlink to create a graph of constraints
+///   \li \link manipulation.security_margins.SecurityMargins SecurityMargins
+///       \endlink to handle different security margins between pairs of objects
+///       of robots.
 ///
 /// \par How to embed a server in an application
 ///
