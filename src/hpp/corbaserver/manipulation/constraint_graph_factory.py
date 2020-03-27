@@ -394,7 +394,8 @@ class ConstraintFactory(ConstraintFactoryAbstract):
     def buildStrictPlacement (self, o):
         n = "place_" + o
         pn = "preplace_" + o
-        width = 0.05
+        # Get distance of object to surface in preplacement
+        distance = self.graphfactory.getPreplacementDistance(o)
         io = self.graphfactory.objects.index(o)
         placeAlreadyCreated = n in self.graph.clientBasic.problem.getAvailable ("numericalconstraint")
         if (len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0) and not placeAlreadyCreated:
@@ -411,7 +412,9 @@ class ConstraintFactory(ConstraintFactoryAbstract):
         if not placeAlreadyCreated:
             self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
         if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
-            self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
+            self.graph.client.problem.createPrePlacementConstraint \
+                (pn, self.graphfactory.contactsPerObjects[io],
+                 self.graphfactory.envContacts, distance)
         return dict ( list(zip (self.pfields, (
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
@@ -425,7 +428,8 @@ class ConstraintFactory(ConstraintFactoryAbstract):
     def buildRelaxedPlacement (self, o):
         n = "place_" + o
         pn = "preplace_" + o
-        width = 0.05
+        # Get distance of object to surface in preplacement
+        distance = self.graphfactory.getPreplacementDistance(o)
         io = self.graphfactory.objects.index(o)
         ljs = []
         for jn in self.graph.clientBasic.robot.getJointNames():
@@ -442,7 +446,9 @@ class ConstraintFactory(ConstraintFactoryAbstract):
         if not placeAlreadyCreated:
             self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
         if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
-            self.graph.client.problem.createPrePlacementConstraint (pn, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts, width)
+            self.graph.client.problem.createPrePlacementConstraint \
+                (pn, self.graphfactory.contactsPerObjects[io],
+                 self.graphfactory.envContacts, distance)
         return dict ( list(zip (self.pfields,
                                 (Constraints (numConstraints = \
                                               _removeEmptyConstraints\
@@ -490,6 +496,10 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
                 if not factory._isObjectGrasped(grasps, io):
                     self.manifold += factory.constraints.p (object, 'placement')
                     self.foliation += factory.constraints.p (object, 'placementComplement')
+
+    ## defaut distance between objec and surface in preplacement configuration
+    defaultPreplaceDist = 0.05
+    preplaceDistance = dict()
 
     ## \param graph an instance of ConstraintGraph
     def __init__(self, graph):
@@ -613,5 +623,30 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
             self.graph.createEdge (st.name, sf.name, names[1])
 
         self.transitions.add(names)
+
+    ## \}
+
+    ## \name Tuning the constraints
+    #  \{
+
+    ## Set preplacement distance
+    #  \param obj name of the object
+    #  \param distance distance of object to surface in preplacement
+    #   configuration
+    def setPreplacementDistance(self, obj, distance):
+        # check that object is registered in factory
+        if not obj in self.objects:
+            raise RuntimeError(obj + " is not references as an object in the "
+                               + "factory")
+        self.preplaceDistance[obj] = distance
+
+    ## Get preplacement distance
+    #  \param obj name of the object
+    def getPreplacementDistance(self, obj):
+        # check that object is registered in factory
+        if not obj in self.objects:
+            raise RuntimeError(obj + " is not references as an object in the "
+                               + "factory")
+        return self.preplaceDistance.get(obj, self.defaultPreplaceDist)
 
     ## \}
