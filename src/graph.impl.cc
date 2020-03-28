@@ -468,24 +468,18 @@ namespace hpp {
                                         const hpp::Names_t& condNC,
                                         const hpp::Names_t& paramNC)
       {
-        graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge> (edgeId);
         try {
+          graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge>(edgeId);
           for (CORBA::ULong i=0; i<condNC.length (); ++i) {
             std::string name (condNC [i]);
             edge->insertConditionConstraint
-              (HPP_STATIC_PTR_CAST(Implicit,
-                                   problemSolver()->numericalConstraints.get
-                                   (name)->copy ()));
+              (problemSolver()->numericalConstraints.get(name)->copy ());
           }
-          std::vector <std::string> pdofNames (paramNC.length ());
           for (CORBA::ULong i=0; i<paramNC.length (); ++i) {
             std::string name (paramNC [i]);
-            edge->insertParamConstraint (
-                HPP_STATIC_PTR_CAST(Implicit,
-                problemSolver()->numericalConstraints.get(name)->copy ()));
+            edge->insertParamConstraint
+              (problemSolver()->numericalConstraints.get(name)->copy ());
           }
-
-          // edge->buildHistogram ();
         } catch (std::exception& err) {
           throw Error (err.what());
         }
