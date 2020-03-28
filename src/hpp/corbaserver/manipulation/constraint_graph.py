@@ -220,7 +220,7 @@ class ConstraintGraph (object):
             else:
                 isInNode = nodeTo
         self.edges [name] =\
-            self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, isInNode)
+            self.graph.createLevelSetEdge (self.nodes[nodeFrom], self.nodes[nodeTo], self._(name), weight, self.nodes[isInNode])
 
     ## Create grasp constraints between robot gripper and object handle
     #
