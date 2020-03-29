@@ -112,7 +112,11 @@ module hpp {
         core_idl::PathValidation getPathValidation () raises (Error);
         //-> pathValidation
 
+        // deprecated
         core_idl::ConstraintSet configConstraint () raises (Error);
+        //-> targetConstraint
+
+        core_idl::ConstraintSet targetConstraint () raises (Error);
 
         core_idl::ConstraintSet pathConstraint () raises (Error);
       }; // interface Edge
