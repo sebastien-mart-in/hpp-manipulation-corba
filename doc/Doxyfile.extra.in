@@ -5,6 +5,7 @@ INPUT		= @CMAKE_SOURCE_DIR@/include \
 		  @CMAKE_SOURCE_DIR@/src/hpp/corbaserver/manipulation/problem_solver.py \
 		  @CMAKE_SOURCE_DIR@/src/hpp/corbaserver/manipulation/constraint_graph.py \
 		  @CMAKE_SOURCE_DIR@/src/hpp/corbaserver/manipulation/constraint_graph_factory.py \
+		  @CMAKE_SOURCE_DIR@/src/hpp/corbaserver/manipulation/constraints.py \
 		  @CMAKE_SOURCE_DIR@/src/hpp/corbaserver/manipulation/security_margins.py \
  		  @CMAKE_SOURCE_DIR@/src/hpp/corbaserver/manipulation/robot.py
 

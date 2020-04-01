@@ -308,6 +308,16 @@ class ConstraintFactoryAbstract(ABC):
 
     ## \name Accessors to the different elementary constraints
     # \{
+
+    ## Get constraints relative to a grasp
+    #
+    #  \param gripper name of a gripper or gripper index
+    #  \param handle name of a handle or handle index
+    #  \return a dictionary with keys <c>['grasp', 'graspComplement',
+    #          'preGrasp']</c> and values the corresponding constraints as
+    #          \link manipulation.constraints.Constraints Constraints\endlink
+    #          instances.
+    #  \warning If grasp does not exist, the function creates it.
     def getGrasp(self, gripper, handle):
         if isinstance(gripper, str): ig = self.graphfactory.grippers.index(gripper)
         else: ig = gripper
@@ -319,9 +329,26 @@ class ConstraintFactoryAbstract(ABC):
             assert isinstance (self._grasp[k], dict)
         return self._grasp[k]
 
+    ## Get constraints relative to a grasp
+    #
+    #  \param gripper name of a gripper or gripper index,
+    #  \param handle name of a handle or handle index,
+    #  \param what a word among <c>['grasp', 'graspComplement', 'preGrasp']</c>.
+    #  \return the corresponding constraints as
+    #          \link manipulation.constraints.Constraints Constraints\endlink
+    #          instances.
+    #  \warning If grasp does not exist, the function creates it.
     def g (self, gripper, handle, what):
         return self.getGrasp(gripper, handle)[what]
 
+    ## Get constraints relative to an object placement
+    #
+    #  \param object object name or index
+    #  \return a dictionary with keys <c>['placement', 'placementComplement',
+    #          'prePlacement']</c> and values the corresponding constraints as
+    #          \link manipulation.constraints.Constraints Constraints\endlink
+    #          instances.
+    #  \warning If placement does not exist, the function creates it.
     def getPlacement(self, object):
         if isinstance(object, str): io = self.graphfactory.objects.index(object)
         else: io = object
@@ -330,6 +357,15 @@ class ConstraintFactoryAbstract(ABC):
             self._placement[k] = self.buildPlacement(self.graphfactory.objects[io])
         return self._placement[k]
 
+    ## Get constraints relative to a placement
+    #
+    #  \param object object name or index
+    #  \param what a word among <c>['placement', 'placementComplement',
+    #         'prePlacement']</c>.
+    #  \return the corresponding constraints as
+    #          \link manipulation.constraints.Constraints Constraints\endlink
+    #          instances.
+    #  \warning If placement does not exist, the function creates it.
     def p (self, object, what):
         return self.getPlacement(object)[what]
     ## \}
@@ -528,6 +564,16 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         self.graph.createEdge (state.name, state.name, n, weight = 0, isInNode = state.name)
         self.graph.addConstraints (edge = n, constraints = state.foliation)
 
+    ## Make transition between to states
+    #
+    #  \param stateFrom initial state,
+    #  \param stateTo new state
+    #  \param ig index of gripper
+    #
+    #  stateTo grasps are the union of stateFrom grasps with a set containing
+    #  a grasp by gripper of index ig in list <c>self.grippers</c> of a handle.
+    #  The index of the newly grasped handle can be found by
+    #  <c>stateTo.grasps[ig]</c>
     def makeTransition(self, stateFrom, stateTo, ig):
         sf = stateFrom
         st = stateTo
@@ -537,8 +583,10 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         if names in self.transitions:
             return
 
+        # index of newly grasped object when crossing the transition
         iobj = self.objectFromHandle [st.grasps[ig]]
         obj = self.objects[iobj]
+        # whether newly grasped object is already grasped in stateFrom
         noPlace = self._isObjectGrasped (sf.grasps, iobj)
 
         gc  = self.constraints.g (ig, st.grasps[ig], 'grasp')

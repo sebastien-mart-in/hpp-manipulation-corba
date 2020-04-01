@@ -18,14 +18,13 @@
 # <http://www.gnu.org/licenses/>.
 
 
+## Container of numerical constraints
+#
+#  Numerical constraints are stored as
+#  \li grasp,
+#  \li pregrasp, or
+#  \li numerical constraint,
 class Constraints (object):
-    """
-    Store constraints of various types
-
-      - grasps,
-      - pregrasps.
-      - numerical constraints,
-    """
     def __init__ (self, grasps = [], pregrasps = [], numConstraints = [],
                   lockedJoints = []):
         if type (grasps) is str:
