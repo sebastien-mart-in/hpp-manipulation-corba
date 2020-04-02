@@ -27,7 +27,6 @@
 module hpp {
   module constraints_idl {
     interface Implicit;
-    typedef sequence <Implicit> Implicits;
     interface LockedJoint;
     typedef sequence <LockedJoint> LockedJoints;
   };
