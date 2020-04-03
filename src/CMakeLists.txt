@@ -58,7 +58,7 @@ FOREACH(IDL ${IDL_SOURCES})
 ENDFOREACH()
 
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl)
-FOREACH(IDL steering_methods _graph _problem _path_planners)
+FOREACH(IDL steering_methods _graph _problem _path_planners device)
   GENERATE_IDL_CPP (hpp/manipulation_idl/${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
     ARGUMENTS

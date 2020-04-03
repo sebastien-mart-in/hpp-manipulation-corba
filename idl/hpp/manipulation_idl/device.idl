@@ -1,0 +1,55 @@
+// Copyright (c) 2020, LAAS-CNRS Airbus SAS
+// Authors: Florent Lamiraux
+//
+// This file is part of hpp-manipulation-corba.
+// hpp-manipulation-corba is free software: you can redistribute it
+// and/or modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation, either version
+// 3 of the License, or (at your option) any later version.
+//
+// hpp-manipulation-corba is distributed in the hope that it will be
+// useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+// of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Lesser Public License for more details.  You should have
+// received a copy of the GNU Lesser General Public License along with
+// hpp-manipulation-corba. If not, see <http://www.gnu.org/licenses/>.
+
+
+#ifndef HPP_MANIPULATION_DEVICE_IDL
+#define HPP_MANIPULATION_DEVICE_IDL
+
+#include <hpp/common.idl>
+#include <hpp/pinocchio_idl/robots.idl>
+
+module hpp {
+  module manipulation_idl {
+    interface Handle {
+      void setMask(in boolSeq mask) raises(Error);
+      //* std::vector<bool> _mask(hpp::corbaServer::boolSeqToVector(mask, 6));
+      //* getT()->mask(_mask);
+    }; // interface Handle
+    interface Device : pinocchio_idl::Device
+    {
+      Names_t getHandleNames() raises(Error);
+      //* typedef core::Container <manipulation::HandlePtr_t>::key_type K_t;
+      //* typedef std::vector<K_t> strings;
+      //* strings __return__ (getT()->handles.template getKeys <strings>());
+      //* return hpp::corbaServer::toNames_t (__return__);
+
+      Handle getHandle (in string name) raises(Error);
+      //* std::string _name (name);
+      //* hpp::manipulation::HandlePtr_t __return__
+      //* (getT()->handles.get (_name));
+      //* return makeServantDownCast
+      //* <hpp::corbaServer::manipulation_impl::Handle,
+      //* hpp::corbaServer::manipulation_impl::Handle>
+      //* (server_, __return__)._retn();
+    }; // interface Device
+  }; // module manipulation
+}; // module hpp
+
+//* #include <hpp/pinocchio_idl/robots.hh>
+//* #include <hpp/manipulation/device.hh>
+//* #include <hpp/manipulation/handle.hh>
+
+#endif // HPP_MANIPULATION_DEVICE_IDL
