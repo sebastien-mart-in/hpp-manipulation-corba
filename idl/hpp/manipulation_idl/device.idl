@@ -31,19 +31,10 @@ module hpp {
     interface Device : pinocchio_idl::Device
     {
       Names_t getHandleNames() raises(Error);
-      //* typedef core::Container <manipulation::HandlePtr_t>::key_type K_t;
-      //* typedef std::vector<K_t> strings;
-      //* strings __return__ (getT()->handles.template getKeys <strings>());
-      //* return hpp::corbaServer::toNames_t (__return__);
+      //-> handles.template getKeys < std::vector<std::string> >
 
       Handle getHandle (in string name) raises(Error);
-      //* std::string _name (name);
-      //* hpp::manipulation::HandlePtr_t __return__
-      //* (getT()->handles.get (_name));
-      //* return makeServantDownCast
-      //* <hpp::corbaServer::manipulation_impl::Handle,
-      //* hpp::corbaServer::manipulation_impl::Handle>
-      //* (server_, __return__)._retn();
+      //-> handles.get
     }; // interface Device
   }; // module manipulation
 }; // module hpp

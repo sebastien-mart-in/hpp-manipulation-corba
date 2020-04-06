@@ -108,20 +108,13 @@ module hpp {
 
         boolean generateTargetConfig(in floatSeq qStart, inout floatSeq q)
           raises(Error);
-        //* using hpp::corbaServer::floatSeqToVector;
-        //* using hpp::corbaServer::vectorToFloatSeq;
-        //* vector_t _qStart(floatSeqToVector(qStart));
-        //* vector_t _q(floatSeqToVector(q));
-        //* bool res(getT()->generateTargetConfig(_qStart, _q));
-        //* q = *vectorToFloatSeq(_q);
-        //* return res;
 
         core_idl::SteeringMethod getSteeringMethod () raises (Error);
         //-> steeringMethod
         core_idl::PathValidation getPathValidation () raises (Error);
         //-> pathValidation
 
-        // deprecated
+        /// \deprecated renamed to \ref targetConstraint
         core_idl::ConstraintSet configConstraint () raises (Error);
         //-> targetConstraint
 
@@ -137,14 +130,6 @@ module hpp {
         boolean generateTargetConfigOnLeaf(in floatSeq qStart,
                                            in floatSeq qLeaf,
                                            inout floatSeq q) raises(Error);
-        //* using hpp::corbaServer::floatSeqToVector;
-        //* using hpp::corbaServer::vectorToFloatSeq;
-        //* vector_t _qStart(floatSeqToVector(qStart));
-        //* vector_t _qLeaf(floatSeqToVector(qLeaf));
-        //* vector_t _q(floatSeqToVector(q));
-        //* bool res(getT()->generateTargetConfigOnLeaf(_qStart, _qLeaf, _q));
-        //* q = *vectorToFloatSeq(_q);
-        //* return res;
       }; // interface LevelSetEdge
 
       interface Validation
