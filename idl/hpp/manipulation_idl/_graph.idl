@@ -27,7 +27,6 @@
 module hpp {
   module constraints_idl {
     interface Implicit;
-    typedef sequence <Implicit> Implicits;
     interface LockedJoint;
     typedef sequence <LockedJoint> LockedJoints;
   };
@@ -107,15 +106,31 @@ module hpp {
         void setSecurityMarginForPair(in size_type row, in size_type col, in value_type margin) raises (Error);
         //-> securityMarginForPair
 
+        boolean generateTargetConfig(in floatSeq qStart, inout floatSeq q)
+          raises(Error);
+
         core_idl::SteeringMethod getSteeringMethod () raises (Error);
         //-> steeringMethod
         core_idl::PathValidation getPathValidation () raises (Error);
         //-> pathValidation
 
+        /// \deprecated renamed to \ref targetConstraint
         core_idl::ConstraintSet configConstraint () raises (Error);
+        //-> targetConstraint
+
+        core_idl::ConstraintSet targetConstraint () raises (Error);
 
         core_idl::ConstraintSet pathConstraint () raises (Error);
       }; // interface Edge
+
+      interface LevelSetEdge : Edge
+      {
+        constraints_idl::Implicits paramConstraints() raises(Error);
+        constraints_idl::Implicits conditionConstraints() raises(Error);
+        boolean generateTargetConfigOnLeaf(in floatSeq qStart,
+                                           in floatSeq qLeaf,
+                                           inout floatSeq q) raises(Error);
+      }; // interface LevelSetEdge
 
       interface Validation
       {

@@ -308,6 +308,16 @@ class ConstraintFactoryAbstract(ABC):
 
     ## \name Accessors to the different elementary constraints
     # \{
+
+    ## Get constraints relative to a grasp
+    #
+    #  \param gripper name of a gripper or gripper index
+    #  \param handle name of a handle or handle index
+    #  \return a dictionary with keys <c>['grasp', 'graspComplement',
+    #          'preGrasp']</c> and values the corresponding constraints as
+    #          \link manipulation.constraints.Constraints Constraints\endlink
+    #          instances.
+    #  \warning If grasp does not exist, the function creates it.
     def getGrasp(self, gripper, handle):
         if isinstance(gripper, str): ig = self.graphfactory.grippers.index(gripper)
         else: ig = gripper
@@ -319,9 +329,26 @@ class ConstraintFactoryAbstract(ABC):
             assert isinstance (self._grasp[k], dict)
         return self._grasp[k]
 
+    ## Get constraints relative to a grasp
+    #
+    #  \param gripper name of a gripper or gripper index,
+    #  \param handle name of a handle or handle index,
+    #  \param what a word among <c>['grasp', 'graspComplement', 'preGrasp']</c>.
+    #  \return the corresponding constraints as
+    #          \link manipulation.constraints.Constraints Constraints\endlink
+    #          instances.
+    #  \warning If grasp does not exist, the function creates it.
     def g (self, gripper, handle, what):
         return self.getGrasp(gripper, handle)[what]
 
+    ## Get constraints relative to an object placement
+    #
+    #  \param object object name or index
+    #  \return a dictionary with keys <c>['placement', 'placementComplement',
+    #          'prePlacement']</c> and values the corresponding constraints as
+    #          \link manipulation.constraints.Constraints Constraints\endlink
+    #          instances.
+    #  \warning If placement does not exist, the function creates it.
     def getPlacement(self, object):
         if isinstance(object, str): io = self.graphfactory.objects.index(object)
         else: io = object
@@ -330,6 +357,15 @@ class ConstraintFactoryAbstract(ABC):
             self._placement[k] = self.buildPlacement(self.graphfactory.objects[io])
         return self._placement[k]
 
+    ## Get constraints relative to a placement
+    #
+    #  \param object object name or index
+    #  \param what a word among <c>['placement', 'placementComplement',
+    #         'prePlacement']</c>.
+    #  \return the corresponding constraints as
+    #          \link manipulation.constraints.Constraints Constraints\endlink
+    #          instances.
+    #  \warning If placement does not exist, the function creates it.
     def p (self, object, what):
         return self.getPlacement(object)[what]
     ## \}
@@ -528,6 +564,16 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         self.graph.createEdge (state.name, state.name, n, weight = 0, isInNode = state.name)
         self.graph.addConstraints (edge = n, constraints = state.foliation)
 
+    ## Make transition between to states
+    #
+    #  \param stateFrom initial state,
+    #  \param stateTo new state
+    #  \param ig index of gripper
+    #
+    #  stateTo grasps are the union of stateFrom grasps with a set containing
+    #  a grasp by gripper of index ig in list <c>self.grippers</c> of a handle.
+    #  The index of the newly grasped handle can be found by
+    #  <c>stateTo.grasps[ig]</c>
     def makeTransition(self, stateFrom, stateTo, ig):
         sf = stateFrom
         st = stateTo
@@ -537,21 +583,34 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         if names in self.transitions:
             return
 
-        iobj = self.objectFromHandle [st.grasps[ig]]
-        obj = self.objects[iobj]
+        # index of newly grasped handle when crossing the transition
+        ih = st.grasps[ig]
+        # index of newly grasped object when crossing the transition
+        iobj = self.objectFromHandle [ih]
+        # whether newly grasped object is already grasped in stateFrom
         noPlace = self._isObjectGrasped (sf.grasps, iobj)
 
-        gc  = self.constraints.g (ig, st.grasps[ig], 'grasp')
-        gcc = self.constraints.g (ig, st.grasps[ig], 'graspComplement')
-        pgc = self.constraints.g (ig, st.grasps[ig], 'preGrasp')
+        # Constraints defining the new grasp as a Constraints instance.
+        gc  = self.constraints.g (ig, ih, 'grasp')
+        # Constraints defining the complement of the new grasp as a Constraints
+        # instance.
+        gcc = self.constraints.g (ig, ih, 'graspComplement')
+        # Constraints defining the new pregrasp as a Constraints instance.
+        pgc = self.constraints.g (ig, ih, 'preGrasp')
         if noPlace:
             pc = Constraints()
             pcc = Constraints()
             ppc = Constraints()
         else:
-            pc  = self.constraints.p (self.objectFromHandle[st.grasps[ig]], 'placement')
-            pcc = self.constraints.p (self.objectFromHandle[st.grasps[ig]], 'placementComplement')
-            ppc = self.constraints.p (self.objectFromHandle[st.grasps[ig]], 'prePlacement')
+            # If object is placed in stateFrom,
+            #   get constraints defining the placement as a Constraints
+            #   instance,
+            pc  = self.constraints.p (self.objectFromHandle[ih], 'placement')
+            #   get constraint defining the complement of the placement as a
+            #   Constraints instance,
+            pcc = self.constraints.p (self.objectFromHandle[ih], 'placementComplement')
+            #   get the preplacement constraint as a Constraints instance.
+            ppc = self.constraints.p (self.objectFromHandle[ih], 'prePlacement')
         manifold = sf.manifold - pc
 
         # The different cases:
@@ -563,6 +622,15 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         nTransitions = 1 + nWaypoints
         nStates = 2 + nWaypoints
 
+        # Check whether level set edge is required
+        assert (len(sf.foliation.grasps) == 0)
+        assert (len(sf.foliation.pregrasps) == 0)
+        assert (len(st.foliation.grasps) == 0)
+        assert (len(st.foliation.pregrasps) == 0)
+        crossedFoliation = False
+        if len(sf.foliation.numConstraints) > 0 and \
+           len(st.foliation.numConstraints) > 0:
+            crossedFoliation = True
         def _createWaypointState (name, constraints):
             self.graph.createNode (name, True)
             self.graph.addConstraints (node = name, constraints = constraints)
@@ -587,16 +655,69 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         if nWaypoints > 0:
             self.graph.createWaypointEdge (sf.name, st.name, names[0], nWaypoints, automaticBuilder = False)
             self.graph.createWaypointEdge (st.name, sf.name, names[1], nWaypoints, automaticBuilder = False)
+            if crossedFoliation:
+                self.graph.createWaypointEdge\
+                    (sf.name, st.name, names[0] + "_ls", nWaypoints, 10,
+                     automaticBuilder = False)
+                if not noPlace:
+                    # If object is already grasped, the backward waypoint edge
+                    # with levelset edge is useless
+                    self.graph.createWaypointEdge\
+                        (st.name, sf.name, names[1] + "_ls", nWaypoints, 10,
+                         automaticBuilder = False)
             wTransitions = []
             for i in range(nTransitions):
                 nf = "{0}_{1}{2}".format(names[0], i, i+1)
                 nb = "{0}_{2}{1}".format(names[1], i, i+1)
                 self.graph.createEdge (wStates[i], wStates[i+1], nf, -1)
                 self.graph.createEdge (wStates[i+1], wStates[i], nb, -1)
-                self.graph.graph.setWaypoint (self.graph.edges[transitions[0]],
+                if crossedFoliation:
+                    nf_ls = nf
+                    nb_ls = nb
+                    # Add LevelSetEdges
+                    if i == 0:
+                        edgeName = nf_ls = nf + "_ls"
+                        # containing state is always start state
+                        containingState = sf.name
+                        self.graph.createLevelSetEdge(wStates[i], wStates[i+1],
+                                                      edgeName, -1,
+                                                      containingState)
+                        paramNC = (st.foliation - sf.foliation).numConstraints
+                        condNC = (st.manifold - sf.manifold).numConstraints
+                        self.graph.addLevelSetFoliation\
+                            (edgeName, condNC = condNC, paramNC = paramNC)
+                        self.graph.addConstraints (edge = edgeName,
+                                                   constraints = sf.foliation)
+                    if i == nTransitions - 1 and crossedFoliation:
+                        edgeName = nb_ls = nb + "_ls"
+                        # containing state is goal state if an object in
+                        # placement is grasped, start state otherwise.
+                        if not noPlace:
+                            containingState = st.name
+                            self.graph.createLevelSetEdge\
+                                (wStates[i+1], wStates[i], edgeName, -1,
+                                 containingState)
+                            pNC = (sf.foliation - st.foliation).numConstraints
+                            cNC = sf.manifold.numConstraints
+                            self.graph.addLevelSetFoliation\
+                                (edgeName, condNC = cNC, paramNC = pNC)
+                            self.graph.addConstraints\
+                                (edge = edgeName, constraints = st.foliation)
+                    self.graph.graph.setWaypoint\
+                        (self.graph.edges[names[0] + '_ls'], i,
+                         self.graph.edges[nf_ls],
+                         self.graph.nodes[wStates[i+1]])
+                    if not noPlace:
+                        self.graph.graph.setWaypoint\
+                            (self.graph.edges[names[1] + '_ls'],
+                             nTransitions-1-i, self.graph.edges[nb_ls],
+                             self.graph.nodes[wStates[i]])
+
+                self.graph.graph.setWaypoint (self.graph.edges[names[0]],
                         i, self.graph.edges[nf], self.graph.nodes[wStates[i+1]])
-                self.graph.graph.setWaypoint (self.graph.edges[transitions[1]],
-                        nTransitions - 1 - i, self.graph.edges[nb], self.graph.nodes[wStates[i]])
+                self.graph.graph.setWaypoint (self.graph.edges[names[1]],
+                        nTransitions - 1 - i, self.graph.edges[nb],
+                        self.graph.nodes[wStates[i]])
                 wTransitions.append ( (nf, nb) )
 
             # Set states
@@ -612,6 +733,20 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
                 self.graph.setContainingNode (wTransitions[i][1], st.name)
                 self.graph.addConstraints (edge = wTransitions[i][1], constraints = st.foliation)
 
+            # If pregrasp, add grasp complement constraint to edge linking
+            # pregrasp to grasp
+            if pregrasp:
+                self.graph.addConstraints(edge = wTransitions[1][0],
+                                          constraints = gcc)
+                self.graph.addConstraints(edge = wTransitions[1][1],
+                                          constraints = gcc)
+            # If preplace, add placement complement constraint to edge linking
+            # grasp inter placement to preplacement.
+            if preplace:
+                self.graph.addConstraints(edge = wTransitions[2][0],
+                                          constraints = pcc)
+                self.graph.addConstraints(edge = wTransitions[2][1],
+                                          constraints = pcc)
             # Set all to short except first one.
             for i in range(nTransitions - 1):
                 self.graph.setShort (wTransitions[i + 1][0], True)

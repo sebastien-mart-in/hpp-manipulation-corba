@@ -383,7 +383,7 @@ namespace hpp {
           graph::StatePtr_t state = HPP_DYNAMIC_PTR_CAST(graph::State, comp);
           if (edge) {
             if (target)
-              constraint = graph()->configConstraint (edge);
+              constraint = graph()->targetConstraint (edge);
             else
               constraint = graph()->pathConstraint (edge);
           } else if (state) {
@@ -417,7 +417,7 @@ namespace hpp {
           graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
           graph::StatePtr_t state = HPP_DYNAMIC_PTR_CAST(graph::State, comp);
           if (edge) {
-            constraint = graph(false)->configConstraint (edge);
+            constraint = graph(false)->targetConstraint (edge);
             DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	    if (core::ConfigProjectorPtr_t cp =
 		constraint->configProjector ()) {
@@ -470,12 +470,12 @@ namespace hpp {
           core::NodePtr_t nNode = problemSolver()->roadmap()->nearestNode
 	    (qoffset, dist);
           if (dist < 1e-8)
-            success = edge->applyConstraints (nNode, *config);
+            success = edge->generateTargetConfig(nNode, *config);
           else
-            success = edge->applyConstraints (*qoffset, *config);
+            success = edge->generateTargetConfig(*qoffset, *config);
 
 	  hpp::core::ConfigProjectorPtr_t configProjector
-	    (edge->configConstraint ()->configProjector ());
+	    (edge->targetConstraint ()->configProjector ());
 	  if (configProjector) {
 	    residualError = configProjector->residualError ();
 	  } else {

@@ -407,7 +407,7 @@ namespace hpp {
           return true;
         } else if (edge) {
           ConfigProjectorPtr_t proj =
-            graph()->configConstraint (edge)->configProjector ();
+            graph()->targetConstraint (edge)->configProjector ();
           if (proj) {
             config.success = (Long) proj->statistics().nbSuccess();
             config.error = (Long) proj->statistics().nbFailure();
@@ -468,24 +468,18 @@ namespace hpp {
                                         const hpp::Names_t& condNC,
                                         const hpp::Names_t& paramNC)
       {
-        graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge> (edgeId);
         try {
+          graph::LevelSetEdgePtr_t edge = getComp <graph::LevelSetEdge>(edgeId);
           for (CORBA::ULong i=0; i<condNC.length (); ++i) {
             std::string name (condNC [i]);
             edge->insertConditionConstraint
-              (HPP_STATIC_PTR_CAST(Implicit,
-                                   problemSolver()->numericalConstraints.get
-                                   (name)->copy ()));
+              (problemSolver()->numericalConstraints.get(name)->copy ());
           }
-          std::vector <std::string> pdofNames (paramNC.length ());
           for (CORBA::ULong i=0; i<paramNC.length (); ++i) {
             std::string name (paramNC [i]);
-            edge->insertParamConstraint (
-                HPP_STATIC_PTR_CAST(Implicit,
-                problemSolver()->numericalConstraints.get(name)->copy ()));
+            edge->insertParamConstraint
+              (problemSolver()->numericalConstraints.get(name)->copy ());
           }
-
-          // edge->buildHistogram ();
         } catch (std::exception& err) {
           throw Error (err.what());
         }
@@ -624,7 +618,7 @@ namespace hpp {
           graph::EdgePtr_t edge = HPP_DYNAMIC_PTR_CAST(graph::Edge, comp);
           graph::StatePtr_t state = HPP_DYNAMIC_PTR_CAST(graph::State, comp);
           if (edge) {
-            constraint = graph(false)->configConstraint (edge);
+            constraint = graph(false)->targetConstraint (edge);
             DevicePtr_t robot = getRobotOrThrow (problemSolver());
 	    if (core::ConfigProjectorPtr_t cp =
 		constraint->configProjector ()) {
@@ -713,12 +707,12 @@ namespace hpp {
           core::NodePtr_t nNode = problemSolver()->roadmap()->nearestNode
 	    (qRhs, dist);
           if (dist < 1e-8)
-            success = edge->applyConstraints (nNode, *config);
+            success = edge->generateTargetConfig (nNode, *config);
           else
-            success = edge->applyConstraints (*qRhs, *config);
+            success = edge->generateTargetConfig (*qRhs, *config);
 
 	  hpp::core::ConfigProjectorPtr_t configProjector
-	    (edge->configConstraint ()->configProjector ());
+	    (edge->targetConstraint ()->configProjector ());
 	  if (configProjector) {
 	    residualError = configProjector->residualError ();
 	  } else {
@@ -875,7 +869,7 @@ namespace hpp {
       {
         try {
           graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId);
-          ConstraintSetPtr_t cs (graph()->configConstraint (edge));
+          ConstraintSetPtr_t cs (graph()->targetConstraint (edge));
           std::ostringstream oss;
           oss << (*cs);
           constraints = oss.str ().c_str ();
