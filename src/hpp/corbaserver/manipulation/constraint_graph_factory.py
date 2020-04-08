@@ -153,6 +153,10 @@ class GraphFactoryAbstract(ABC):
     ## \param contactsPerObjects a list of list of contact names.
     ##  handlesPerObjects and contactsPerObjects must have one list for each object, in the same order.
     def setObjects(self, objects, handlesPerObjects, contactsPerObjects):
+        if len(objects) != len(handlesPerObjects):
+            raise IndexError("There should be as many handlesPerObjects as objects")
+        if len(objects) != len(contactsPerObjects):
+            raise IndexError("There should be as many contactsPerObjects as objects")
         self.objects = tuple(objects)
         handles = []
         hpo = []
