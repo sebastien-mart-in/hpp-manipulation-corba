@@ -737,20 +737,6 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
                 self.graph.setContainingNode (wTransitions[i][1], st.name)
                 self.graph.addConstraints (edge = wTransitions[i][1], constraints = st.foliation)
 
-            # If pregrasp, add grasp complement constraint to edge linking
-            # pregrasp to grasp
-            if pregrasp:
-                self.graph.addConstraints(edge = wTransitions[1][0],
-                                          constraints = gcc)
-                self.graph.addConstraints(edge = wTransitions[1][1],
-                                          constraints = gcc)
-            # If preplace, add placement complement constraint to edge linking
-            # grasp inter placement to preplacement.
-            if preplace:
-                self.graph.addConstraints(edge = wTransitions[2][0],
-                                          constraints = pcc)
-                self.graph.addConstraints(edge = wTransitions[2][1],
-                                          constraints = pcc)
             # Set all to short except first one.
             for i in range(nTransitions - 1):
                 self.graph.setShort (wTransitions[i + 1][0], True)
