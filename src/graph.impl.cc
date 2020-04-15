@@ -205,9 +205,13 @@ namespace hpp {
 
       void Graph::createSubGraph(const char* subgraphName)
       {
+        try {
         graph::GuidedStateSelectorPtr_t ns = graph::GuidedStateSelector::create
           (subgraphName, problemSolver()->roadmap ());
         graph()->stateSelector(ns);
+        } catch (const std::exception& exc){
+          throw (Error(exc.what()));
+        }
       }
 
       void Graph::setTargetNodeList(const ID graphId, const hpp::IDseq& nodes)
@@ -257,6 +261,7 @@ namespace hpp {
           const char* edgeName, const Long nb, const Long w,
           const Long isInNodeId)
       {
+        try {
         graph::StatePtr_t from = getComp <graph::State> (nodeFromId),
 	  to = getComp <graph::State> (nodeToId),
 	  isInNode = getComp <graph::State> (isInNodeId);
@@ -270,11 +275,15 @@ namespace hpp {
 
         edge->nbWaypoints (nb);
         return (Long) edge->id ();
+        } catch (const std::exception& exc){
+          throw (Error(exc.what()));
+        }
       }
 
       void Graph::setWaypoint (const ID waypointEdgeId, const Long index,
           const ID edgeId, const ID nodeId)
       {
+        try {
         WaypointEdgePtr_t we = getComp <graph::WaypointEdge> (waypointEdgeId);
         EdgePtr_t edge = getComp <Edge> (edgeId);
         graph::StatePtr_t state = getComp <graph::State> (nodeId);
@@ -282,6 +291,9 @@ namespace hpp {
         if (index < 0 || (std::size_t)index > we->nbWaypoints ())
           throw Error ("Invalid index");
         we->setWaypoint (index, edge, state);
+        } catch (const std::exception& exc){
+          throw (Error(exc.what()));
+        }
       }
 
       void Graph::getGraph (GraphComp_out graph_out, GraphElements_out elmts)
