@@ -1,5 +1,5 @@
-# Copyright (c) 2012 CNRS
-# Author: Florent Lamiraux
+# Copyright (c) 2012, 2020 CNRS
+# Author: Florent Lamiraux, Guilhem Saurel
 #
 # This file is part of hpp-manipulation-corba.
 # hpp-manipulation-corba is free software: you can redistribute it
@@ -24,7 +24,8 @@ SET(IDL_SOURCES
 )
 
 INCLUDE(${HPP_CORBASERVER_CMAKE_PLUGIN})
-INCLUDE(${HPP_CORBASERVER_DATAROOTDIR}/hpp-corbaserver/cmake/omniidl.cmake)
+STRING(REPLACE "hpp-corbaserver-plugin.cmake" "omniidl.cmake" HPP_CORBASERVER_OMNIIDL ${HPP_CORBASERVER_CMAKE_PLUGIN})
+INCLUDE(${HPP_CORBASERVER_OMNIIDL})
 OMNIIDL_INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/idl ${HPP_CORBASERVER_DATAROOTDIR}/idl
   )
@@ -119,10 +120,10 @@ ADD_LIBRARY(${LIBRARY_NAME} SHARED
   client.cc
   )
 
-PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hpp-corbaserver)
+TARGET_LINK_LIBRARIES(${LIBRARY_NAME} hpp-corbaserver::hpp-corbaserver)
 PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} omniORB4)
 
-INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION lib)
+INSTALL(TARGETS ${LIBRARY_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
 
 IF (NOT CLIENT_ONLY)
   # Server plugin
@@ -137,17 +138,13 @@ IF (NOT CLIENT_ONLY)
     robot.impl.hh
     server.cc
     tools.cc # Should be moved into the library
-    LINK_DEPENDENCIES hpp-manipulation-corba
-    PKG_CONFIG_DEPENDENCIES omniORB4 hpp-corbaserver hpp-manipulation hpp-manipulation-urdf)
+    LINK_DEPENDENCIES ${LIBRARY_NAME}
+    PKG_CONFIG_DEPENDENCIES omniORB4)
 
 
   # Stand alone corba server
   ADD_EXECUTABLE (hpp-manipulation-server hpp-manipulation-corba.cc)
-  TARGET_LINK_LIBRARIES (hpp-manipulation-server ${LIBRARY_NAME})
-  PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-manipulation)
-  PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-manipulation-urdf)
-  PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-corbaserver)
-  PKG_CONFIG_USE_DEPENDENCY (hpp-manipulation-server hpp-template-corba)
+  TARGET_LINK_LIBRARIES (hpp-manipulation-server ${LIBRARY_NAME} hpp-manipulation-urdf::hpp-manipulation-urdf)
 
   INSTALL (TARGETS hpp-manipulation-server DESTINATION ${CMAKE_INSTALL_BINDIR})
 ENDIF (NOT CLIENT_ONLY)

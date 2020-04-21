@@ -1,5 +1,5 @@
-# Copyright (c) 2012 CNRS
-# Author: Florent Lamiraux
+# Copyright (c) 2012, 2020 CNRS
+# Author: Florent Lamiraux, Guilhem Saurel
 #
 # This file is part of hpp-manipulation-corba.
 # hpp-manipulation-corba is free software: you can redistribute it
@@ -15,49 +15,46 @@
 # hpp-manipulation-corba.  If not, see
 # <http://www.gnu.org/licenses/>.
 
-# Requires at least CMake 2.6 to configure the package.
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 
 SET(PROJECT_NAME hpp-manipulation-corba)
 SET(PROJECT_DESCRIPTION "Corba server for manipulation planning")
 
+SET(CLIENT_ONLY FALSE CACHE BOOL "Set to true to install the client only")
+SET(CUSTOM_HEADER_DIR hpp/corbaserver/manipulation)
+SET(PROJECT_USE_CMAKE_EXPORT TRUE)
 SET(CXX_DISABLE_WERROR true)
 
 INCLUDE(cmake/hpp.cmake)
 INCLUDE(cmake/idl.cmake)
 INCLUDE(cmake/python.cmake)
 
-SET(CLIENT_ONLY FALSE CACHE BOOL "Set to true to install the client only")
-
-SET(CUSTOM_HEADER_DIR hpp/corbaserver/manipulation)
-
 COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
 PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
 
 LIST(APPEND PKG_CONFIG_ADDITIONAL_VARIABLES cmake_plugin)
-CONFIG_FILES (doc/main.hh)
+CONFIG_FILES(doc/main.hh)
 
 SET(${PROJECT_NAME}_HEADERS
   include/hpp/corbaserver/manipulation/client.hh
   )
-IF (NOT CLIENT_ONLY)
+
+IF(NOT CLIENT_ONLY)
   SET(${PROJECT_NAME}_HEADERS
     include/hpp/corbaserver/manipulation/server.hh
     include/hpp/corbaserver/manipulation/fwd.hh
     ${${PROJECT_NAME}_HEADERS}
     )
-ENDIF (NOT CLIENT_ONLY)
+ENDIF(NOT CLIENT_ONLY)
 
 # search for python
 FINDPYTHON()
 
-ADD_REQUIRED_DEPENDENCY("hpp-corbaserver >= 3")
-IF (NOT CLIENT_ONLY)
-  ADD_REQUIRED_DEPENDENCY("hpp-template-corba >= 1.1")
-  ADD_DOC_DEPENDENCY("hpp-core >= 4")
-  ADD_REQUIRED_DEPENDENCY("hpp-manipulation >= 4")
-  ADD_REQUIRED_DEPENDENCY("hpp-manipulation-urdf >= 4")
-ENDIF (NOT CLIENT_ONLY)
+ADD_PROJECT_DEPENDENCY("hpp-corbaserver" REQUIRED)
+IF(NOT CLIENT_ONLY)
+    ADD_PROJECT_DEPENDENCY("hpp-manipulation" REQUIRED)
+    ADD_PROJECT_DEPENDENCY("hpp-manipulation-urdf" REQUIRED)
+ENDIF(NOT CLIENT_ONLY)
 ADD_REQUIRED_DEPENDENCY("omniORB4 >= 4.1.4")
 
 ADD_SUBDIRECTORY(src)
