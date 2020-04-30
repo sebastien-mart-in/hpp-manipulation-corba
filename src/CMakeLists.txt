@@ -138,7 +138,7 @@ IF (NOT CLIENT_ONLY)
     robot.impl.hh
     server.cc
     tools.cc # Should be moved into the library
-    LINK_DEPENDENCIES PUBLIC ${LIBRARY_NAME}
+    LINK_DEPENDENCIES PUBLIC ${LIBRARY_NAME} hpp-manipulation-urdf::hpp-manipulation-urdf
     PKG_CONFIG_DEPENDENCIES omniORB4)
 
 
