@@ -1,0 +1,43 @@
+<?xml version='1.0'?> 
+ <package format='2'> 
+ <name>hpp-manipulation-corba</name> 
+ <version>4.9.0</version> 
+ <description>Corba server for manipulation planning </description> 
+ 
+ <maintainer email='hpp@laas.fr'>Joseph Mirabel</maintainer> 
+ <license>LGPL</license> 
+ 
+ <!-- <url type='website'>https://github.com/humanoid-path-planner/hpp-manipulation-corba </url> --> 
+ 
+ <author>Joseph Mirabel</author> 
+ <author>Florent Lamiraux et al.</author> 
+ 
+ <buildtool_depend>catkin</buildtool_depend> 
+ <build_depend>hpp-corbaserver</build_depend> 
+ <exec_depend>hpp-corbaserver</exec_depend> 
+ <build_export_depend>hpp-corbaserver</build_export_depend>
+ <build_depend>hpp-manipulation</build_depend> 
+ <exec_depend>hpp-manipulation</exec_depend> 
+ <build_export_depend>hpp-manipulation</build_export_depend>
+ <build_depend>hpp-manipulation-urdf</build_depend> 
+ <exec_depend>hpp-manipulation-urdf</exec_depend> 
+ <build_export_depend>hpp-manipulation-urdf</build_export_depend>
+ <build_depend>eigen3</build_depend> 
+ <exec_depend>eigen3</exec_depend> 
+ <build_export_depend>eigen3</build_export_depend>
+ <build_depend>urdfdom</build_depend> 
+ <exec_depend>urdfdom</exec_depend> 
+ <build_export_depend>urdfdom</build_export_depend>
+ <build_depend>hpp-fcl</build_depend> 
+ <exec_depend>hpp-fcl</exec_depend> 
+ <build_export_depend>hpp-fcl</build_export_depend>
+ <build_depend>romeo_description;omniORB4;omniORB4</build_depend> 
+ <exec_depend>romeo_description;omniORB4;omniORB4</exec_depend> 
+ <build_export_depend>romeo_description;omniORB4;omniORB4</build_export_depend>
+ <build_depend>omniDynamic4</build_depend> 
+ <exec_depend>omniDynamic4</exec_depend> 
+ <build_export_depend>omniDynamic4</build_export_depend>
+ <build_depend>roboptim-trajectory</build_depend> 
+ <exec_depend>roboptim-trajectory</exec_depend> 
+ <build_export_depend>roboptim-trajectory</build_export_depend>
+ </package>
