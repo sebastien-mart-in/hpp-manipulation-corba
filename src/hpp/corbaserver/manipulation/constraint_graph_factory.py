@@ -405,7 +405,7 @@ class ConstraintFactory(ConstraintFactoryAbstract):
         self.graph = graph
         ## Select whether placement should be strict or relaxed.
         # \sa buildStrictPlacement, buildRelaxedPlacement
-        self.strict = False
+        self.strict = True
 
     ## Calls ConstraintGraph.createGraph and ConstraintGraph.createPreGrasp
     ## \param g gripper string
