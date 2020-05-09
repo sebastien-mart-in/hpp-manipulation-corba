@@ -183,6 +183,23 @@ module hpp {
         boolean setConstraints (in ID idComp, in boolean target)
           raises (Error);
 
+        /// Register constraints
+        /// \param constraint a numerical constraint partially constraining the
+        ///        (relative) pose of an object or robot body (grasp,
+        ///        placement),
+        /// \param complement the complement constraint, i.e. the constaint that
+        ///        combined with the previous one totally constrains the pose
+        ///        of the object or robot body.
+        /// \param both a constraint (usually explicit) that is equivalent to
+        ///        the combination of the two first parameters.
+        ///
+        /// Registering constraints enables the numerical solvers to be more
+        /// efficient. Instead of inserting "constraint" and "complement" in
+        /// a solver, the graph will insert constraint "both", thus replacing
+        /// two implicit constraints by an explicit one.
+        void registerConstraints(in string constraint, in string complement,
+                                 in string both);
+
         /// Apply constaints to a configuration
         ///
         /// \param idComp ID of a node or a configuration

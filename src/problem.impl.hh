@@ -78,6 +78,9 @@ namespace hpp {
 
         virtual bool setConstraints (hpp::ID id, bool target);
 
+        virtual void registerConstraints
+        (const char* constraint, const char* complement, const char* both);
+
         virtual bool applyConstraints (hpp::ID id, const hpp::floatSeq& input,
             hpp::floatSeq_out output, double& residualError);
 

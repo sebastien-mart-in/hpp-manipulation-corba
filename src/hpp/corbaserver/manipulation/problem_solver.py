@@ -111,6 +111,10 @@ class ProblemSolver (Parent):
             return name, prename
         return name
 
+    ## \copydoc hpp::corbaserver::manipulation::Problem::registerConstraints
+    def registerConstraints(self, *args):
+        self.client.manipulation.problem.registerConstraints(*args)
+
     ## Return balance constraints created by method
     #  ProblemSolver.createStaticStabilityConstraints
     def balanceConstraints (self):

@@ -405,6 +405,25 @@ namespace hpp {
 	}
       }
 
+      void Problem::registerConstraints
+      (const char* constraint, const char* complement, const char* both)
+      {
+        using constraints::ImplicitPtr_t;
+        try {
+          ImplicitPtr_t constr
+            (problemSolver()->numericalConstraints.get(constraint));
+          ImplicitPtr_t comp
+            (problemSolver()->numericalConstraints.get(complement));
+          ImplicitPtr_t comb
+            (problemSolver()->numericalConstraints.get(both));
+          problemSolver()->constraintsAndComplements.push_back
+            (ConstraintAndComplement_t (constr, comp, comb));
+        } catch (const std::exception& exc)
+        {
+          throw hpp::Error(exc.what());
+        }
+      }
+
       bool Problem::applyConstraints (hpp::ID id,
           const hpp::floatSeq& input,
           hpp::floatSeq_out output,
