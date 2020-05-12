@@ -403,9 +403,6 @@ class ConstraintFactory(ConstraintFactoryAbstract):
     def __init__ (self, graphfactory, graph):
         super (ConstraintFactory, self).__init__(graphfactory)
         self.graph = graph
-        ## Select whether placement should be strict or relaxed.
-        # \sa buildStrictPlacement, buildRelaxedPlacement
-        self.strict = True
 
     ## Calls ConstraintGraph.createGraph and ConstraintGraph.createPreGrasp
     ## \param g gripper string
@@ -421,17 +418,11 @@ class ConstraintFactory(ConstraintFactoryAbstract):
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),
             ))))
 
-    def buildPlacement (self, o):
-        if self.strict:
-            return self.buildStrictPlacement (o)
-        else:
-            return self.buildRelaxedPlacement (o)
-
-    ## This implements strict placement manifolds,
+    ## This implements placement manifolds,
     ## where the parameterization constraints is the complement
     ## of the placement constraint.
     ## \param o string
-    def buildStrictPlacement (self, o):
+    def buildPlacement (self, o):
         n = "place_" + o
         pn = "preplace_" + o
         # Get distance of object to surface in preplacement
@@ -460,45 +451,6 @@ class ConstraintFactory(ConstraintFactoryAbstract):
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ pn, ])),
             ))))
-
-    ## This implements relaxed placement manifolds,
-    ## where the parameterization constraints is the LockedJoint of
-    ## the object root joint
-    ## \param o string
-    def buildRelaxedPlacement (self, o):
-        n = "place_" + o
-        pn = "preplace_" + o
-        # Get distance of object to surface in preplacement
-        distance = self.graphfactory.getPreplacementDistance(o)
-        io = self.graphfactory.objects.index(o)
-        ljs = []
-        for jn in self.graph.clientBasic.robot.getJointNames():
-            if jn.startswith(o + "/"):
-                ljs.append(jn)
-                q = self.graph.clientBasic.robot.getJointConfig(jn)
-                self.graph.clientBasic.problem.createLockedJoint(jn, jn, q)
-        placeAlreadyCreated = n in self.graph.clientBasic.problem.getAvailable ("numericalconstraint")
-        if (len(self.graphfactory.contactsPerObjects[io]) == 0 or len(self.graphfactory.envContacts) == 0) and not placeAlreadyCreated:
-            return dict ( list(zip (self.pfields,
-                                    (Constraints (),
-                                     Constraints (numConstraints = ljs),
-                                     Constraints (),))))
-        if not placeAlreadyCreated:
-            self.graph.client.problem.createPlacementConstraint (n, self.graphfactory.contactsPerObjects[io], self.graphfactory.envContacts)
-        if not pn in self.graph.clientBasic.problem.getAvailable ("numericalconstraint"):
-            self.graph.client.problem.createPrePlacementConstraint \
-                (pn, self.graphfactory.contactsPerObjects[io],
-                 self.graphfactory.envContacts, distance)
-        return dict ( list(zip (self.pfields,
-                                (Constraints (numConstraints = \
-                                              _removeEmptyConstraints\
-                                              (self.graph.clientBasic.problem,
-                                               [ n, ])),
-                                 Constraints (numConstraints = ljs),
-                                 Constraints (numConstraints = \
-                                              _removeEmptyConstraints\
-                                              (self.graph.clientBasic.problem,
-                                               [ pn, ])),))))
 
 ## Default implementation of ConstraintGraphFactory
 #
