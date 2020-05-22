@@ -291,10 +291,10 @@ class GraphFactoryAbstract(ABC):
                 nGrasps = grasps[:isg] + (ish, ) + grasps[isg+1:]
 
                 nextIsAllowed = self.graspIsAllowed (nGrasps)
-                if nextIsAllowed: next = self._makeState (nGrasps, depth + 1)
+                if nextIsAllowed: nnext = self._makeState (nGrasps, depth + 1)
 
                 if isAllowed and nextIsAllowed:
-                    self.makeTransition (current, next, isg)
+                    self.makeTransition (current, nnext, isg)
 
                 self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
 
