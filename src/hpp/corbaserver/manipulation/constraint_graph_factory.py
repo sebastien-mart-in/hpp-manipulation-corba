@@ -497,6 +497,7 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
 
     ## defaut distance between objec and surface in preplacement configuration
     defaultPreplaceDist = 0.05
+    ## See methods setPreplacementDistance and getPreplacementDistance
     preplaceDistance = dict()
 
     ## \param graph an instance of ConstraintGraph
