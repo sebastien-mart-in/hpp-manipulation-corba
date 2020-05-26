@@ -206,6 +206,11 @@ class GraphFactoryAbstract(ABC):
     @abc.abstractmethod
     def makeLoopTransition(self, state): pass
 
+    ## Check whether a transition between two states is allowed
+    #  \param stateFrom, stateTo states to connect
+    @abc.abstractmethod
+    def transitionIsAllowed(self, stateFrom, stateTo): return True
+
     ## Create two transitions between two different states.
     # \param stateFrom: same as grasps in \ref makeState
     # \param stateTo: same as grasps in \ref makeState
@@ -291,10 +296,11 @@ class GraphFactoryAbstract(ABC):
                 nGrasps = grasps[:isg] + (ish, ) + grasps[isg+1:]
 
                 nextIsAllowed = self.graspIsAllowed (nGrasps)
-                if nextIsAllowed: next = self._makeState (nGrasps, depth + 1)
+                if nextIsAllowed: nnext = self._makeState (nGrasps, depth + 1)
 
-                if isAllowed and nextIsAllowed:
-                    self.makeTransition (current, next, isg)
+                if isAllowed and nextIsAllowed and self.transitionIsAllowed\
+                   (stateFrom = current, stateTo = nnext):
+                    self.makeTransition (current, nnext, isg)
 
                 self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
 
@@ -491,6 +497,7 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
 
     ## defaut distance between objec and surface in preplacement configuration
     defaultPreplaceDist = 0.05
+    ## See methods setPreplacementDistance and getPreplacementDistance
     preplaceDistance = dict()
 
     ## \param graph an instance of ConstraintGraph
