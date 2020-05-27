@@ -208,8 +208,8 @@ class GraphFactoryAbstract(ABC):
 
     ## Check whether a transition between two states is allowed
     #  \param stateFrom, stateTo states to connect
-    @abc.abstractmethod
-    def transitionIsAllowed(self, stateFrom, stateTo): return True
+    def transitionIsAllowed(self, stateFrom, stateTo):
+        return True
 
     ## Create two transitions between two different states.
     # \param stateFrom: same as grasps in \ref makeState
