@@ -117,10 +117,7 @@ class SecurityMargins(object):
     #  \param obj2 name of second robot or object.
     def getSecurityMarginBetween(self, obj1, obj2):
         key = frozenset([obj1, obj2])
-        if self.marginMatrix.has_key(key):
-            return self.marginMatrix[key]
-        else:
-            return self.defaultMargin
+        return self.marginMatrix.get(key, self.defaultMargin)
 
     # Get list of constraints that are active somewhere along the edge
     #
