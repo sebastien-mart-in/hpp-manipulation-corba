@@ -100,7 +100,7 @@ module hpp {
         void setState (in State st) raises (Error);
         //-> state
         intSeqSeq getRelativeMotion () raises (Error);
-        //* return matrixToIntSeqSeq(getT()->relativeMotion().template cast<CORBA::Long>());
+        //* return corbaServer::matrixToIntSeqSeq(getT()->relativeMotion().template cast<CORBA::Long>());
         floatSeqSeq getSecurityMargins () raises (Error);
         //-> securityMargins
         void setSecurityMarginForPair(in size_type row, in size_type col, in value_type margin) raises (Error);

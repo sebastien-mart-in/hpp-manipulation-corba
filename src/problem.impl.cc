@@ -643,14 +643,14 @@ namespace hpp {
 	}
       }
 
-      hpp::manipulation_idl::graph_idl::Validation_ptr Problem::createGraphValidation ()
+      manipulation_idl::graph_idl::Validation_ptr Problem::createGraphValidation ()
       {
         core::ProblemSolverPtr_t ps = problemSolver();
         graph::ValidationPtr_t validation (new graph::Validation (ps->problem()));
 
-        typedef corbaServer::manipulation_impl::graph_impl::Validation Validation_impl;
+        typedef manipulation_impl::graph_impl::Validation Validation_impl;
 
-        hpp::manipulation_idl::graph_idl::Validation_var validation_idl =
+        manipulation_idl::graph_idl::Validation_var validation_idl =
           corbaServer::makeServantDownCast <Validation_impl> (server_->parent(),
               Validation_impl::Storage (validation));
         return validation_idl._retn();
