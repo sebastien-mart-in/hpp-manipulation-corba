@@ -222,8 +222,11 @@ class GraphFactoryAbstract(ABC):
 
     ## \}
 
+    def _existState(self, grasps):
+        return grasps in self.states
+
     def _makeState(self, grasps, priority):
-        if grasps not in self.states:
+        if not self._existState(grasps):
             state = self.makeState (grasps, priority)
             self.states[grasps] = state
 
@@ -296,13 +299,15 @@ class GraphFactoryAbstract(ABC):
                 nGrasps = grasps[:isg] + (ish, ) + grasps[isg+1:]
 
                 nextIsAllowed = self.graspIsAllowed (nGrasps)
+                isNewState = not self._existState(nGrasps)
                 if nextIsAllowed: nnext = self._makeState (nGrasps, depth + 1)
 
                 if isAllowed and nextIsAllowed and self.transitionIsAllowed\
                    (stateFrom = current, stateTo = nnext):
                     self.makeTransition (current, nnext, isg)
 
-                self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
+                if isNewState:
+                    self._recurse (ngrippers, nhandles, nGrasps, depth + 2)
 
 ## An abstract class which stores the constraints.
 #
