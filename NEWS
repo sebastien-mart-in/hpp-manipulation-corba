@@ -1,4 +1,12 @@
                                                                 -*- outline -*-
+New in v4.10.0
+* In class ConstraintGraphFactory
+  - add abstract method transitionIsAllowed,
+  - simplify construction of graph,
+  - always use constraints and complement for contact constraints (flag strict)
+* Add package.xml.
+
+New in v4.9.0
 * In graph component classes (State, Edge, Graph) locked joints are handled as other numerical constraints.
 New in v4.6.1
 * Remove deprecated methods and functions.
