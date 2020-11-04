@@ -1048,18 +1048,26 @@ namespace hpp {
 
       void Graph::getRelativeMotionMatrix (ID edgeId, intSeqSeq_out matrix)
       {
+        try {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
         matrix = matrixToIntSeqSeq(edge->relativeMotion().cast<CORBA::Long>());
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
       }
 
       void Graph::setSecurityMarginForEdge
       (ID edgeId, const char* joint1, const char* joint2, double margin)
       {
+        try {
         graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
         DevicePtr_t robot(edge->parentGraph()->robot());
         JointPtr_t j1 (robot->getJointByName(joint1));
         JointPtr_t j2 (robot->getJointByName(joint2));
         edge->securityMarginForPair(j1->index(), j2->index(), margin);
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
       }
     } // namespace impl
   } // namespace manipulation
