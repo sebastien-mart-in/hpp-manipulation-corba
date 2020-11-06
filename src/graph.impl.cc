@@ -1064,7 +1064,9 @@ namespace hpp {
         DevicePtr_t robot(edge->parentGraph()->robot());
         JointPtr_t j1 (robot->getJointByName(joint1));
         JointPtr_t j2 (robot->getJointByName(joint2));
-        edge->securityMarginForPair(j1->index(), j2->index(), margin);
+	size_type i1 = 0; if (j1) { i1 = j1->index();}
+	size_type i2 = 0; if (j2) { i2 = j2->index();}
+        edge->securityMarginForPair(i1, i2, margin);
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());
 	}

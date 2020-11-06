@@ -76,7 +76,7 @@ namespace hpp {
               strcpy (nameList[rank], itJs->first->name().c_str ());
             } else {
               nameList[rank] = new char[5];
-              strcpy (nameList[rank], "NONE");
+              strcpy (nameList[rank], "universe");
             }
             nbPts += itJs->second.size ();
             (*indexes)[rank] = (int) nbPts;
