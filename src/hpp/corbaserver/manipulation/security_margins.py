@@ -65,7 +65,7 @@ class SecurityMargins(object):
             l = len(ro)
             self.robotToJoints[ro] = list(filter(lambda n:n[:l+1] == ro + "/",
                                             self.robot.jointNames))
-        self.robotToJoints["universe"] = ['NONE']
+        self.robotToJoints["universe"] = ['universe']
         self.jointToRobot = dict()
         for ro, joints in self.robotToJoints.items():
             for j in joints:
