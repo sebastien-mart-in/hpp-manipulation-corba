@@ -50,6 +50,8 @@ namespace hpp {
 
         virtual Names_t* getSelected (const char* what);
 
+        virtual void readRoadmap (const char* filename);
+
         virtual void createGrasp (const char* graspName,
             const char* gripperName, const char* handleName);
 

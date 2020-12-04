@@ -49,6 +49,10 @@ module hpp {
         /// \note For most of the types, the list will contain only one element.
         Names_t getSelected (in string type) raises (Error);
 
+        /// Read a roadmap from a file
+        /// \param filename name of the file from which the roadmap is read.
+        void readRoadmap (in string filename) raises (Error);
+
         /// Create grasp constraints between robot gripper and object handle
 	///
 	/// Creates two contraints between a handle and a gripper.

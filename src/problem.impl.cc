@@ -26,6 +26,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include <hpp/util/debug.hh>
+#include <hpp/pinocchio/serialization.hh>
 #include <hpp/constraints/implicit.hh>
 #include <hpp/core/roadmap.hh>
 #include <hpp/core/distance.hh>
@@ -45,6 +46,7 @@
 #include <hpp/manipulation/graph/edge.hh>
 #include <hpp/manipulation/graph/validation.hh>
 #include <hpp/manipulation/steering-method/graph.hh>
+#include <hpp/manipulation/serialization.hh>
 
 #include "hpp/manipulation_idl/_graph.hh"
 
@@ -193,6 +195,31 @@ namespace hpp {
         }
 
         return toNames_t (ret.begin(), ret.end());
+      }
+
+      struct iarchive :
+        boost::archive::binary_iarchive,
+        hpp::serialization::archive_device_wrapper,
+        hpp::serialization::archive_graph_wrapper
+      {
+        iarchive(std::istream& is) : boost::archive::binary_iarchive (is) {}
+      };
+
+      void Problem::readRoadmap (const char* filename)
+      {
+        try {
+          DevicePtr_t robot = getRobotOrThrow (problemSolver());
+
+          hpp::core::RoadmapPtr_t roadmap;
+          std::ifstream ifs (filename);
+          iarchive ia (ifs);
+          ia.device = robot;
+          ia.graph = graph();
+          ia >> roadmap;
+          problemSolver()->roadmap(roadmap);
+        } catch (const std::exception& exc) {
+          throw hpp::Error (exc.what ());
+        }
       }
 
       void Problem::createGrasp (const char* graspName,
