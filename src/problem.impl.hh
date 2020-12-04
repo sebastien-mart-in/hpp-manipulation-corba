@@ -102,6 +102,8 @@ namespace hpp {
 
         hpp::manipulation_idl::graph_idl::Validation_ptr createGraphValidation ();
 
+        core_idl::Roadmap_ptr deserializeRoadmap(const char* filename,
+            pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph);
       private:
         ProblemSolverPtr_t problemSolver();
         graph::GraphPtr_t graph(bool throwIfNull = true);

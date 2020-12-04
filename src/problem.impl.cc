@@ -49,6 +49,8 @@
 #include <hpp/manipulation/serialization.hh>
 
 #include "hpp/manipulation_idl/_graph.hh"
+#include "hpp/pinocchio_idl/robots-fwd.hh"
+#include "hpp/core_idl/path_planners.hh" // For hpp::core_impl::Roadmap
 
 #include "tools.hh"
 
@@ -77,7 +79,7 @@ namespace hpp {
               nameList[rank] = new char[itJs->first->name().length ()+1];
               strcpy (nameList[rank], itJs->first->name().c_str ());
             } else {
-              nameList[rank] = new char[5];
+              nameList[rank] = new char[9];
               strcpy (nameList[rank], "universe");
             }
             nbPts += itJs->second.size ();
@@ -681,6 +683,22 @@ namespace hpp {
           corbaServer::makeServantDownCast <Validation_impl> (server_->parent(),
               Validation_impl::Storage (validation));
         return validation_idl._retn();
+      }
+
+      core_idl::Roadmap_ptr Problem::deserializeRoadmap(const char* filename,
+          pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph)
+      {
+        hpp::core::RoadmapPtr_t roadmap;
+        std::ifstream ifs (filename);
+        iarchive ia (ifs);
+        ia.device = corbaServer::reference_to_object<pinocchio::Device> (server_->parent(), robot);
+        ia.graph = corbaServer::reference_to_object<graph::Graph> (server_->parent(), graph);
+        ia >> roadmap;
+
+        core_idl::Roadmap_var o = corbaServer::makeServantDownCast<core_impl::Roadmap> (
+            server_->parent(),
+            roadmap);
+        return o._retn();
       }
     } // namespace impl
   } // namespace manipulation

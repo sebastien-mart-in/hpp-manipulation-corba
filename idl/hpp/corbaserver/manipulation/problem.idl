@@ -21,6 +21,9 @@
 #include <hpp/corbaserver/manipulation/gcommon.idl>
 #include <hpp/common.idl>
 
+#include <hpp/pinocchio_idl/robots.idl>
+#include <hpp/core_idl/path_planners.idl>
+
 #include <hpp/manipulation_idl/_graph.idl>
 
 module hpp {
@@ -258,6 +261,8 @@ module hpp {
 
         manipulation_idl::graph_idl::Validation createGraphValidation ()
           raises (Error);
+        core_idl::Roadmap deserializeRoadmap(in string filename, in pinocchio_idl::Device robot,
+          in manipulation_idl::graph_idl::Graph graph) raises (Error);
       }; // interface Problem
     }; // module manipulation
   }; // module corbaserver
