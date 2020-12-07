@@ -685,8 +685,9 @@ namespace hpp {
         return validation_idl._retn();
       }
 
-      core_idl::Roadmap_ptr Problem::deserializeRoadmap(const char* filename,
-          pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph)
+      core_idl::Roadmap_ptr Problem::loadRoadmap(const char* filename,
+          pinocchio_idl::Device_ptr robot,
+	  manipulation_idl::graph_idl::Graph_ptr graph)
       {
         hpp::core::RoadmapPtr_t roadmap;
         std::ifstream ifs (filename);
