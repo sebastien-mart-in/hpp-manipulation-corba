@@ -199,12 +199,13 @@ namespace hpp {
         return toNames_t (ret.begin(), ret.end());
       }
 
+      template<typename base_archive = boost::archive::binary_iarchive>
       struct iarchive :
-        boost::archive::binary_iarchive,
+        base_archive,
         hpp::serialization::archive_device_wrapper,
         hpp::serialization::archive_graph_wrapper
       {
-        iarchive(std::istream& is) : boost::archive::binary_iarchive (is) {}
+        iarchive(std::istream& is) : base_archive (is) {}
       };
 
       void Problem::readRoadmap (const char* filename)
@@ -214,7 +215,7 @@ namespace hpp {
 
           hpp::core::RoadmapPtr_t roadmap;
           std::ifstream ifs (filename);
-          iarchive ia (ifs);
+          iarchive<> ia (ifs);
           ia.device = robot;
           ia.graph = graph();
           ia >> roadmap;
@@ -691,10 +692,21 @@ namespace hpp {
       {
         hpp::core::RoadmapPtr_t roadmap;
         std::ifstream ifs (filename);
-        iarchive ia (ifs);
-        ia.device = corbaServer::reference_to_object<pinocchio::Device> (server_->parent(), robot);
-        ia.graph = corbaServer::reference_to_object<graph::Graph> (server_->parent(), graph);
-        ia >> roadmap;
+        pinocchio::DevicePtr_t device = corbaServer::reference_to_object<pinocchio::Device> (server_->parent(), robot);
+        graph::GraphPtr_t _graph = corbaServer::reference_to_object<graph::Graph> (server_->parent(), graph);
+
+        std::string fn (filename);
+        if (fn.size() >= 4 && fn.compare(fn.size()-4, 4, ".xml") == 0) {
+          iarchive<boost::archive::xml_iarchive> ia (ifs);
+          ia.device = device;
+          ia.graph = _graph;
+          ia >> boost::serialization::make_nvp("roadmap", roadmap);
+        } else {
+          iarchive<> ia (ifs);
+          ia.device = device;
+          ia.graph = _graph;
+          ia >> roadmap;
+        }
 
         core_idl::Roadmap_var o = corbaServer::makeServantDownCast<core_impl::Roadmap> (
             server_->parent(),
