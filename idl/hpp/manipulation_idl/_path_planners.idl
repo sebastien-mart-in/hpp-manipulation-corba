@@ -13,6 +13,7 @@
 #include <hpp/common.idl>
 
 #include <hpp/core_idl/path_planners.idl>
+#include <hpp/manipulation_idl/_graph.idl>
 
 module hpp
 {
@@ -21,6 +22,10 @@ module hpp
   }; // module core
 
   module manipulation_idl {
+    interface Roadmap : core_idl::Roadmap {
+      void constraintGraph (in graph_idl::Graph graph) raises (Error);
+    }; // interface Roadmap
+
     module pathPlanner_idl {
       interface IkSolverInitialization
       {
@@ -53,5 +58,7 @@ module hpp
 //* #include <hpp/manipulation/path-planner/end-effector-trajectory.hh>
 //* #include <hpp/core_idl/paths.hh>
 //* #include <hpp/core_idl/path_planners.hh>
+//* #include <hpp/manipulation_idl/_graph-fwd.hh>
+//* #include <hpp/manipulation/roadmap.hh>
 
 #endif // HPP_MANIPULATION_CORBA_PATH_PLANNERS_IDL

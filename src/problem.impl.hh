@@ -23,6 +23,7 @@
 # include "hpp/corbaserver/manipulation/problem-idl.hh"
 
 # include "hpp/manipulation_idl/_graph-idl.hh"
+# include "hpp/manipulation_idl/_path_planners-idl.hh"
 
 namespace hpp {
   namespace manipulation {
@@ -104,6 +105,8 @@ namespace hpp {
 
         core_idl::Roadmap_ptr loadRoadmap(const char* filename,
             pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph);
+
+        core_idl::Roadmap_ptr createRoadmap(core_idl::Distance_ptr distance, pinocchio_idl::Device_ptr robot);
       private:
         ProblemSolverPtr_t problemSolver();
         graph::GraphPtr_t graph(bool throwIfNull = true);

@@ -23,7 +23,9 @@
 
 #include <hpp/pinocchio_idl/robots.idl>
 #include <hpp/core_idl/path_planners.idl>
+#include <hpp/core_idl/distances.idl>
 
+#include <hpp/manipulation_idl/_path_planners.idl>
 #include <hpp/manipulation_idl/_graph.idl>
 
 module hpp {
@@ -272,6 +274,9 @@ module hpp {
 	/// \return the roadmap as a CORBA object.
         core_idl::Roadmap loadRoadmap(in string filename, in pinocchio_idl::Device robot,
           in manipulation_idl::graph_idl::Graph graph) raises (Error);
+
+        core_idl::Roadmap createRoadmap(in core_idl::Distance distance,
+          in pinocchio_idl::Device robot) raises (Error);
       }; // interface Problem
     }; // module manipulation
   }; // module corbaserver

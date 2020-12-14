@@ -28,7 +28,6 @@
 #include <hpp/util/debug.hh>
 #include <hpp/pinocchio/serialization.hh>
 #include <hpp/constraints/implicit.hh>
-#include <hpp/core/roadmap.hh>
 #include <hpp/core/distance.hh>
 #include <hpp/core/config-projector.hh>
 #include <hpp/core/path-projector.hh>
@@ -47,8 +46,11 @@
 #include <hpp/manipulation/graph/validation.hh>
 #include <hpp/manipulation/steering-method/graph.hh>
 #include <hpp/manipulation/serialization.hh>
+#include <hpp/manipulation/roadmap.hh>
 
 #include "hpp/manipulation_idl/_graph.hh"
+#include "hpp/manipulation_idl/_path_planners-fwd.hh"
+#include "hpp/manipulation_idl/device-fwd.hh"
 #include "hpp/pinocchio_idl/robots-fwd.hh"
 #include "hpp/core_idl/path_planners.hh" // For hpp::core_impl::Roadmap
 
@@ -713,6 +715,19 @@ namespace hpp {
             roadmap);
         return o._retn();
       }
+
+      core_idl::Roadmap_ptr Problem::createRoadmap(core_idl::Distance_ptr distance, pinocchio_idl::Device_ptr robot)
+      {
+        core_idl::Roadmap_var o = corbaServer::makeServantDownCast<core_impl::Roadmap> (
+            server_->parent(),
+            Roadmap::create(
+              corbaServer::reference_to_servant_base<core::Distance> (server_->parent(), distance)->get()
+              ,
+              corbaServer::reference_to_servant_base<pinocchio::Device> (server_->parent(), robot)->get()
+              ));
+        return o._retn();
+      }
+
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp
