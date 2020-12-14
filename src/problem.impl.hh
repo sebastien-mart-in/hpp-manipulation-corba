@@ -51,7 +51,7 @@ namespace hpp {
 
         virtual Names_t* getSelected (const char* what);
 
-        virtual void readRoadmap (const char* filename);
+        virtual void loadRoadmap (const char* filename);
 
         virtual void createGrasp (const char* graspName,
             const char* gripperName, const char* handleName);
@@ -103,7 +103,9 @@ namespace hpp {
 
         hpp::manipulation_idl::graph_idl::Validation_ptr createGraphValidation ();
 
-        core_idl::Roadmap_ptr loadRoadmap(const char* filename,
+        core_idl::Roadmap_ptr readRoadmap(const char* filename,
+            pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph);
+        core_idl::Roadmap_ptr writeRoadmap(const char* filename,
             pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph);
 
         core_idl::Roadmap_ptr createRoadmap(core_idl::Distance_ptr distance, pinocchio_idl::Device_ptr robot);

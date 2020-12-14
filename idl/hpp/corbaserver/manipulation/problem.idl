@@ -54,9 +54,9 @@ module hpp {
         /// \note For most of the types, the list will contain only one element.
         Names_t getSelected (in string type) raises (Error);
 
-        /// Read a roadmap from a file
+        /// Load a roadmap from a file
         /// \param filename name of the file from which the roadmap is read.
-        void readRoadmap (in string filename) raises (Error);
+        void loadRoadmap (in string filename) raises (Error);
 
         /// Create grasp constraints between robot gripper and object handle
 	///
@@ -263,7 +263,8 @@ module hpp {
 
         manipulation_idl::graph_idl::Validation createGraphValidation ()
           raises (Error);
-	/// Load a roadmap from a file
+
+	/// Read a roadmap from a file
 	/// \param filename name of the file,
         ///        If it ends with '.xml', then the file is interpreted in
         ///        XML format, otherwise it is interpreted in binary format.
@@ -272,7 +273,19 @@ module hpp {
 	/// \param constraint graph with which the roadmap was build before
 	///        saving in the file.
 	/// \return the roadmap as a CORBA object.
-        core_idl::Roadmap loadRoadmap(in string filename, in pinocchio_idl::Device robot,
+        core_idl::Roadmap readRoadmap(in string filename, in pinocchio_idl::Device robot,
+          in manipulation_idl::graph_idl::Graph graph) raises (Error);
+
+	/// Write a roadmap ro a file
+	/// \param filename name of the file,
+        ///        If it ends with '.xml', then the file is interpreted in
+        ///        XML format, otherwise it is interpreted in binary format.
+	/// \param robot the robot for which the roadmap was built before
+	///        saving in the file,
+	/// \param constraint graph with which the roadmap was build before
+	///        saving in the file.
+	/// \return the roadmap as a CORBA object.
+        core_idl::Roadmap writeRoadmap(in string filename, in pinocchio_idl::Device robot,
           in manipulation_idl::graph_idl::Graph graph) raises (Error);
 
         core_idl::Roadmap createRoadmap(in core_idl::Distance distance,
