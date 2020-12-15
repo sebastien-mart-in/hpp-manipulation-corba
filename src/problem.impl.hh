@@ -105,7 +105,7 @@ namespace hpp {
 
         core_idl::Roadmap_ptr readRoadmap(const char* filename,
             pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph);
-        core_idl::Roadmap_ptr writeRoadmap(const char* filename,
+        void writeRoadmap(const char* filename, core_idl::Roadmap_ptr roadmap,
             pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph);
 
         core_idl::Roadmap_ptr createRoadmap(core_idl::Distance_ptr distance, pinocchio_idl::Device_ptr robot);

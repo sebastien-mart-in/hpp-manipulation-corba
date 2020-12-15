@@ -53,13 +53,17 @@
 #include "hpp/manipulation_idl/_path_planners-fwd.hh"
 #include "hpp/manipulation_idl/device-fwd.hh"
 #include "hpp/pinocchio_idl/robots-fwd.hh"
-#include "hpp/core_idl/path_planners.hh" // For hpp::core_impl::Roadmap
+#include "hpp/core_idl/path_planners-fwd.hh" // For hpp::core_impl::Roadmap
+#include "hpp/core_idl/distances-fwd.hh" // For hpp::core_impl::Roadmap
 
 #include "tools.hh"
 
 namespace hpp {
   namespace manipulation {
     namespace impl {
+      using corbaServer::reference_to_object;
+      using corbaServer::makeServantDownCast;
+
       namespace {
         using corbaServer::floatSeqToConfigPtr;
         typedef core::ProblemSolver CPs_t;
@@ -682,7 +686,7 @@ namespace hpp {
         typedef manipulation_impl::graph_impl::Validation Validation_impl;
 
         manipulation_idl::graph_idl::Validation_var validation_idl =
-          corbaServer::makeServantDownCast <Validation_impl> (server_->parent(),
+          makeServantDownCast <Validation_impl> (server_->parent(),
               Validation_impl::Storage (validation));
         return validation_idl._retn();
       }
@@ -691,8 +695,8 @@ namespace hpp {
           pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph)
       {
 	try {
-          pinocchio::DevicePtr_t device = corbaServer::reference_to_servant_base<pinocchio::Device> (server_->parent(), robot)->get();
-          graph::GraphPtr_t _graph = corbaServer::reference_to_object<graph::Graph> (server_->parent(), graph);
+          pinocchio::DevicePtr_t device = reference_to_object<pinocchio::Device> (server_->parent(), robot);
+          graph::GraphPtr_t _graph = reference_to_object<graph::Graph> (server_->parent(), graph);
 
           hpp::core::RoadmapPtr_t roadmap;
           std::string fn (filename);
@@ -716,7 +720,7 @@ namespace hpp {
                 make_nvp(_graph->name(), _graph.get()));
           }
 
-          core_idl::Roadmap_var o = corbaServer::makeServantDownCast<core_impl::Roadmap> (
+          core_idl::Roadmap_var o = makeServantDownCast<core_impl::Roadmap> (
               server_->parent(), roadmap);
           return o._retn();
         }
@@ -725,15 +729,15 @@ namespace hpp {
 	}
       }
 
-      core_idl::Roadmap_ptr Problem::writeRoadmap(const char* filename,
+      void Problem::writeRoadmap(const char* filename,
+          core_idl::Roadmap_ptr _roadmap,
           pinocchio_idl::Device_ptr robot, manipulation_idl::graph_idl::Graph_ptr graph)
       {
 	try {
-          pinocchio::DevicePtr_t device = corbaServer::reference_to_servant_base<pinocchio::Device> (server_->parent(), robot)->get();
-          graph::GraphPtr_t _graph = corbaServer::reference_to_object<graph::Graph> (server_->parent(), graph);
+          pinocchio::DevicePtr_t device = reference_to_object<pinocchio::Device> (server_->parent(), robot);
+          graph::GraphPtr_t _graph = reference_to_object<graph::Graph> (server_->parent(), graph);
+          core::RoadmapPtr_t roadmap = reference_to_object<core::Roadmap> (server_->parent(), _roadmap);
 
-
-          hpp::core::RoadmapPtr_t roadmap;
           std::string fn (filename);
           bool xml = (fn.size() >= 4 && fn.compare(fn.size()-4, 4, ".xml") == 0);
           using namespace core::parser;
@@ -754,10 +758,6 @@ namespace hpp {
                 make_nvp(device->name(), device.get()),
                 make_nvp(_graph->name(), _graph.get()));
           }
-
-          core_idl::Roadmap_var o = corbaServer::makeServantDownCast<core_impl::Roadmap> (
-              server_->parent(), roadmap);
-          return o._retn();
         }
 	catch(const std::exception& exc) {
 	  throw hpp::Error(exc.what());
@@ -766,12 +766,12 @@ namespace hpp {
 
       core_idl::Roadmap_ptr Problem::createRoadmap(core_idl::Distance_ptr distance, pinocchio_idl::Device_ptr robot)
       {
-        core_idl::Roadmap_var o = corbaServer::makeServantDownCast<core_impl::Roadmap> (
+        core_idl::Roadmap_var o = makeServantDownCast<core_impl::Roadmap> (
             server_->parent(),
             Roadmap::create(
-              corbaServer::reference_to_servant_base<core::Distance> (server_->parent(), distance)->get()
+              reference_to_object<core::Distance> (server_->parent(), distance)
               ,
-              corbaServer::reference_to_servant_base<pinocchio::Device> (server_->parent(), robot)->get()
+              reference_to_object<pinocchio::Device> (server_->parent(), robot)
               ));
         return o._retn();
       }

@@ -285,7 +285,8 @@ module hpp {
 	/// \param constraint graph with which the roadmap was build before
 	///        saving in the file.
 	/// \return the roadmap as a CORBA object.
-        core_idl::Roadmap writeRoadmap(in string filename, in pinocchio_idl::Device robot,
+        void writeRoadmap(in string filename, in core_idl::Roadmap roadmap,
+          in pinocchio_idl::Device robot,
           in manipulation_idl::graph_idl::Graph graph) raises (Error);
 
         core_idl::Roadmap createRoadmap(in core_idl::Distance distance,
