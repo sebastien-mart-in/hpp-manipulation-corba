@@ -19,8 +19,6 @@
 #include <fstream>
 #include <sstream>
 
-#include <boost/foreach.hpp>
-
 #include <pinocchio/multibody/model.hpp>
 
 #include <hpp/util/debug.hh>
@@ -140,9 +138,9 @@ namespace hpp {
         return g;
       }
 
-      template <typename T> boost::shared_ptr<T> Graph::getComp (ID id, bool throwIfWrongType)
+      template <typename T> shared_ptr<T> Graph::getComp (ID id, bool throwIfWrongType)
       {
-        boost::shared_ptr <T> comp;
+        shared_ptr <T> comp;
         try {
           comp = HPP_DYNAMIC_PTR_CAST(T, graph()->get(id).lock());
         } catch (std::out_of_range& e) {

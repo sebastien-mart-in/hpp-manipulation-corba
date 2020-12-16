@@ -22,9 +22,6 @@
 #include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/corbaserver/conversions.hh>
 
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/assign/list_of.hpp>
-
 #include <hpp/util/debug.hh>
 #include <hpp/pinocchio/serialization.hh>
 #include <hpp/constraints/implicit.hh>
@@ -153,7 +150,8 @@ namespace hpp {
       Names_t* Problem::getAvailable (const char* what)
       {
         std::string w (what);
-        boost::algorithm::to_lower(w);
+        std::transform(w.begin(), w.end(), w.begin(),
+            [](unsigned char c){ return std::tolower(c); });
         typedef std::list <std::string> Ret_t;
         Ret_t ret;
 
@@ -168,13 +166,8 @@ namespace hpp {
         } else if (w == "constraintgraph") {
           ret = problemSolver()->graphs.getKeys <Ret_t> ();
         } else if (w == "type") {
-#if __cplusplus <= 199711L
-          ret = boost::assign::list_of ("Gripper") ("Handle") ("RobotContact")
-            ("EnvContact")("ConstraintGraph");
-#else
           ret = { "Gripper", "Handle", "RobotContact", "EnvContact",
                   "ConstraintGraph" };
-#endif
         } else {
           throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
         }
@@ -185,7 +178,8 @@ namespace hpp {
       Names_t* Problem::getSelected (const char* what)
       {
         std::string w (what);
-        boost::algorithm::to_lower(w);
+        std::transform(w.begin(), w.end(), w.begin(),
+            [](unsigned char c){ return std::tolower(c); });
         typedef std::list <std::string> Ret_t;
         Ret_t ret;
 
@@ -194,11 +188,7 @@ namespace hpp {
             ret.push_back (problemSolver()->constraintGraph()->name());
           else throw Error ("No constraint graph selected.");
         } else if (w == "type") {
-#if __cplusplus <= 199711L
-          ret = boost::assign::list_of ("ConstraintGraph");
-#else
           ret = { "ConstraintGraph" };
-#endif
         } else {
           throw Error (("Type \"" + std::string(what) + "\" not known").c_str());
         }
