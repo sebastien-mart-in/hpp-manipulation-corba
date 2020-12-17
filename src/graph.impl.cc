@@ -40,8 +40,6 @@
 
 #include <hpp/constraints/differentiable-function.hh>
 
-#include <hpp/constraints/locked-joint.hh>
-
 #include <hpp/corbaserver/conversions.hh>
 #include <hpp/corbaserver/manipulation/server.hh>
 
@@ -102,23 +100,6 @@ namespace hpp {
           out.handles_  = toStringVector (in.handles );
           out.link_ = in.link;
         }
-      }
-
-      // Convert a sequence of strings to a vector of string
-      // Check that size of sequence is the same as expected.
-      std::vector <std::string>
-      convertPassiveDofNameVector (const hpp::Names_t& names, const size_t& s)
-      {
-	if (names.length () != s) {
-	  std::ostringstream oss;
-	  oss << "Number of constraints (" << s
-	      << ") and number of lists of passive joints (" <<
-	    names.length () << ") should be the same."
-	      << std::endl;
-	  oss << "Use ProblemSolver.addPassiveDofs to create lists of passive joints.";
-	    throw std::runtime_error (oss.str ().c_str ());
-	}
-        return toStringVector (names);
       }
 
       Graph::Graph () :
@@ -527,15 +508,12 @@ namespace hpp {
 
         if (constraintNames.length () > 0) {
           try {
-            std::vector <std::string> pdofNames = convertPassiveDofNameVector
-              (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               if (!problemSolver()->numericalConstraint (name))
                 throw Error ("The numerical function does not exist.");
               component->addNumericalConstraint
-		(problemSolver()->numericalConstraint(name),
-                 problemSolver()->passiveDofs.get (pdofNames [i], core::segments_t()));
+		(problemSolver()->numericalConstraint(name));
             }
           } catch (std::exception& err) {
             throw Error (err.what());
@@ -572,14 +550,10 @@ namespace hpp {
 
         if (constraintNames.length () > 0) {
           try {
-            std::vector <std::string> pdofNames = convertPassiveDofNameVector
-              (passiveDofsNames, constraintNames.length ());
             for (CORBA::ULong i=0; i<constraintNames.length (); ++i) {
               std::string name (constraintNames [i]);
               n->addNumericalConstraintForPath
-                (problemSolver()->numericalConstraint(name)->copy (),
-                 problemSolver()->passiveDofs.get (pdofNames [i],
-                                                   core::segments_t()));
+                (problemSolver()->numericalConstraint(name)->copy ());
             }
           } catch (std::exception& err) {
             throw Error (err.what());
