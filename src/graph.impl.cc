@@ -501,8 +501,7 @@ namespace hpp {
       }
 
       void Graph::addNumericalConstraints (const Long graphComponentId,
-          const hpp::Names_t& constraintNames,
-          const hpp::Names_t& passiveDofsNames)
+          const hpp::Names_t& constraintNames)
       {
         graph::GraphComponentPtr_t component = getComp<graph::GraphComponent>(graphComponentId, true);
 
@@ -543,8 +542,7 @@ namespace hpp {
       }
 
       void Graph::addNumericalConstraintsForPath (const Long nodeId,
-          const hpp::Names_t& constraintNames,
-          const hpp::Names_t& passiveDofsNames)
+          const hpp::Names_t& constraintNames)
       {
         graph::StatePtr_t n = getComp <graph::State> (nodeId);
 

@@ -152,16 +152,13 @@ module hpp {
 	void resetConstraints(in long graphComponentId) raises (Error);
 
         /// \deprecated use addNumericalConstraints
-        void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames, in Names_t passiveDofsNames)
+        void setNumericalConstraints (in long graphComponentId, in Names_t constraintNames)
           raises (Error);
 
         /// Add the numerical constraints to a component.
         /// \param graphComponentId ID of the component.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
-        /// \param passiveDofsNames array of names of vector of passive dofs in the ProblemSolver map.
-        /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
-        ///       which corresponds to an empty vector of passive dofs.
-        void addNumericalConstraints (in long graphComponentId, in Names_t constraintNames, in Names_t passiveDofsNames)
+        void addNumericalConstraints (in long graphComponentId, in Names_t constraintNames)
           raises (Error);
 
 	/// Get the list of numerical constraints applied to a component.
@@ -171,16 +168,13 @@ module hpp {
 	  raises (Error);
 
         /// \deprecated use addNumericalConstraintsForPath
-        void setNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames, in Names_t passiveDofsNames)
+        void setNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames)
           raises (Error);
 
         /// Add the numerical constraints for path to a node.
         /// \param nodeId ID of the node.
         /// \param constraintNames is an array of names of constraints in the ProblemSolver map.
-        /// \param passiveDofsNames array of names of vector of passive dofs in the ProblemSolver map.
-        /// \note If passiveDofsNames is a shorter list than constraintNames, passiveDofsNames is extended with an empty string,
-        ///       which corresponds to an empty vector of passive dofs.
-        void addNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames, in Names_t passiveDofsNames)
+        void addNumericalConstraintsForPath (in long nodeId, in Names_t constraintNames)
           raises (Error);
 
 	/// Remove collision pairs from an edge

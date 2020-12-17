@@ -21,21 +21,6 @@ from __future__ import print_function
 from subprocess import Popen
 from .constraints import Constraints
 
-## Association of a numerical constraint with the associated passive joints
-#
-#  Passive joints are information provided to the constraint solver to get
-#  better performance and behavior in the resolution.
-class _ConstraintAndPassiveJoints (object):
-    def __init__ (self, constraint, passiveJoints):
-        self.constraint_ = constraint
-        self.passiveJoints_ = passiveJoints
-    @property
-    def constraint (self):
-        return self.constraint_
-    @property
-    def passiveJoints (self):
-        return self.passiveJoints_
-
 ### Definition of a constraint graph.
 ##
 ##  This class wraps the Corba client to the server implemented by
@@ -239,18 +224,11 @@ class ConstraintGraph (object):
     #  \param handle name of the handle in the form "object/handle"
     #  where object is the name of the object owning the handle and handle
     #  is the name of the handle in this object.
-    #  \param passiveJoints name of the set of passive joints associated to
-    #         the grasp constraints as register in ProblemSolver
-    #         \sa manipulation.problem_solver.ProblemSolver::addPassiveDofs.
     #
     #  \sa method hpp::corbaserver::manipulation::Problem::createGrasp.
-    #
-    #  \note Passive joints are only used for path constraints and are for
-    #        computational optimization only.
-    def createGrasp (self, name, gripper, handle, passiveJoints = ""):
+    def createGrasp (self, name, gripper, handle):
         self.client.problem.createGrasp (self._(name), gripper, handle)
-        self.grasps [name] = (_ConstraintAndPassiveJoints (self._(name),
-                                                          passiveJoints),)
+        self.grasps [name] = (self._(name),)
 
     ## Create pre-grasp constraints between robot gripper and object handle
     #
@@ -270,18 +248,11 @@ class ConstraintGraph (object):
     #  \param handle name of the handle in the form "object/handle"
     #  where object is the name of the object owning the handle and handle
     #  is the name of the handle in this object,
-    #  \param passiveJoints name of the set of passive joints associated to
-    #         the pre-grasp constraints as register in ProblemSolver.
-    #         \sa manipulation.problem_solver.ProblemSolver::addPassiveDofs.
     #
     #  \sa hpp::corbaserver::manipulation::Problem::createPreGrasp
-    #
-    #  \note Passive joints are only used for path constraints and are for
-    #        computational optimization only.
-    def createPreGrasp (self, name, gripper, handle, passiveJoints = ""):
+    def createPreGrasp (self, name, gripper, handle):
         self.client.problem.createPreGrasp (self._(name), gripper, handle)
-        self.pregrasps [name] = \
-            (_ConstraintAndPassiveJoints (self._(name), passiveJoints),)
+        self.pregrasps [name] = (self._(name),)
 
     ## Set the problem constraints to the specified constraint.
     # 
@@ -309,11 +280,9 @@ class ConstraintGraph (object):
     # \param constraints set of constraints containing grasps, pregrasps,
     #                    numerical constraints and locked joints.
     #                    It must be of type hpp.corbaserver.manipulation.Constraints.
-    # \param passiveJoints passive joints (not modified by constraint
-    #                      resolution)
     # \note Exaclty one of the parameter graph, node and edge must be set.
     def addConstraints (self, graph = False, node = None, edge = None,
-                        constraints = None, passiveJoints = []):
+                        constraints = None):
         """
         Add the constraints to an edge, a node or the whole graph
 
@@ -326,8 +295,6 @@ class ConstraintGraph (object):
             constraints: set of constraints containing grasps, pregrasps,
                          numerical constraints and locked joints.
                          It must be of type hpp.corbaserver.manipulation.Constraints.
-            passiveJoints: passive joints (not modified by constraint
-                           resolution)
           note: Exaclty one of the parameter graph, node and edge must be set.
         """
         if not isinstance (constraints, Constraints):
@@ -336,20 +303,16 @@ class ConstraintGraph (object):
             (graph = graph, node = node, edge = edge,
              grasps = constraints.grasps,
              pregrasps = constraints.pregrasps,
-             numConstraints = constraints.numConstraints,
-             passiveJoints = passiveJoints)
+             numConstraints = constraints.numConstraints)
 
     def _addConstraints (self, graph = False, node = None, edge = None,
                          grasps = None, pregrasps = None,
-                         numConstraints = [], passiveJoints = []):
+                         numConstraints = []):
         if not type (graph) is bool:
             raise TypeError ("ConstraintGraph.addConstraints: " +\
                              "graph argument should be a boolean, got " + \
                              repr (graph))
         nc = numConstraints [:]
-        nopdofs = ["" for i in range (len(numConstraints))]
-        pdofs = nopdofs [::]
-        pdofs [:len(passiveJoints)] = passiveJoints [:]
         if grasps is not None:
             for g in grasps:
                 for pair in self.grasps [g]:
@@ -357,23 +320,18 @@ class ConstraintGraph (object):
                         nc.append (pair.constraint + "/complement")
                     else:
                         nc.append (pair.constraint)
-                    nopdofs.append("")
-                    pdofs.append (pair.passiveJoints)
         if pregrasps is not None:
             for g in pregrasps:
                 for pair in self.pregrasps [g]:
                     nc.append (pair.constraint)
-                    nopdofs.append("")
-                    pdofs.append (pair.passiveJoints)
 
         if node is not None:
-            self.graph.addNumericalConstraints (self.nodes [node], nc, nopdofs)
-            self.graph.addNumericalConstraintsForPath (self.nodes [node], nc,
-                                                       pdofs)
+            self.graph.addNumericalConstraints (self.nodes [node], nc)
+            self.graph.addNumericalConstraintsForPath (self.nodes [node], nc)
         elif edge is not None:
-            self.graph.addNumericalConstraints (self.edges [edge], nc, nopdofs)
+            self.graph.addNumericalConstraints (self.edges [edge], nc)
         elif graph:
-            self.graph.addNumericalConstraints (self.graphId, nc, nopdofs)
+            self.graph.addNumericalConstraints (self.graphId, nc)
 
     ## Remove collision pairs from an edge
     #
@@ -388,18 +346,14 @@ class ConstraintGraph (object):
     #  \param condGrasps, condPregrasps name, or list of names, of grasp or pregrasp that define the foliated manifold
     #  \param condNC, condLJ numerical constraints and locked joints that define the foliated manifold
     #  \param paramGrasps, paramPregrasps name, or list of names, of grasp or pregrasp that parametrize the foliation
-    #  \param paramNC, paramPassiveJoints, paramLJ numerical constraints and locked joints that parametrize the foliation
-    #  \note If passiveDofsNames is a shorter list than numConstraints, passiveDofsNames is extended with an empty string,
-    #        which corresponds to an empty vector of passive dofs.
+    #  \param paramNC, paramLJ numerical constraints and locked joints that parametrize the foliation
     def addLevelSetFoliation (self, edge,
             condGrasps = None, condPregrasps = None, condNC = [], condLJ = [],
-            paramGrasps = None, paramPregrasps = None, paramNC = [], paramPassiveJoints = [], paramLJ = []):
+            paramGrasps = None, paramPregrasps = None, paramNC = [], paramLJ = []):
         if condLJ != []:
             raise RuntimeError ("Locked joints are now handled as numerical" +
                                 " constraints. Please merge elements in list" +
                                 " condLJ with condNC")
-        if paramPassiveJoints != [] :
-            raise RuntimeError ("Passive dofs are not handled anymore.")
         if paramLJ != []:
             raise RuntimeError ("Locked joints are now handled as numerical" +
                                 " constraints. Please merge elements in list" +
@@ -419,7 +373,6 @@ class ConstraintGraph (object):
             for g in paramGrasps:
                 for pair in self.grasps [g]:
                     param_nc.append (pair.constraint)
-                    pdofs.append (pair.passiveJoints)
         if paramPregrasps is not None:
             for g in paramPregrasps:
                 for pair in self.pregrasps [g]:

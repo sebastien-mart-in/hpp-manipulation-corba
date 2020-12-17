@@ -98,30 +98,24 @@ namespace hpp {
                                              const hpp::Names_t& paramNC);
 
           virtual void setNumericalConstraints (const Long graphComponentId,
-                                       const hpp::Names_t& constraintNames,
-                                       const hpp::Names_t& passiveDofsNames)
+                                       const hpp::Names_t& constraintNames)
           {
-            addNumericalConstraints(graphComponentId,
-                constraintNames, passiveDofsNames);
+            addNumericalConstraints(graphComponentId, constraintNames);
           }
           virtual void addNumericalConstraints (const Long graphComponentId,
-                                       const hpp::Names_t& constraintNames,
-                                       const hpp::Names_t& passiveDofsNames);
+                                       const hpp::Names_t& constraintNames);
 
 	  virtual void getNumericalConstraints(const Long elmtId, hpp::Names_t_out names);
 
 	  virtual void resetConstraints(const Long graphComponentId);
 
           virtual void setNumericalConstraintsForPath (const Long nodeId,
-              const hpp::Names_t& constraintNames,
-              const hpp::Names_t& passiveDofsNames)
+              const hpp::Names_t& constraintNames)
           {
-            addNumericalConstraintsForPath(nodeId,
-                constraintNames, passiveDofsNames);
+            addNumericalConstraintsForPath(nodeId, constraintNames);
           }
           virtual void addNumericalConstraintsForPath (const Long nodeId,
-              const hpp::Names_t& constraintNames,
-              const hpp::Names_t& passiveDofsNames);
+              const hpp::Names_t& constraintNames);
 
           virtual void removeCollisionPairFromEdge
 	  (ID edgeId, const char* joint1, const char* joint2);
