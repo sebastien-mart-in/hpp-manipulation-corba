@@ -163,14 +163,25 @@ namespace hpp {
       }
 
       void Robot::insertRobotSRDFModel (const char* robotName,
-          const char* packageName, const char* modelName,
-          const char* srdfSuffix)
+          const char* srdfPath)
       {
 	try {
           DevicePtr_t robot = getOrCreateRobot (problemSolver());
-	  srdf::loadModelFromFile (robot, std::string (robotName),
-              std::string (packageName), std::string (modelName),
-              std::string (srdfSuffix));
+	  srdf::loadModelFromFile (robot, robotName, srdfPath);
+          hpp::pinocchio::urdf::loadSRDFModel(robot, robotName, srdfPath);
+          problemSolver()->resetProblem ();
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
+      void Robot::insertRobotSRDFModelFromString (const char* robotName,
+          const char* srdfString)
+      {
+	try {
+          DevicePtr_t robot = getOrCreateRobot (problemSolver());
+	  srdf::loadModelFromXML (robot, robotName, srdfString);
+          hpp::pinocchio::urdf::loadSRDFModelFromString (robot, robotName, srdfString);
           problemSolver()->resetProblem ();
 	} catch (const std::exception& exc) {
 	  throw Error (exc.what ());

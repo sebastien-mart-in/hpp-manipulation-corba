@@ -51,8 +51,10 @@ namespace hpp {
               const char* srdfString);
 
           virtual void insertRobotSRDFModel (const char* robotName,
-              const char* packageName, const char* modelName,
-              const char* srdfSuffix);
+              const char* srdfPath);
+
+          virtual void insertRobotSRDFModelFromString (const char* robotName,
+              const char* srdfString);
 
           virtual void insertHumanoidModel (const char* robotName,
               const char* rootJointType, const char* urdfName,

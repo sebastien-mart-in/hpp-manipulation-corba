@@ -125,17 +125,10 @@ class Robot (Parent):
     #
     #  \param robotName key of the robot in hpp::manipulation::Device object
     #         map (see hpp::manipulation::Device)
-    #  \param packageName Name of the ROS package containing the model,
-    #  \param modelName Name of the package containing the model
-    #  \param srdfSuffix suffix for srdf file,
-    #
-    #  The ros url are built as follows:
-    #  \li "package://${packageName}/srdf/${modelName}${srdfSuffix}.srdf"
-    def insertRobotSRDFModel (self, robotName, packageName,
-            modelName, srdfSuffix):
+    #  \param srdfPath path to srdf file (can start with "package://")
+    def insertRobotSRDFModel (self, robotName, srdfPath):
         if self.load:
-            self.client.manipulation.robot.insertRobotSRDFModel (robotName,
-                    packageName, modelName, srdfSuffix)
+            self.client.manipulation.robot.insertRobotSRDFModel (robotName, srdfPath)
 
     ## Load humanoid robot model and insert it in the device
     #

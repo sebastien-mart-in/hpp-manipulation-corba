@@ -60,9 +60,13 @@ module hpp
 
     /// Load a SRDF for the robot. Several SRDF can thus be loaded for the same
     /// robot
-    void insertRobotSRDFModel (in string robotName, in string packageName,
-        in string modelName, in string srdfSuffix)
+    void insertRobotSRDFModel (in string robotName, in string srdfPath)
       raises (Error);
+
+    /// Load a SRDF for the robot. Several SRDF can thus be loaded for the same
+    /// robot
+    void insertRobotSRDFModelFromString (in string robotName,
+        in string srdfString) raises (Error);
 
     ///  Insert humanoid robot model as a child of the root joint of the Device
     ///
