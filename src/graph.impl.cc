@@ -1026,6 +1026,17 @@ namespace hpp {
 	}
       }
 
+      void Graph::getSecurityMarginMatrixForEdge(ID edgeId,
+						 floatSeqSeq_out matrix)
+      {
+        try {
+        graph::EdgePtr_t edge = getComp <graph::Edge> (edgeId, true);
+        matrix = corbaServer::matrixToFloatSeqSeq(edge->securityMargins());
+	} catch (const std::exception& exc) {
+	  throw Error (exc.what ());
+	}
+      }
+
       void Graph::setSecurityMarginForEdge
       (ID edgeId, const char* joint1, const char* joint2, double margin)
       {
@@ -1041,6 +1052,7 @@ namespace hpp {
 	  throw Error (exc.what ());
 	}
       }
+
     } // namespace impl
   } // namespace manipulation
 } // namespace hpp

@@ -626,6 +626,9 @@ class ConstraintGraph (object):
         self.graph.setSecurityMarginForEdge(self.edges[edge], joint1, joint2,
                                             margin)
 
+    def getSecurityMarginMatrixForEdge(self, edge):
+        return self.graph.getSecurityMarginMatrixForEdge(self.edges[edge])
+
     ## get the textToTex translation
     def _ (self, text):
         return self.textToTex.get (text, text)
