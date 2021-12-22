@@ -169,6 +169,7 @@ class SecurityMargins(object):
     #  \li for each active placement constraint, set security margin to 0
     #      between the placed object and any object or robot that holds a
     #      contact surface.
+    #  \todo take into account environment.
     def apply (self):
         factory = self.factory; graph = factory.graph
         # Set security margin for each edge
@@ -176,11 +177,13 @@ class SecurityMargins(object):
             # first set requested security margin between each pair of objects
             for i1, ro1 in enumerate(self.robotsAndObjects):
                 for i2, ro2 in enumerate(self.robotsAndObjects):
-                    if i2 <= i1: continue
+                    if i2 < i1: continue
                     margin = self.getSecurityMarginBetween(ro1, ro2)
                     for k1, j1 in enumerate(self.robotToJoints[ro1]):
                         for k2, j2 in enumerate(self.robotToJoints[ro2]):
-                            graph.setSecurityMarginForEdge(e, j1, j2, margin)
+                            if j1!=j2:
+                                graph.setSecurityMarginForEdge\
+                                    (e, j1, j2, margin)
             # Then set 0 margin where necessary.
             # for grasps, set 0 between gripper and object.
             constraints = self.getActiveConstraintsAlongEdge(e)

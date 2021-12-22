@@ -185,6 +185,8 @@ namespace hpp {
           virtual void getRelativeMotionMatrix (ID edgeID, intSeqSeq_out matrix);
           virtual void setSecurityMarginForEdge
           (ID edgeId, const char* joint1, const char* joint2, double margin);
+	  virtual void getSecurityMarginMatrixForEdge(ID edgeId,
+						      floatSeqSeq_out matrix);
         private:
           template <typename T> shared_ptr<T> getComp(ID id, bool throwIfWrongType = true);
           ProblemSolverPtr_t problemSolver();

@@ -409,6 +409,16 @@ module hpp {
         void setSecurityMarginForEdge(in ID edgeID, in string joint1,
                                       in string joint2, in double margin)
           raises(Error);
+
+	/// Get matrix of collision security margins along an edge
+        ///
+        /// \param edgeID index of the edge,
+	/// \retval matrix of security margins. indices are joints ids + 1
+	///         0 is the environment.
+        void getSecurityMarginMatrixForEdge(in ID edgeID,
+					    out floatSeqSeq margin)
+          raises(Error);
+
       }; // interface Graph
     }; // module manipulation
   }; // module corbaserver
