@@ -140,6 +140,11 @@ module hpp {
 
         boolean hasWarnings () raises (Error);
 
+        stringSeqSeq getCollisionsForNode (in string name) raises (Error);
+        //* std::string _name (name);
+        //* hpp::stringSeqSeq* __return__ (hpp::corbaServer::vectorToStringSeqSeq(getT()->getCollisionsForNode (_name)));
+        //* return __return__;
+
         boolean validate (in GraphComponent comp) raises (Error);
       }; // interface Validation
     }; // module graph
