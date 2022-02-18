@@ -21,7 +21,9 @@ import re, abc, sys
 from .constraints import Constraints
 
 def _removeEmptyConstraints (problem, constraints):
-    return [ n for n in constraints if problem.getConstraintDimensions(n)[2] > 0 ]
+    return [ n for n in constraints
+             if n in problem.getAvailable('numericalconstraint') and
+             problem.getConstraintDimensions(n)[2] > 0 ]
 
 class Rules(object):
     def __init__ (self, grippers, handles, rules):
@@ -418,11 +420,18 @@ class ConstraintFactory(ConstraintFactoryAbstract):
     ## Calls ConstraintGraph.createGraph and ConstraintGraph.createPreGrasp
     ## \param g gripper string
     ## \param h handle  string
+    ## \note if the grasp constraint already exists, it is not created.
     def buildGrasp (self, g, h):
         n = g + " grasps " + h
         pn = g + " pregrasps " + h
-        self.graph.createGrasp (n, g, h)
-        self.graph.createPreGrasp (pn, g, h)
+        graspAlreadyCreated = n in \
+            self.graph.clientBasic.problem.getAvailable ("numericalconstraint")
+        pregraspAlreadyCreated = pn in \
+            self.graph.clientBasic.problem.getAvailable ("numericalconstraint")
+        if not graspAlreadyCreated:
+            self.graph.createGrasp (n, g, h)
+        if not pregraspAlreadyCreated:
+            self.graph.createPreGrasp (pn, g, h)
         return dict ( list(zip (self.gfields, (
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n, ])),
             Constraints (numConstraints = _removeEmptyConstraints(self.graph.clientBasic.problem, [ n + "/complement", ])),
