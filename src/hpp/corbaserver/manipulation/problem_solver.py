@@ -110,6 +110,7 @@ class ProblemSolver (Parent):
     ## Create placement and pre-placement constraints
     #
     # \param width set to None to skip creation of pre-placement constraint
+    # \return names of the placement and preplacement constraints
     #
     # See hpp::corbaserver::manipulation::Problem::createPlacementConstraint
     # and hpp::corbaserver::manipulation::Problem::createPrePlacementConstraint
