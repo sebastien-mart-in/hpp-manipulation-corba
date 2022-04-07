@@ -122,6 +122,12 @@ class ProblemSolver (Parent):
             return name, prename
         return name
 
+    ## Create QP Static stability constraint
+    #
+    #  \copydoc hpp::corbaserver::manipulation::Problem::createQPStabilityConstraint
+    def createQPStabilityConstraint(self, *args):
+        self.client.manipulation.problem.createQPStabilityConstraint(*args)
+
     ## \copydoc hpp::corbaserver::manipulation::Problem::registerConstraints
     def registerConstraints(self, *args):
         self.client.manipulation.problem.registerConstraints(*args)

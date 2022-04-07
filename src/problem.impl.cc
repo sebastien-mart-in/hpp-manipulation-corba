@@ -353,8 +353,8 @@ namespace hpp {
 	}
       }
 
-      void Problem::createQPStabilityConstraint (const char* placName,
-          const Names_t& shapesName)
+      void Problem::createQPStabilityConstraint (const char* constraintName,
+          const char* comRootJointName, const Names_t& shapesName)
       {
 	try {
 #ifdef HPP_CONSTRAINTS_USE_QPOASES
@@ -390,16 +390,17 @@ namespace hpp {
 
           CenterOfMassComputationPtr_t com = CenterOfMassComputation::create
             (robot);
-          com->add (robot->rootJoint ());
-          QPStaticStabilityPtr_t c = QPStaticStability::create (placName, robot,
-              fds, com);
-          problemSolver()->addNumericalConstraint (placName,
+          JointPtr_t comRJ(robot->getJointByName(comRootJointName));
+          com->add(comRJ);
+          QPStaticStabilityPtr_t c = QPStaticStability::create
+            (constraintName, robot, fds, com);
+          problemSolver()->addNumericalConstraint (constraintName,
               Implicit::create (c,
                 constraints::ComparisonTypes_t(1, constraints::EqualToZero))
               );
 #else
           // Avoid unused-variable compilation warnings
-          (void)placName;
+          (void)constraintName;
           (void)shapesName;
           throw std::runtime_error
             ("Problem::createQPStabilityConstraint is not implemented");
