@@ -334,7 +334,9 @@ namespace hpp {
       {
 	try {
 	  problemSolver()->createPlacementConstraint (placName,
-              toStringList(surface1), toStringList(surface2), 1e-3);
+              corbaServer::toStrings<std::vector<std::string> >(surface1),
+              corbaServer::toStrings<std::vector<std::string> >(surface2),
+                                                      1e-3);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
@@ -347,7 +349,9 @@ namespace hpp {
       {
 	try {
 	  problemSolver()->createPrePlacementConstraint (placName,
-              toStringList(surface1), toStringList(surface2), width, 1e-3);
+              corbaServer::toStrings<std::vector<std::string> >(surface1),
+              corbaServer::toStrings<std::vector<std::string> >(surface2),
+                                                         width, 1e-3);
 	} catch (const std::exception& exc) {
 	  throw hpp::Error (exc.what ());
 	}
