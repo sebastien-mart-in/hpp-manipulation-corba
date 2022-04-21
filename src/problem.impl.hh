@@ -87,8 +87,8 @@ namespace hpp {
             const Names_t& shapeName, const Names_t& envContactName,
             CORBA::Double width);
 
-        virtual void createQPStabilityConstraint (const char* placName,
-            const Names_t& shapesName);
+        virtual void createQPStabilityConstraint (const char* constraintName,
+            const char* comRootJointName, const Names_t& shapesName);
 
         virtual bool setConstraints (hpp::ID id, bool target);
 

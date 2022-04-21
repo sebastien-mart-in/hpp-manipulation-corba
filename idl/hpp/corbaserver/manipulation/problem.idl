@@ -187,10 +187,13 @@ module hpp {
 
         /// Create a QPStaticStability constraints
         /// \param constraintName
+        /// \param comRootJointName name of the root joint of the center of
+        ///        mass to be used,
         /// \param shapesName list of the convex shape name of the robot on
         ///        which forces are applied.
-        void createQPStabilityConstraint (in string constraintName,
-            in Names_t shapesName)
+        ///
+        void createQPStabilityConstraint(in string constraintName,
+            in string comRootJointName, in Names_t shapesName)
           raises (Error);
 
         /// Set the problem constraints to the specified constraint.
@@ -250,10 +253,10 @@ module hpp {
         /// \param qe configuration at the end of the path
         /// \retval return true if the path is built and fully projected.
         /// \retval indexNotProj -1 is the path could not be built. The index
-        ///                      of the built path (before projection) in the 
+        ///                      of the built path (before projection) in the
         ///                      in the ProblemSolver path vector.
         /// \retval indexProj -1 is the path could not be fully projected. The
-        ///                   index of the built path (before projection) in the 
+        ///                   index of the built path (before projection) in the
         ///                   in the ProblemSolver path vector.
         /// No path validation is made. The paths can be retrieved using
         /// corbaserver::Problem::configAtParam

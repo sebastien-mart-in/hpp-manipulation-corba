@@ -110,6 +110,7 @@ class ProblemSolver (Parent):
     ## Create placement and pre-placement constraints
     #
     # \param width set to None to skip creation of pre-placement constraint
+    # \return names of the placement and preplacement constraints
     #
     # See hpp::corbaserver::manipulation::Problem::createPlacementConstraint
     # and hpp::corbaserver::manipulation::Problem::createPrePlacementConstraint
@@ -121,6 +122,12 @@ class ProblemSolver (Parent):
             self.client.manipulation.problem.createPrePlacementConstraint (prename, shapeName, envContactName, width)
             return name, prename
         return name
+
+    ## Create QP Static stability constraint
+    #
+    #  \copydoc hpp::corbaserver::manipulation::Problem::createQPStabilityConstraint
+    def createQPStabilityConstraint(self, *args):
+        self.client.manipulation.problem.createQPStabilityConstraint(*args)
 
     ## \copydoc hpp::corbaserver::manipulation::Problem::registerConstraints
     def registerConstraints(self, *args):
