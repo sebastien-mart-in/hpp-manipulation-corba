@@ -31,22 +31,24 @@
 from hpp.corbaserver.client import Client as _Parent
 from hpp_idl.hpp.corbaserver.manipulation import Graph, Robot, Problem
 
-class Client (_Parent):
-  """
-  Connect and create clients for hpp-manipulation library.
-  """
 
-  defaultClients = {
-          'graph'  : Graph,
-          'problem': Problem,
-          'robot'  : Robot,
-          }
-  def __init__(self, url = None, context = "corbaserver"):
+class Client(_Parent):
     """
-    Initialize CORBA and create default clients.
-    :param url: URL in the IOR, corbaloc, corbalocs, and corbanames formats.
-                For a remote corba server, use
-                url = "corbaloc:iiop:<host>:<port>/NameService"
+    Connect and create clients for hpp-manipulation library.
     """
-    self._initOrb (url)
-    self._makeClients ("manipulation", self.defaultClients, context)
+
+    defaultClients = {
+        "graph": Graph,
+        "problem": Problem,
+        "robot": Robot,
+    }
+
+    def __init__(self, url=None, context="corbaserver"):
+        """
+        Initialize CORBA and create default clients.
+        :param url: URL in the IOR, corbaloc, corbalocs, and corbanames formats.
+                    For a remote corba server, use
+                    url = "corbaloc:iiop:<host>:<port>/NameService"
+        """
+        self._initOrb(url)
+        self._makeClients("manipulation", self.defaultClients, context)

@@ -32,56 +32,44 @@
 // See the COPYING file for more information.
 
 #ifndef HPP_MANIPULATION_CORBA_CLIENT_HH
-# define HPP_MANIPULATION_CORBA_CLIENT_HH
+#define HPP_MANIPULATION_CORBA_CLIENT_HH
 
-# include <omniORB4/CORBA.h>
+#include <omniORB4/CORBA.h>
 
-# include <hpp/corbaserver/client.hh>
-# include <hpp/corbaserver/manipulation/robot-idl.hh>
-# include <hpp/corbaserver/manipulation/problem-idl.hh>
-# include <hpp/corbaserver/manipulation/graph-idl.hh>
-# include <hpp/corbaserver/obstacle-idl.hh>
+#include <hpp/corbaserver/client.hh>
+#include <hpp/corbaserver/manipulation/config.hh>
+#include <hpp/corbaserver/manipulation/graph-idl.hh>
+#include <hpp/corbaserver/manipulation/problem-idl.hh>
+#include <hpp/corbaserver/manipulation/robot-idl.hh>
+#include <hpp/corbaserver/obstacle-idl.hh>
 
-# include <hpp/corbaserver/manipulation/config.hh>
+namespace hpp {
+namespace corbaServer {
+namespace manipulation {
+class HPP_MANIPULATION_CORBA_DLLAPI Client : public ClientBase {
+ public:
+  Client(int argc, char* argv[]);
 
-namespace hpp
-{
-  namespace corbaServer
-  {
-    namespace manipulation
-    {
-      class HPP_MANIPULATION_CORBA_DLLAPI Client : public ClientBase
-      {
-        public:
-          Client (int argc, char* argv[]);
+  ~Client();
 
-          ~Client ();
+  /// \param iiop base address
+  /// \param context the hpp context name (passed to the server)
+  void connect(const char* iiop = "corbaloc:iiop:",
+               const char* context = "corbaserver");
 
-          /// \param iiop base address
-          /// \param context the hpp context name (passed to the server)
-          void connect (const char* iiop = "corbaloc:iiop:",
-              const char* context = "corbaserver");
+  hpp::corbaserver::manipulation::Robot_var& robot() { return robot_; }
 
+  hpp::corbaserver::manipulation::Problem_var& problem() { return problem_; }
 
-          hpp::corbaserver::manipulation::Robot_var& robot () {
-            return robot_;
-          }
+  hpp::corbaserver::manipulation::Graph_var& graph() { return graph_; }
 
-          hpp::corbaserver::manipulation::Problem_var& problem () {
-            return problem_;
-          }
+ private:
+  hpp::corbaserver::manipulation::Robot_var robot_;
+  hpp::corbaserver::manipulation::Problem_var problem_;
+  hpp::corbaserver::manipulation::Graph_var graph_;
+};
+}  // end of namespace manipulation.
+}  // end of namespace corbaServer.
+}  // end of namespace hpp.
 
-          hpp::corbaserver::manipulation::Graph_var& graph () {
-            return graph_;
-          }
-
-        private:
-          hpp::corbaserver::manipulation::Robot_var robot_;
-          hpp::corbaserver::manipulation::Problem_var problem_;
-          hpp::corbaserver::manipulation::Graph_var graph_;
-      };
-    } // end of namespace manipulation.
-  } // end of namespace corbaServer.
-} // end of namespace hpp.
-
-#endif // HPP_MANIPULATION_CORBA_CLIENT_HH
+#endif  // HPP_MANIPULATION_CORBA_CLIENT_HH

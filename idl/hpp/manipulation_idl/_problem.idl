@@ -33,7 +33,7 @@ module hpp
   module core_idl {
     interface Problem;
   }; // module core
-  
+
   module manipulation_idl {
     module graph_idl {
       interface Graph;

@@ -27,48 +27,44 @@
 // DAMAGE.
 
 #ifndef HPP_MANIPULATION_CORBA_SERVER_HH
-# define HPP_MANIPULATION_CORBA_SERVER_HH
+#define HPP_MANIPULATION_CORBA_SERVER_HH
 
-# include <stdexcept>
-
-# include <hpp/corba/template/server.hh>
-
-# include <hpp/corbaserver/server-plugin.hh>
-
-# include <hpp/corbaserver/manipulation/fwd.hh>
-# include <hpp/corbaserver/manipulation/config.hh>
+#include <hpp/corba/template/server.hh>
+#include <hpp/corbaserver/manipulation/config.hh>
+#include <hpp/corbaserver/manipulation/fwd.hh>
+#include <hpp/corbaserver/server-plugin.hh>
+#include <stdexcept>
 
 namespace hpp {
-  namespace manipulation {
-    namespace impl {
-      class Graph;
-      class Problem;
-      class Robot;
-    }
-    class HPP_MANIPULATION_CORBA_DLLAPI Server : public corbaServer::ServerPlugin
-    {
-    public:
-      Server (corbaServer::Server* parent);
+namespace manipulation {
+namespace impl {
+class Graph;
+class Problem;
+class Robot;
+}  // namespace impl
+class HPP_MANIPULATION_CORBA_DLLAPI Server : public corbaServer::ServerPlugin {
+ public:
+  Server(corbaServer::Server* parent);
 
-      ~Server ();
+  ~Server();
 
-      /// Start corba server
-      /// Call hpp::corba::Server <impl::Problem>::startCorbaServer
-      void startCorbaServer(const std::string& contextId,
-			    const std::string& contextKind);
+  /// Start corba server
+  /// Call hpp::corba::Server <impl::Problem>::startCorbaServer
+  void startCorbaServer(const std::string& contextId,
+                        const std::string& contextKind);
 
-      ::CORBA::Object_ptr servant (const std::string& name) const;
+  ::CORBA::Object_ptr servant(const std::string& name) const;
 
-      std::string name () const;
+  std::string name() const;
 
-      ProblemSolverPtr_t problemSolver ();
+  ProblemSolverPtr_t problemSolver();
 
-    private:
-      corba::Server <impl::Graph>* graphImpl_;
-      corba::Server <impl::Problem>* problemImpl_;
-      corba::Server <impl::Robot>* robotImpl_;
-    }; // class Server
-  } // namespace manipulation
-} // namespace hpp
+ private:
+  corba::Server<impl::Graph>* graphImpl_;
+  corba::Server<impl::Problem>* problemImpl_;
+  corba::Server<impl::Robot>* robotImpl_;
+};  // class Server
+}  // namespace manipulation
+}  // namespace hpp
 
-#endif // HPP_MANIPULATION_CORBA_SERVER_HH
+#endif  // HPP_MANIPULATION_CORBA_SERVER_HH

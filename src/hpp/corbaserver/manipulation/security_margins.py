@@ -28,39 +28,46 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 # DAMAGE.
 
-## Handles security margins between robots and objects in collision checking
-#
-#  This class sets the requested security margins in \link
-#  hpp::core::PathValidation PathValidation\endlink instances of
-#  constraints graph \link hpp::manipulation::graph::Edges
-#  edges\endlink.
-#
-#  \sa hpp::core::ObstacleUserInterface::setSecurityMargins
-#
-#  By default the security margin between objects or robots is set to 0
-#  It can be modified by changing the value of the class member
-#  \c defaultMargin.
-#
-#  A given security margin can be set for a pair of robots or objects by calling
-#  method \link SecurityMargins.setSecurityMarginBetween
-#  \c setSecurityMarginBetween \endlink.
-#
-#  Once appropriate margins have been set by the user, method
-#  \link SecurityMargins.apply \c apply \endlink computes and sets for each edge
-#  and each pair of bodies security margins as required. However, along edges
-#  where two objects are requested to be close to each other, the security
-#  margin is set to 0. For instance
-#  \li between a pregrasp and grasp configuration the security margin is set to
-#      0 between the gripper and the object to be grasped,
-#  \li along an edge where an object lies in a stable position the security
-#      margin between this object and any object holding a surface over which
-#      it could be put is set to 0.
-class SecurityMargins(object):
+
+class SecurityMargins:
+    """
+    Handles security margins between robots and objects in collision checking
+
+    This class sets the requested security margins in \\link
+    hpp::core::PathValidation PathValidation\\endlink instances of
+    constraints graph \\link hpp::manipulation::graph::Edges
+    edges\\endlink.
+
+    \\sa hpp::core::ObstacleUserInterface::setSecurityMargins
+
+    By default the security margin between objects or robots is set to 0
+    It can be modified by changing the value of the class member
+    \\c defaultMargin.
+
+    A given security margin can be set for a pair of robots or objects by calling
+    method \\link SecurityMargins.setSecurityMarginBetween
+    \\c setSecurityMarginBetween \\endlink.
+
+    Once appropriate margins have been set by the user, method
+    \\link SecurityMargins.apply \\c apply \\endlink computes and sets for each edge
+    and each pair of bodies security margins as required. However, along edges
+    where two objects are requested to be close to each other, the security
+    margin is set to 0. For instance
+    \\li between a pregrasp and grasp configuration the security margin is set to
+        0 between the gripper and the object to be grasped,
+    \\li along an edge where an object lies in a stable position the security
+        margin between this object and any object holding a surface over which
+        it could be put is set to 0.
+    """
+
     defaultMargin = 0
-    ## Constructor
-    #  \param robotsAndObjects list of robots and objects. It is assumed that
-    #         joints names are prefixed by these name followed by "/"
+
     def __init__(self, problemSolver, factory, robotsAndObjects):
+        """
+        Constructor
+        \\param robotsAndObjects list of robots and objects. It is assumed that
+               joints names are prefixed by these name followed by "/"
+        """
         self.ps = problemSolver
         self.robot = self.ps.robot
         self.factory = factory
@@ -73,10 +80,11 @@ class SecurityMargins(object):
     def computeJoints(self):
         self.robotToJoints = dict()
         for ro in self.robotsAndObjects:
-            l = len(ro)
-            self.robotToJoints[ro] = list(filter(lambda n:n[:l+1] == ro + "/",
-                                            self.robot.jointNames))
-        self.robotToJoints["universe"] = ['universe']
+            le = len(ro)
+            self.robotToJoints[ro] = list(
+                filter(lambda n: n[: le + 1] == ro + "/", self.robot.jointNames)
+            )
+        self.robotToJoints["universe"] = ["universe"]
         self.jointToRobot = dict()
         for ro, joints in self.robotToJoints.items():
             for j in joints:
@@ -114,38 +122,45 @@ class SecurityMargins(object):
         for o1, l1 in self.contactSurfaces.items():
             for o2, l2 in self.contactSurfaces.items():
                 if o1 != o2 and len(l1) > 0 and len(l2) > 0:
-                    self.possibleContacts.append ((o1,o2))
+                    self.possibleContacts.append((o1, o2))
 
-    ## Set security margin between two robots or objects
-    #  \param obj1 name of first robot or object,
-    #  \param obj2 name of second robot or object.
-    #  \param margin margin to set between those robots or objects.
     def setSecurityMarginBetween(self, obj1, obj2, margin):
+        """
+        Set security margin between two robots or objects
+        \\param obj1 name of first robot or object,
+        \\param obj2 name of second robot or object.
+        \\param margin margin to set between those robots or objects.
+        """
         self.marginMatrix[frozenset([obj1, obj2])] = margin
 
-    ## Get security margin between two robots or objects
-    #  \param obj1 name of first robot or object,
-    #  \param obj2 name of second robot or object.
     def getSecurityMarginBetween(self, obj1, obj2):
+        """
+        Get security margin between two robots or objects
+        \\param obj1 name of first robot or object,
+        \\param obj2 name of second robot or object.
+        """
         key = frozenset([obj1, obj2])
         return self.marginMatrix.get(key, self.defaultMargin)
 
-    # Get list of constraints that are active somewhere along the edge
-    #
-    # The result is a dictionary with
-    #  - key "place" and value a list of objects,
-    #  - key "grasp" and value a list of pairs (gripper, object).
-    def getActiveConstraintsAlongEdge (self, edge):
-        factory = self.factory; graph = factory.graph
+    def getActiveConstraintsAlongEdge(self, edge):
+        """
+        Get list of constraints that are active somewhere along the edge
+
+        The result is a dictionary with
+         - key "place" and value a list of objects,
+         - key "grasp" and value a list of pairs (gripper, object).
+        """
+        factory = self.factory
+        graph = factory.graph
         p = graph.clientBasic.problem.getProblem()
         g = p.getConstraintGraph()
         e = g.get(graph.edges[edge])
         s1 = e.stateFrom()
         s2 = e.stateTo()
-        c1 = list(map(lambda c:c.function().name(), s1.numericalConstraints()))
-        c1 += list(map(lambda c:c.function().name(), g.numericalConstraints()))
-        c2 = list(map(lambda c:c.function().name(), s2.numericalConstraints()))
-        c2 += list(map(lambda c:c.function().name(), g.numericalConstraints()))
+        c1 = list(map(lambda c: c.function().name(), s1.numericalConstraints()))
+        c1 += list(map(lambda c: c.function().name(), g.numericalConstraints()))
+        c2 = list(map(lambda c: c.function().name(), s2.numericalConstraints()))
+        c2 += list(map(lambda c: c.function().name(), g.numericalConstraints()))
         d = set(c1).union(set(c2))
         res = dict()
         res["place"] = list()
@@ -155,46 +170,48 @@ class SecurityMargins(object):
                 if c == "place_" + o:
                     res["place"].append(o)
             for g in factory.grippers:
-                for o, handles in zip(factory.objects,
-                                      factory.handlesPerObjects):
+                for o, handles in zip(factory.objects, factory.handlesPerObjects):
                     # o object
                     # handles <- indices of handles of object o
                     for h in handles:
                         handle = factory.handles[h]
                         if c == g + " grasps " + handle:
-                            res["grasp"].append((g,o))
+                            res["grasp"].append((g, o))
         return res
 
-    ## Set security margins between
-    #  \li robot bodies and objects,
-    #  \li robot bodies and environment,
-    #  \li objects and environment,
-    #
-    #  For each edge, do the following:
-    #  \li set requested security margin between each pair of robots or
-    #      objects,
-    #  \li detect grasp and placement constraints that are active sometime along
-    #      the edge,
-    #  \li for each active grasp constraint, set security margin to 0 between
-    #      joints of the gripper and object,
-    #  \li for each active placement constraint, set security margin to 0
-    #      between the placed object and any object or robot that holds a
-    #      contact surface.
-    #  \todo take into account environment.
-    def apply (self):
-        factory = self.factory; graph = factory.graph
+    def apply(self):
+        """
+        Set security margins between
+        \\li robot bodies and objects,
+        \\li robot bodies and environment,
+        \\li objects and environment,
+
+        For each edge, do the following:
+        \\li set requested security margin between each pair of robots or
+            objects,
+        \\li detect grasp and placement constraints that are active sometime along
+            the edge,
+        \\li for each active grasp constraint, set security margin to 0 between
+            joints of the gripper and object,
+        \\li for each active placement constraint, set security margin to 0
+            between the placed object and any object or robot that holds a
+            contact surface.
+        \\todo take into account environment.
+        """
+        factory = self.factory
+        graph = factory.graph
         # Set security margin for each edge
         for e in graph.edges.keys():
             # first set requested security margin between each pair of objects
             for i1, ro1 in enumerate(self.robotsAndObjects):
                 for i2, ro2 in enumerate(self.robotsAndObjects):
-                    if i2 < i1: continue
+                    if i2 < i1:
+                        continue
                     margin = self.getSecurityMarginBetween(ro1, ro2)
                     for k1, j1 in enumerate(self.robotToJoints[ro1]):
                         for k2, j2 in enumerate(self.robotToJoints[ro2]):
-                            if j1!=j2:
-                                graph.setSecurityMarginForEdge\
-                                    (e, j1, j2, margin)
+                            if j1 != j2:
+                                graph.setSecurityMarginForEdge(e, j1, j2, margin)
             # Then set 0 margin where necessary.
             # for grasps, set 0 between gripper and object.
             constraints = self.getActiveConstraintsAlongEdge(e)

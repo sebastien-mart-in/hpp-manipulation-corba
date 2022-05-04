@@ -27,20 +27,20 @@
 // DAMAGE.
 
 #ifndef HPP_MANIPULATION_CORBA_FWD_HH
-# define HPP_MANIPULATION_CORBA_FWD_HH
+#define HPP_MANIPULATION_CORBA_FWD_HH
 
-# include <hpp/manipulation/fwd.hh>
+#include <hpp/manipulation/fwd.hh>
 
 namespace hpp {
-  namespace manipulation {
-    namespace impl {
-      typedef manipulation::ProblemSolver ProblemSolver;
-      typedef core::ConstraintSet ConstraintSet;
-      typedef core::ConfigProjector ConfigProjector;
-      typedef core::ConfigProjectorPtr_t ConfigProjectorPtr_t;
-    } // namespace impl
-    class Server;
-  } // namespace manipulation
-} // namespace hpp
+namespace manipulation {
+namespace impl {
+typedef manipulation::ProblemSolver ProblemSolver;
+typedef core::ConstraintSet ConstraintSet;
+typedef core::ConfigProjector ConfigProjector;
+typedef core::ConfigProjectorPtr_t ConfigProjectorPtr_t;
+}  // namespace impl
+class Server;
+}  // namespace manipulation
+}  // namespace hpp
 
-#endif // HPP_MANIPULATION_CORBA_FWD_HH
+#endif  // HPP_MANIPULATION_CORBA_FWD_HH

@@ -26,9 +26,9 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 // DAMAGE.
 
+#include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/corbaserver/server.hh>
 #include <hpp/manipulation/package-config.hh>
-#include <hpp/corbaserver/manipulation/server.hh>
 #include <hpp/manipulation/problem-solver.hh>
 
 typedef hpp::corbaServer::Server CorbaServer;
@@ -36,22 +36,24 @@ typedef hpp::manipulation::Server ManipulationServer;
 typedef hpp::manipulation::ProblemSolver ProblemSolver;
 typedef hpp::manipulation::ProblemSolverPtr_t ProblemSolverPtr_t;
 
-int main (int argc, char* argv [])
-{
-  if (argc > 0) std::cerr << argv[0];
-  else          std::cerr << "hpp-manipulation-server";
+int main(int argc, char* argv[]) {
+  if (argc > 0)
+    std::cerr << argv[0];
+  else
+    std::cerr << "hpp-manipulation-server";
   std::cerr << " is provided for backward compatibility.\n"
-    "You can now use hppcorbaserver and add the following lines to your Python script:\n"
-    "from hpp.corbaserver import loadServerPlugin\n"
-    "loadServerPlugin (\"corbaserver\", \"manipulation-corba.so\")\n"
-    << std::endl;
+               "You can now use hppcorbaserver and add the following lines to "
+               "your Python script:\n"
+               "from hpp.corbaserver import loadServerPlugin\n"
+               "loadServerPlugin (\"corbaserver\", \"manipulation-corba.so\")\n"
+            << std::endl;
 
   ProblemSolverPtr_t problemSolver = new ProblemSolver();
 
-  CorbaServer corbaServer (problemSolver, argc,
-			   const_cast<const char**> (argv), true);
-  corbaServer.startCorbaServer ();
+  CorbaServer corbaServer(problemSolver, argc, const_cast<const char**>(argv),
+                          true);
+  corbaServer.startCorbaServer();
 
-  corbaServer.loadPlugin (corbaServer.mainContextId(), "manipulation-corba.so");
+  corbaServer.loadPlugin(corbaServer.mainContextId(), "manipulation-corba.so");
   corbaServer.processRequest(true);
 }

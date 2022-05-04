@@ -132,7 +132,7 @@ module hpp
     /// \param linkName name of the link (hpp::model::Body) holding the gripper,
     /// \param gripperName name of the gripper,
     /// \param handlePositioninJoint position of the handle in the joint frame.
-    void addGripper (in string linkName, in string gripperName, 
+    void addGripper (in string linkName, in string gripperName,
         in Transform_ handlePositioninJoint)
       raises (Error);
 

@@ -14,7 +14,7 @@ New in v4.6.0
 * Update Robot class.
 * Automatically generate EndEffectorTrajectory bindings.
 * Add graph components to IDL.
- 
+
 New in v4.1
 * Add ProblemSolver.addConfigValidation and ProblemSolver.clearConfigValidations.
 * If dependency to QPOases is not set, do not implement static stability constr.

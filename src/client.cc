@@ -30,44 +30,36 @@
 
 #include <iostream>
 
-namespace hpp
-{
-  namespace corbaServer
-  {
-    namespace manipulation
-    {
-      using CORBA::Exception;
-      using CORBA::Object_var;
-      using CORBA::SystemException;
-      using CORBA::ORB_init;
-      using CORBA::PolicyList;
-      using omniORB::fatalException;
+namespace hpp {
+namespace corbaServer {
+namespace manipulation {
+using CORBA::Exception;
+using CORBA::Object_var;
+using CORBA::ORB_init;
+using CORBA::PolicyList;
+using CORBA::SystemException;
+using omniORB::fatalException;
 
-      Client::Client(int argc, char *argv[])
-        : ClientBase (argc, argv)
-      {}
+Client::Client(int argc, char* argv[]) : ClientBase(argc, argv) {}
 
-      void Client::connect (const char* iiop, const char* context)
-      {
-        ClientBase::connect(iiop);
+void Client::connect(const char* iiop, const char* context) {
+  ClientBase::connect(iiop);
 
-        CORBA::Object_var obj;
-        const char* plugin = "manipulation";
+  CORBA::Object_var obj;
+  const char* plugin = "manipulation";
 
-        obj = tools()->getServer (context, plugin, "robot");
-        robot_ = hpp::corbaserver::manipulation::Robot::_narrow(obj.in());
+  obj = tools()->getServer(context, plugin, "robot");
+  robot_ = hpp::corbaserver::manipulation::Robot::_narrow(obj.in());
 
-        obj = tools()->getServer (context, plugin, "problem");
-        problem_ = hpp::corbaserver::manipulation::Problem::_narrow(obj.in());
+  obj = tools()->getServer(context, plugin, "problem");
+  problem_ = hpp::corbaserver::manipulation::Problem::_narrow(obj.in());
 
-        obj = tools()->getServer (context, plugin, "graph");
-        graph_ = hpp::corbaserver::manipulation::Graph::_narrow(obj.in());
-      }
+  obj = tools()->getServer(context, plugin, "graph");
+  graph_ = hpp::corbaserver::manipulation::Graph::_narrow(obj.in());
+}
 
-      /// \brief Shutdown CORBA server
-      Client::~Client()
-      {
-      }
-    } // end of namespace manipulation.
-  } // end of namespace corbaServer.
-} // end of namespace hpp.
+/// \brief Shutdown CORBA server
+Client::~Client() {}
+}  // end of namespace manipulation.
+}  // end of namespace corbaServer.
+}  // end of namespace hpp.

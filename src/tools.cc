@@ -29,10 +29,9 @@
 #include "tools.hh"
 
 namespace hpp {
-  DevicePtr_t getRobotOrThrow (ProblemSolverPtr_t p)
-  {
-    DevicePtr_t robot = p->robot ();
-    if (!robot) throw Error ("Robot not found.");
-    return robot;
-  }
-} // namespace hpp
+DevicePtr_t getRobotOrThrow(ProblemSolverPtr_t p) {
+  DevicePtr_t robot = p->robot();
+  if (!robot) throw Error("Robot not found.");
+  return robot;
+}
+}  // namespace hpp
