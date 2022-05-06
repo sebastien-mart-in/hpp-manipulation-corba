@@ -59,6 +59,7 @@ FOREACH(IDL ${IDL_SOURCES})
     -Wbextern=constraints:hpp_stubs.constraints
     -Wbextern=paths:hpp_stubs.core
     -Wbextern=steering_methods:hpp_stubs.core
+    -Wbextern=path_projectors:hpp_stubs.core
     -Wbextern=path_validations:hpp_stubs.core
     -Wbextern=_constraints:hpp_stubs.core
     -Wbextern=path_planners:hpp_stubs.core
@@ -95,6 +96,7 @@ FOREACH(IDL steering_methods _graph _problem _path_planners device)
     -Wbextern=paths:hpp_stubs.core
     -Wbextern=steering_methods:hpp_stubs.core
     -Wbextern=distances:hpp_stubs.core
+    -Wbextern=path_projectors:hpp_stubs.core
     -Wbextern=path_validations:hpp_stubs.core
     -Wbextern=constraints:hpp_stubs.constraints
     -Wbextern=configuration_shooters:hpp_stubs.core
