@@ -710,7 +710,7 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
                         object, "placementComplement"
                     )
 
-    # defaut distance between objec and surface in preplacement configuration
+    # default distance between object and surface in preplacement configuration
     defaultPreplaceDist = 0.05
     # See methods setPreplacementDistance and getPreplacementDistance
     preplaceDistance = dict()
@@ -725,6 +725,10 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         self.constraints = ConstraintFactory(self, graph)
 
         self.graph = graph
+
+        # whether there should be placement complement in transition from
+        # intersec to preplace
+        self.preplaceGuide = False
 
     # # \name Default functions
     # \{
@@ -781,7 +785,7 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
         pgc = self.constraints.g(ig, ih, "preGrasp")
         if noPlace:
             pc = Constraints()
-            # pcc = Constraints()
+            pcc = Constraints()
             ppc = Constraints()
         else:
             # If object is placed in stateFrom,
@@ -790,7 +794,7 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
             pc = self.constraints.p(self.objectFromHandle[ih], "placement")
             #   get constraint defining the complement of the placement as a
             #   Constraints instance,
-            # pcc = self.constraints.p(self.objectFromHandle[ih], "placementComplement")
+            pcc = self.constraints.p(self.objectFromHandle[ih], "placementComplement")
             #   get the preplacement constraint as a Constraints instance.
             ppc = self.constraints.p(self.objectFromHandle[ih], "prePlacement")
         manifold = sf.manifold - pc
@@ -969,6 +973,13 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
             if pregrasp:
                 self.graph.addConstraints(edge=wTransitions[1][0], constraints=gcc)
                 self.graph.addConstraints(edge=wTransitions[1][1], constraints=gcc)
+            # Add placement complement constraint to edge linking
+            # from intersec to preplace
+            if intersec and preplace and self.preplaceGuide:
+                self.graph.addConstraints(edge = wTransitions[pregrasp + intersec][0],
+                                        constraints = pcc)
+                self.graph.addConstraints(edge = wTransitions[pregrasp + intersec][1],
+                                        constraints = pcc)
             # Set all to short except first one.
             for i in range(nTransitions - 1):
                 self.graph.setShort(wTransitions[i + 1][0], True)
@@ -1012,4 +1023,8 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
             )
         return self.preplaceDistance.get(obj, self.defaultPreplaceDist)
 
+    # Set whether we should add placement complement
+    # to the transition between intersec and preplace (if available)
+    def setPreplaceGuide(self, preplaceGuide):
+        self.preplaceGuide = preplaceGuide
     # # \}
