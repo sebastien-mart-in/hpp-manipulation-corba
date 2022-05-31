@@ -94,11 +94,11 @@ std::string toStr<graph::WaypointEdge>() {
   return "WaypointEdge";
 }
 
-std::list<graph::helper::ObjectDef_t> toObjectList(const Names_t& names,
-                                                   const Namess_t& hsPO,
-                                                   const Namess_t& shPO) {
+std::vector<graph::helper::ObjectDef_t> toObjectVector(const Names_t& names,
+                                                       const Namess_t& hsPO,
+                                                       const Namess_t& shPO) {
   using graph::helper::ObjectDef_t;
-  std::list<graph::helper::ObjectDef_t> ret;
+  std::vector<graph::helper::ObjectDef_t> ret;
   // Check size of lists
   if (hsPO.length() != names.length()) {
     HPP_THROW(Error, "Number of handle lists ("
@@ -116,8 +116,8 @@ std::list<graph::helper::ObjectDef_t> toObjectList(const Names_t& names,
     ret.push_back(ObjectDef_t());
     ObjectDef_t& od = ret.back();
     od.name = names[i];
-    od.handles = toStringList(hsPO[i]);
-    od.shapes = toStringList(shPO[i]);
+    od.handles = corbaServer::toStrings<std::vector<std::string> >(hsPO[i]);
+    od.shapes = corbaServer::toStrings<std::vector<std::string> >(shPO[i]);
   }
   return ret;
 }
@@ -959,9 +959,10 @@ Long Graph::autoBuild(const char* graphName, const Names_t& grippers,
   }
   try {
     graph::GraphPtr_t g = graph::helper::graphBuilder(
-        problemSolver(), graphName, toStringList(grippers),
-        toObjectList(objects, handlesPerObject, shapesPreObject),
-        toStringList(envNames), rules);
+        problemSolver(), graphName,
+        corbaServer::toStrings<std::vector<std::string> >(grippers),
+        toObjectVector(objects, handlesPerObject, shapesPreObject),
+        corbaServer::toStrings<std::vector<std::string> >(envNames), rules);
 
     return (Long)g->id();
   } catch (const std::exception& exc) {

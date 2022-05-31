@@ -306,8 +306,9 @@ void Problem::createPlacementConstraint(const char* placName,
                                         const Names_t& surface1,
                                         const Names_t& surface2) {
   try {
-    problemSolver()->createPlacementConstraint(placName, toStringList(surface1),
-                                               toStringList(surface2), 1e-3);
+    problemSolver()->createPlacementConstraint(
+        placName, corbaServer::toStrings<std::vector<std::string> >(surface1),
+        corbaServer::toStrings<std::vector<std::string> >(surface2), 1e-3);
   } catch (const std::exception& exc) {
     throw hpp::Error(exc.what());
   }
@@ -319,7 +320,9 @@ void Problem::createPrePlacementConstraint(const char* placName,
                                            CORBA::Double width) {
   try {
     problemSolver()->createPrePlacementConstraint(
-        placName, toStringList(surface1), toStringList(surface2), width, 1e-3);
+        placName, corbaServer::toStrings<std::vector<std::string> >(surface1),
+        corbaServer::toStrings<std::vector<std::string> >(surface2), width,
+        1e-3);
   } catch (const std::exception& exc) {
     throw hpp::Error(exc.what());
   }
