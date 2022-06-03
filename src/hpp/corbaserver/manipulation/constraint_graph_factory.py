@@ -976,10 +976,12 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
             # Add placement complement constraint to edge linking
             # from intersec to preplace
             if intersec and preplace and self.preplaceGuide:
-                self.graph.addConstraints(edge = wTransitions[pregrasp + intersec][0],
-                                        constraints = pcc)
-                self.graph.addConstraints(edge = wTransitions[pregrasp + intersec][1],
-                                        constraints = pcc)
+                self.graph.addConstraints(
+                    edge=wTransitions[pregrasp + intersec][0], constraints=pcc
+                )
+                self.graph.addConstraints(
+                    edge=wTransitions[pregrasp + intersec][1], constraints=pcc
+                )
             # Set all to short except first one.
             for i in range(nTransitions - 1):
                 self.graph.setShort(wTransitions[i + 1][0], True)
@@ -1027,4 +1029,5 @@ class ConstraintGraphFactory(GraphFactoryAbstract):
     # to the transition between intersec and preplace (if available)
     def setPreplaceGuide(self, preplaceGuide):
         self.preplaceGuide = preplaceGuide
+
     # # \}
