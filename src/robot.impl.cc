@@ -155,7 +155,7 @@ void Robot::insertRobotModelFromString(const char* robotName,
                                        const char* urdfString,
                                        const char* srdfString) {
   insertRobotModelOnFrameFromString(robotName, "universe", rootJointType,
-      urdfString, srdfString);
+                                    urdfString, srdfString);
 }
 
 void Robot::insertRobotModelOnFrameFromString(const char* robotName,
