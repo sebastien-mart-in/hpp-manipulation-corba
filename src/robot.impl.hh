@@ -60,6 +60,12 @@ class Robot : public virtual POA_hpp::corbaserver::manipulation::Robot {
                                           const char* urdfString,
                                           const char* srdfString);
 
+  virtual void insertRobotModelOnFrameFromString(const char* robotName,
+                                                 const char* frameName,
+                                                 const char* rootJointType,
+                                                 const char* urdfString,
+                                                 const char* srdfString);
+
   virtual void insertRobotSRDFModel(const char* robotName,
                                     const char* srdfPath);
 

@@ -51,7 +51,8 @@ module hpp
         in string urdfname, in string srdfname)
       raises (Error);
 
-    /// \copydoc hpp::corbaserver::manipulation::robot::Robot::insertRobotModelOnFrame
+    /// \copydoc hpp::corbaserver::manipulation::Robot::insertRobotModel
+    /// \param frameName existing frame onto which the robot should be loaded.
     void insertRobotModelOnFrame (in string robotName, in string frameName,
         in string rootJointType, in string urdfname, in string srdfname)
       raises (Error);
@@ -66,6 +67,12 @@ module hpp
     /// \param srdfString srdf file. Can be empty.
     void insertRobotModelFromString (in string robotName, in string rootJointType,
         in string urdfString, in string srdfString)
+      raises (Error);
+
+    /// \copydoc hpp::corbaserver::manipulation::Robot::insertRobotModelFromString
+    /// \param frameName existing frame onto which the robot should be loaded.
+    void insertRobotModelOnFrameFromString (in string robotName, in string frameName,
+        in string rootJointType, in string urdfString, in string srdfString)
       raises (Error);
 
     /// Load a SRDF for the robot. Several SRDF can thus be loaded for the same
