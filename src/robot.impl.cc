@@ -154,13 +154,25 @@ void Robot::insertRobotModelFromString(const char* robotName,
                                        const char* rootJointType,
                                        const char* urdfString,
                                        const char* srdfString) {
+  insertRobotModelOnFrameFromString(robotName, "universe", rootJointType,
+                                    urdfString, srdfString);
+}
+
+void Robot::insertRobotModelOnFrameFromString(const char* robotName,
+                                              const char* frameName,
+                                              const char* rootJointType,
+                                              const char* urdfString,
+                                              const char* srdfString) {
   try {
     DevicePtr_t robot = getOrCreateRobot(problemSolver());
     if (robot->robotFrames(robotName).size() > 0)
       HPP_THROW(std::invalid_argument,
                 "A robot named " << robotName << " already exists");
+    if (!robot->model().existFrame(frameName))
+      HPP_THROW(std::invalid_argument, "No frame named " << frameName << ".");
+    pinocchio::FrameIndex frame = robot->model().getFrameId(frameName);
 
-    pinocchio::urdf::loadModelFromString(robot, 0, robotName, rootJointType,
+    pinocchio::urdf::loadModelFromString(robot, frame, robotName, rootJointType,
                                          urdfString, srdfString);
     srdf::loadModelFromXML(robot, robotName, srdfString);
     problemSolver()->resetProblem();

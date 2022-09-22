@@ -145,7 +145,7 @@ class Robot(Parent):
         self.rebuildRanks()
 
     def insertRobotModelFromString(
-        self, robotName, rootJointType, urdfString, srdfString
+        self, robotName, rootJointType, urdfString, srdfString, frame="universe"
     ):
         """
         Same as Robot.insertRobotModel
@@ -154,8 +154,8 @@ class Robot(Parent):
         \\param srdfString XML string of the SRDF
         """
         if self.load:
-            self.client.manipulation.robot.insertRobotModelFromString(
-                robotName, rootJointType, urdfString, srdfString
+            self.client.manipulation.robot.insertRobotModelOnFrameFromString(
+                robotName, frame, rootJointType, urdfString, srdfString
             )
         self.robotNames.append(robotName)
         self.rootJointType[robotName] = rootJointType
