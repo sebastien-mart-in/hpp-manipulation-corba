@@ -1,57 +1,49 @@
-# Copyright (c) 2012, 2020 CNRS
-# Author: Florent Lamiraux, Guilhem Saurel
+# Copyright (c) 2012, 2020 CNRS Author: Florent Lamiraux, Guilhem Saurel
 #
 
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are
-# met:
+# modification, are permitted provided that the following conditions are met:
 #
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
+# 1. Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
 #
-# 2. Redistributions in binary form must reproduce the above copyright
-# notice, this list of conditions and the following disclaimer in the
-# documentation and/or other materials provided with the distribution.
+# 1. Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-# DAMAGE.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-SET(LIBRARY_NAME ${PROJECT_NAME})
-SET(IDL_SOURCES
-  gcommon
-  graph
-  problem
-  robot
-)
+set(LIBRARY_NAME ${PROJECT_NAME})
+set(IDL_SOURCES gcommon graph problem robot)
 
-INCLUDE(${HPP_CORBASERVER_CMAKE_PLUGIN})
-INCLUDE(${HPP_CORBASERVER_OMNIIDL_CMAKE})
-OMNIIDL_INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}/idl ${HPP_CORBASERVER_DATAROOTDIR}/idl
-  )
+include(${HPP_CORBASERVER_CMAKE_PLUGIN})
+include(${HPP_CORBASERVER_OMNIIDL_CMAKE})
+omniidl_include_directories(${CMAKE_SOURCE_DIR}/idl
+                            ${HPP_CORBASERVER_DATAROOTDIR}/idl)
 
-INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/src)
+include_directories(${CMAKE_BINARY_DIR}/src)
 
-FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation)
-FOREACH(IDL ${IDL_SOURCES})
-  GENERATE_IDL_CPP (hpp/corbaserver/manipulation/${IDL}
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation)
+foreach(IDL ${IDL_SOURCES})
+  generate_idl_cpp(
+    hpp/corbaserver/manipulation/${IDL}
+    ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation ARGUMENTS
+    -Wbguard_prefix=hpp_manipulation_corba_idl HEADER_SUFFIX -idl.hh)
+  generate_idl_python(
+    ${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
-    ARGUMENTS
-    -Wbguard_prefix=hpp_manipulation_corba_idl
-    HEADER_SUFFIX -idl.hh)
-  GENERATE_IDL_PYTHON (${IDL} ${CMAKE_SOURCE_DIR}/idl/hpp/corbaserver/manipulation
     ENABLE_DOCSTRING
-    STUBS hpp_stubs.corbaserver.manipulation
+    STUBS
+    hpp_stubs.corbaserver.manipulation
     ARGUMENTS
     -Wbmodules=hpp_idl
     -Wbextern=common:hpp_stubs
@@ -65,29 +57,31 @@ FOREACH(IDL ${IDL_SOURCES})
     -Wbextern=path_planners:hpp_stubs.core
     -Wbextern=distances:hpp_stubs.core
     -Wbextern=_graph:hpp_stubs.manipulation
-    -Wbextern=_path_planners:hpp_stubs.manipulation
-    )
-  INSTALL(
+    -Wbextern=_path_planners:hpp_stubs.manipulation)
+  install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/corbaserver/manipulation/${IDL}-idl.hh
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/corbaserver/manipulation)
-ENDFOREACH()
+endforeach()
 
-FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl)
-FOREACH(IDL steering_methods _graph _problem _path_planners device)
-  GENERATE_IDL_CPP (hpp/manipulation_idl/${IDL}
-    ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
-    ARGUMENTS
-    -Wbguard_prefix=hpp_manipulation_idl
-    HEADER_SUFFIX -idl.hh)
-  GENERATE_IDL_CPP_IMPL (hpp/manipulation_idl/${IDL}
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl)
+foreach(IDL steering_methods _graph _problem _path_planners device)
+  generate_idl_cpp(
+    hpp/manipulation_idl/${IDL} ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
+    ARGUMENTS -Wbguard_prefix=hpp_manipulation_idl HEADER_SUFFIX -idl.hh)
+  generate_idl_cpp_impl(
+    hpp/manipulation_idl/${IDL}
     ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
     ARGUMENTS
     -Wbguard_prefix=hpp_manipulation_idl
     -Wbinc_prefix=hpp/manipulation_idl
-    HH_SUFFIX -idl.hh)
-  GENERATE_IDL_PYTHON (${IDL} ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
+    HH_SUFFIX
+    -idl.hh)
+  generate_idl_python(
+    ${IDL}
+    ${CMAKE_SOURCE_DIR}/idl/hpp/manipulation_idl
     ENABLE_DOCSTRING
-    STUBS hpp_stubs.manipulation
+    STUBS
+    hpp_stubs.manipulation
     ARGUMENTS
     -Wbmodules=hpp_idl
     -Wbextern=common:hpp_stubs
@@ -102,47 +96,44 @@ FOREACH(IDL steering_methods _graph _problem _path_planners device)
     -Wbextern=configuration_shooters:hpp_stubs.core
     -Wbextern=_constraints:hpp_stubs.core
     -Wbextern=_problem:hpp_stubs.core
-    -Wbextern=path_planners:hpp_stubs.core
-    )
-  INSTALL(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-idl.hh
-    ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}.hh
-    ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-fwd.hh
+    -Wbextern=path_planners:hpp_stubs.core)
+  install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-idl.hh
+          ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}.hh
+          ${CMAKE_CURRENT_BINARY_DIR}/hpp/manipulation_idl/${IDL}-fwd.hh
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpp/manipulation_idl)
-ENDFOREACH()
+endforeach()
 
-INSTALL(
-  DIRECTORY ${CMAKE_SOURCE_DIR}/idl/hpp
-  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/idl/)
-INSTALL(
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/idl/hpp
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/idl/)
+install(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_idl/hpp/corbaserver/manipulation
   DESTINATION ${PYTHON_SITELIB}/hpp_idl/hpp/corbaserver)
-INSTALL(
-  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_idl/hpp/manipulation_idl
-  DESTINATION ${PYTHON_SITELIB}/hpp_idl/hpp/)
-INSTALL(
-  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_stubs/corbaserver/manipulation
-  DESTINATION ${PYTHON_SITELIB}/hpp_stubs/corbaserver)
-INSTALL(
-  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_stubs/manipulation
-  DESTINATION ${PYTHON_SITELIB}/hpp_stubs)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_idl/hpp/manipulation_idl
+        DESTINATION ${PYTHON_SITELIB}/hpp_idl/hpp/)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_stubs/corbaserver/manipulation
+        DESTINATION ${PYTHON_SITELIB}/hpp_stubs/corbaserver)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hpp_stubs/manipulation
+        DESTINATION ${PYTHON_SITELIB}/hpp_stubs)
 
-ADD_CUSTOM_TARGET(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS} ${ALL_IDL_CPP_IMPL_STUBS})
-ADD_CUSTOM_TARGET(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
+add_custom_target(generate_idl_cpp DEPENDS ${ALL_IDL_CPP_STUBS}
+                                           ${ALL_IDL_CPP_IMPL_STUBS})
+add_custom_target(generate_idl_python DEPENDS ${ALL_IDL_PYTHON_STUBS})
 
-ADD_LIBRARY(${LIBRARY_NAME} SHARED
-  ${ALL_IDL_CPP_STUBS}
-  client.cc
-  )
+add_library(${LIBRARY_NAME} SHARED ${ALL_IDL_CPP_STUBS} client.cc)
 
-TARGET_LINK_LIBRARIES(${LIBRARY_NAME} PUBLIC hpp-corbaserver::hpp-corbaserver)
-PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} omniORB4)
+target_link_libraries(${LIBRARY_NAME} PUBLIC hpp-corbaserver::hpp-corbaserver)
+pkg_config_use_dependency(${LIBRARY_NAME} omniORB4)
 
-INSTALL(TARGETS ${LIBRARY_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
+install(
+  TARGETS ${LIBRARY_NAME}
+  EXPORT ${TARGETS_EXPORT_NAME}
+  DESTINATION lib)
 
-IF (NOT CLIENT_ONLY)
+if(NOT CLIENT_ONLY)
   # Server plugin
-  HPP_ADD_SERVER_PLUGIN(manipulation-corba
+  hpp_add_server_plugin(
+    manipulation-corba
     SOURCES
     ${ALL_IDL_CPP_IMPL_STUBS}
     graph.impl.cc
@@ -153,25 +144,30 @@ IF (NOT CLIENT_ONLY)
     robot.impl.hh
     server.cc
     tools.cc # Should be moved into the library
-    LINK_DEPENDENCIES PUBLIC ${LIBRARY_NAME} hpp-manipulation-urdf::hpp-manipulation-urdf
-    PKG_CONFIG_DEPENDENCIES omniORB4)
-
+    LINK_DEPENDENCIES
+    PUBLIC
+    ${LIBRARY_NAME}
+    hpp-manipulation-urdf::hpp-manipulation-urdf
+    PKG_CONFIG_DEPENDENCIES
+    omniORB4)
 
   # Stand alone corba server
-  ADD_EXECUTABLE (hpp-manipulation-server hpp-manipulation-corba.cc)
-  TARGET_LINK_LIBRARIES (hpp-manipulation-server PUBLIC ${LIBRARY_NAME} hpp-manipulation-urdf::hpp-manipulation-urdf)
+  add_executable(hpp-manipulation-server hpp-manipulation-corba.cc)
+  target_link_libraries(
+    hpp-manipulation-server PUBLIC ${LIBRARY_NAME}
+                                   hpp-manipulation-urdf::hpp-manipulation-urdf)
 
-  INSTALL (TARGETS hpp-manipulation-server DESTINATION ${CMAKE_INSTALL_BINDIR})
-ENDIF (NOT CLIENT_ONLY)
+  install(TARGETS hpp-manipulation-server DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif(NOT CLIENT_ONLY)
 
-ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_cpp)
-ADD_DEPENDENCIES (${LIBRARY_NAME} generate_idl_python)
+add_dependencies(${LIBRARY_NAME} generate_idl_cpp)
+add_dependencies(${LIBRARY_NAME} generate_idl_python)
 
-PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation __init__.py)
-PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation client.py)
-PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation problem_solver.py)
-PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation robot.py)
-PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation constraints.py)
-PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation constraint_graph.py)
-PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation constraint_graph_factory.py)
-PYTHON_INSTALL_ON_SITE(hpp/corbaserver/manipulation security_margins.py)
+python_install_on_site(hpp/corbaserver/manipulation __init__.py)
+python_install_on_site(hpp/corbaserver/manipulation client.py)
+python_install_on_site(hpp/corbaserver/manipulation problem_solver.py)
+python_install_on_site(hpp/corbaserver/manipulation robot.py)
+python_install_on_site(hpp/corbaserver/manipulation constraints.py)
+python_install_on_site(hpp/corbaserver/manipulation constraint_graph.py)
+python_install_on_site(hpp/corbaserver/manipulation constraint_graph_factory.py)
+python_install_on_site(hpp/corbaserver/manipulation security_margins.py)
