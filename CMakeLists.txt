@@ -53,15 +53,17 @@ if(NOT CLIENT_ONLY)
       include/hpp/corbaserver/manipulation/fwd.hh ${${PROJECT_NAME}_HEADERS})
 endif(NOT CLIENT_ONLY)
 
-# search for python
-findpython()
-
 add_project_dependency("hpp-corbaserver" REQUIRED)
 if(NOT CLIENT_ONLY)
   add_project_dependency("hpp-manipulation" REQUIRED)
   add_project_dependency("hpp-manipulation-urdf" REQUIRED)
 endif(NOT CLIENT_ONLY)
 add_required_dependency("omniORB4 >= 4.1.4")
+
+# search for python
+if(NOT FINDPYTHON_ALREADY_CALLED)
+  findpython()
+endif()
 
 add_subdirectory(src)
 
