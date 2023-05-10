@@ -31,6 +31,8 @@
 
 #include <hpp/core_idl/path_planners.idl>
 #include <hpp/manipulation_idl/_graph.idl>
+#include <hpp/core_idl/paths.idl>
+
 
 module hpp
 {
@@ -48,7 +50,7 @@ module hpp
       {
       }; // interface IkSolverInitialization
 
-      interface EndEffectorTrajectory : core_idl::PathPlanner
+      interface EET_PIECEWISE : core_idl::PathPlanner
       {
         long getNRandomConfig (         ) raises (Error);
         //-> nRandomConfig
@@ -67,7 +69,28 @@ module hpp
 
         void setIkSolverInitialization (in IkSolverInitialization solver);
         //-> ikSolverInitialization
-      }; // interface EndEffectorTrajectory
+      }; // interface EET_PIECEWISE
+
+      interface EET_HERMITE : core_idl::PathPlanner
+      {
+        long getNRandomConfig (         ) raises (Error);
+        //-> nRandomConfig
+        void setNRandomConfig (in long n) raises (Error);
+        //-> nRandomConfig
+
+        long getNDiscreteSteps (         ) raises (Error);
+        //-> nDiscreteSteps
+        void setNDiscreteSteps (in long n) raises (Error);
+        //-> nDiscreteSteps
+
+        boolean getCheckFeasibilityOnly (            ) raises (Error);
+        //-> checkFeasibilityOnly
+        void    setCheckFeasibilityOnly (in boolean n) raises (Error);
+        //-> checkFeasibilityOnly
+
+        void setIkSolverInitialization (in IkSolverInitialization solver);
+        //-> ikSolverInitialization
+      }; // interface EET_HERMITE
     }; // module pathPlanner_idl
   }; // module manipulation_idl
 }; // module hpp
@@ -77,5 +100,6 @@ module hpp
 //* #include <hpp/core_idl/path_planners.hh>
 //* #include <hpp/manipulation_idl/_graph-fwd.hh>
 //* #include <hpp/manipulation/roadmap.hh>
+
 
 #endif // HPP_MANIPULATION_CORBA_PATH_PLANNERS_IDL
