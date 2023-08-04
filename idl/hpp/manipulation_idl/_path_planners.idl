@@ -50,7 +50,7 @@ module hpp
       {
       }; // interface IkSolverInitialization
 
-      interface EET_PIECEWISE : core_idl::PathPlanner
+      interface EndEffectorTrajectory : core_idl::PathPlanner
       {
         long getNRandomConfig (         ) raises (Error);
         //-> nRandomConfig
@@ -69,7 +69,7 @@ module hpp
 
         void setIkSolverInitialization (in IkSolverInitialization solver);
         //-> ikSolverInitialization
-      }; // interface EET_PIECEWISE
+      }; // interface EndEffectorTrajectory
 
       interface EET_HERMITE : core_idl::PathPlanner
       {
