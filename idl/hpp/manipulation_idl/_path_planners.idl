@@ -83,6 +83,10 @@ module hpp
         void setNDiscreteSteps (in long n) raises (Error);
         //-> nDiscreteSteps
 
+        long get_M_value (         ) raises (Error);
+
+        void set_M_value (in long M) raises (Error);
+
         boolean getCheckFeasibilityOnly (            ) raises (Error);
         //-> checkFeasibilityOnly
         void    setCheckFeasibilityOnly (in boolean n) raises (Error);
